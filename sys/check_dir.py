@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 
 
+
 def check_exists(myPath):
 
 	"""check if the path exists"""
