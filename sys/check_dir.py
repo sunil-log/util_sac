@@ -56,3 +56,4 @@ if __name__ == "__main__":
 
 	directory = Path("path/to/directory")
 	renew_command.execute(directory)
+
