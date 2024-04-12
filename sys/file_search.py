@@ -24,7 +24,11 @@ class FileSearcher:
 
 	def _create_dataframe(self, file_paths: List[Path]) -> pd.DataFrame:
 		try:
-			data = {"File Path": file_paths}
+			data = {
+				"File Path": file_paths,
+				"Parent": [path.parent for path in file_paths],
+				"Stem": [path.stem for path in file_paths]
+			}
 			return pd.DataFrame(data)
 		except Exception as e:
 			raise FileSearchError(f"Error occurred while creating DataFrame: {e}")
