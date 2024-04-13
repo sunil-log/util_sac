@@ -7,7 +7,11 @@ import zipfile
 import os
 
 
-from util_sac.sys.check_dir import renew_dir
+from util_sac.sys.check_dir import FileSystemManager, RenewDirectoryCommand
+fs_manager = FileSystemManager()
+renew_command = RenewDirectoryCommand(fs_manager)
+
+
 from glob import glob
 import subprocess
 import pandas as pd
@@ -29,7 +33,7 @@ def unzip_all(src, dst):
 
 	
 	# unzip all
-	renew_dir(dst)
+	renew_command.execute(dst)
 	for ifn in fns:
 		print(f"> unzipping {ifn}")
 		subprocess.call(['unzip', ifn, "-d", f"./{dst}/"])
