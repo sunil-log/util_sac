@@ -32,13 +32,13 @@ class DataProcessor(ABC):
 	def process_data(self, file_path: Path) -> Union[list, tuple, set, dict, np.array]:
 		pass
 
-
 class ConcreteDataProcessor(DataProcessor):
 	def process_data(self, file_path: Path) -> Union[list, tuple, set, dict, np.array]:
 		# Implement the data processing logic here
 		# This is just a placeholder example
 		data = np.array([1, 2, 3, 4, 5])
 		return data
+
 
 class PathProcessor:
 	def __init__(self, data_path: str, unnecessary_path: str, save_dir: str, save_filename: str, data_description: str, processor: DataProcessor):
