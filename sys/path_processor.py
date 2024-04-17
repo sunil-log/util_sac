@@ -20,24 +20,48 @@
 """
 
 
-import numpy as np
-import os
+from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Union
+from typing import Union, Callable
+import numpy as np
+from datetime import datetime
+import glob
+
+class DataProcessor(ABC):
+	@abstractmethod
+	def process_data(self, file_path: Path) -> Union[list, tuple, set, dict, np.array]:
+		pass
+
+
+class ConcreteDataProcessor(DataProcessor):
+	def process_data(self, file_path: Path) -> Union[list, tuple, set, dict, np.array]:
+		# Implement the data processing logic here
+		# This is just a placeholder example
+		data = np.array([1, 2, 3, 4, 5])
+		return data
 
 class PathProcessor:
-	def __init__(self, data_path: str, unnecessary_path: str, save_dir: str, save_filename: str):
+	def __init__(self, data_path: str, unnecessary_path: str, save_dir: str, save_filename: str, data_description: str, processor: DataProcessor):
 		self.data_path = Path(data_path)
 		self.unnecessary_path = Path(unnecessary_path)
 		self.save_dir = Path(save_dir)
 		self.save_filename = save_filename
+		self.data_description = data_description
+		self.processor = processor
 
-	def process_and_save(self, data: Union[list, tuple, set, dict, np.array]) -> None:
+	def process_and_save(self) -> None:
 		try:
 			self._validate_paths()
-			processed_path = self._remove_unnecessary_path()
+			processed_path = self._remove_unnecessary_path(self.data_path)
 			save_path = self._create_save_path(processed_path)
-			self._save_data(save_path, data)
+			if not save_path.exists():
+				data = self.processor.process_data(self.data_path)
+				self._save_data(save_path, data)
+				self._save_data_description(save_path)
+			else:
+				print(f"Skipping processing for {self.data_path} as {save_path} already exists.")
+
+
 		except (ValueError, OSError) as e:
 			print(f"Error occurred: {str(e)}")
 
@@ -47,8 +71,12 @@ class PathProcessor:
 		if not self.unnecessary_path.is_dir():
 			raise ValueError(f"Invalid unnecessary path: {self.unnecessary_path}")
 
-	def _remove_unnecessary_path(self) -> Path:
-		return self.data_path.relative_to(self.unnecessary_path)
+
+	def _get_file_paths(self) -> list[Path]:
+		return [Path(file_path) for file_path in glob.glob(str(self.data_dir / "**" / "*.h5"), recursive=True)]
+
+	def _remove_unnecessary_path(self, file_path: Path) -> Path:
+		return file_path.relative_to(self.unnecessary_path)
 
 	def _create_save_path(self, processed_path: Path) -> Path:
 		save_path = self.save_dir / processed_path.parent / self.save_filename
@@ -60,23 +88,30 @@ class PathProcessor:
 			np.save(str(save_path), data)
 		except ImportError:
 			raise ImportError("NumPy library is required to save the data.")
-		print(f"Data saved to: {save_path}")
+		print(f"\033[92mData saved to: {save_path}\033[0m")
 
-
-
+	def _save_data_description(self, save_path: Path) -> None:
+		description_path = save_path.with_name(f"{self.save_filename}_description.txt")
+		if description_path.exists():
+			return
+		current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		description_content = f"Time: {current_time}\nFilename: {self.save_filename}\nDescription: {self.data_description}"
+		with open(description_path, 'w') as file:
+			file.write(description_content)
 
 # Usage example
 if __name__ == '__main__':
-	data_location = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/대전성모병원/PSG group 2 (PD without RBD)/edf1/raw_microvolt.h5"
+	data_location = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/대전성모병원/PSG group 2 (PD without RBD)/edf1/"
 	unnecessary_path = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/"
 	save_location = "./"
 	save_filename = "data.npy"
+	data_description = "This is a sample data description."
+
+	# Create an instance of ConcreteDataProcessor
+	data_processor = ConcreteDataProcessor()
 
 	# Create an instance of PathProcessor
-	path_processor = PathProcessor(data_location, unnecessary_path, save_location, save_filename)
+	path_processor = PathProcessor(data_location, unnecessary_path, save_location, save_filename, data_description, data_processor)
 
-	# Assuming you have already loaded the data from the h5 file
-	data = np.array([1, 2, 3, 4, 5])  # Replace with your actual data
-
-	# Process the path and save the data
-	path_processor.process_and_save(data)
+	# Process the files and save the data
+	path_processor.process_and_save()
