@@ -41,6 +41,38 @@ class ConcreteDataProcessor(DataProcessor):
 
 
 class PathProcessor:
+
+	"""
+	Processor 와 data 를 받아서 처하고, 그것을 directory 의 구조를 유지하면서 저장한다.
+
+	예시:
+	    # data.npy 파일을 './대전성모병원/PSG group 2 (PD without RBD)/edf1/'에 저장
+	    data_path = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/대전성모병원/PSG group 2 (PD without RBD)/edf1/raw_microvolt.h5"
+	    unwanted_path = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/"
+	    save_location = './'
+	    file_name = 'data.npy'
+
+	속성:
+	    data_path (Path): 데이터 파일의 경로입니다.
+	    unnecessary_path (Path): 처리된 파일 경로에서 제거될 경로입니다.
+	    save_dir (Path): 처리된 데이터가 저장될 디렉토리입니다.
+	    save_filename (str): 저장된 데이터의 파일 이름입니다.
+	    data_description (str): 처리되는 데이터에 대한 설명입니다.
+	    processor (DataProcessor): 데이터를 처리하기 위한 DataProcessor 서브클래스의 인스턴스입니다.
+
+	메소드:
+	    process_and_save(): 데이터 파일을 처리하고 처리된 데이터를 저장합니다.
+	    _validate_paths(): 제공된 데이터 및 불필요한 경로를 검증합니다.
+	    _remove_unnecessary_path(file_path: Path) -> Path: 파일 경로에서 불필요한 경로를 제거합니다.
+	    _create_save_path(processed_path: Path) -> Path: 처리된 데이터를 저장할 경로를 생성합니다.
+	    _save_data(save_path: Path, data: Union[list, tuple, set, dict, np.array]) -> None: 처리된 데이터를 저장합니다.
+	    _save_data_description(save_path: Path) -> None: 처리된 데이터에 대한 설명 파일을 저장합니다.
+
+	사용 방법:
+	    필요한 속성을 제공하여 PathProcessor 인스턴스를 생성합니다.
+	    process_and_save() 메소드를 호출하여 데이터 파일을 처리하고 처리된 데이터를 저장합니다.
+	"""
+
 	def __init__(self, data_path: str, unnecessary_path: str, save_dir: str, save_filename: str, data_description: str, processor: DataProcessor):
 		self.data_path = Path(data_path)
 		self.unnecessary_path = Path(unnecessary_path)
