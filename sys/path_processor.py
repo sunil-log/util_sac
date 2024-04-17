@@ -1,22 +1,3 @@
-"""
-
-
-사용 방법:
-1. 데이터 파일의 전체 경로, 제거하고 싶은 경로 부분, 저장하고자 하는 위치 및 파일 이름을 지정합니다.
-2. 데이터(numpy array)와 함께 이 정보를 함수나 클래스에 전달하여 데이터를 적절한 위치에 저장합니다.
-
-예시:
-    # data.npy 파일을 './대전성모병원/PSG group 2 (PD without RBD)/edf1/'에 저장
-    data_path = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/대전성모병원/PSG group 2 (PD without RBD)/edf1/raw_microvolt.h5"
-    unwanted_path = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/"
-    save_location = './'
-    file_name = 'data.npy'
-    save_data_as_npy(data, data_path, unwanted_path, save_location, file_name)
-
-이 모듈은 파일 읽기 기능을 포함하지 않으며, 주어진 numpy array 데이터를 받아 path 를 처리하고 저장하는 역할만을 합니다.
-"""
-
-
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Union, Callable
