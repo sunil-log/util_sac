@@ -22,7 +22,7 @@
 
 """
 
-
+import numpy as np
 import os
 from pathlib import Path
 from typing import Union
@@ -34,7 +34,7 @@ class PathProcessor:
 		self.save_dir = Path(save_dir)
 		self.save_filename = save_filename
 
-	def process_and_save(self, data: Union[list, tuple, set, dict]) -> None:
+	def process_and_save(self, data: Union[list, tuple, set, dict, np.array]) -> None:
 		try:
 			self._validate_paths()
 			processed_path = self._remove_unnecessary_path()
@@ -57,15 +57,17 @@ class PathProcessor:
 		save_path.parent.mkdir(parents=True, exist_ok=True)
 		return save_path
 
-	def _save_data(self, save_path: Path, data: Union[list, tuple, set, dict]) -> None:
+	def _save_data(self, save_path: Path, data: Union[list, tuple, set, dict, np.array]) -> None:
 		try:
-			import numpy as np
 			np.save(str(save_path), data)
 		except ImportError:
 			raise ImportError("NumPy library is required to save the data.")
+		print(f"Data saved to: {save_path}")
 
 
-"""
+
+
+# Usage example
 if __name__ == '__main__':
 	data_location = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/대전성모병원/PSG group 2 (PD without RBD)/edf1/raw_microvolt.h5"
 	unnecessary_path = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/"
@@ -80,4 +82,3 @@ if __name__ == '__main__':
 
 	# Process the path and save the data
 	path_processor.process_and_save(data)
-"""
