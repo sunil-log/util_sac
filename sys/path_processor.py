@@ -1,26 +1,24 @@
 """
-다음과 같은 file 이 있어
-/media/sac/WD4T/Projects_backup/eeg_data/RBD/대전성모병원/PSG group 2 (PD without RBD)/edf1/raw_microvolt.h5
+기능:
+- 원본 데이터 파일의 경로에서 필요없는 부분을 제거하고, 원하는 위치에 데이터 파일을 저장합니다.
+- 지정된 디렉토리 구조가 존재하지 않는 경우, 필요에 따라 디렉토리를 생성합니다.
+- numpy array 형식의 데이터를 .npy 파일로 저장합니다.
 
+사용 방법:
+1. 데이터 파일의 전체 경로, 제거하고 싶은 경로 부분, 저장하고자 하는 위치 및 파일 이름을 지정합니다.
+2. 데이터(numpy array)와 함께 이 정보를 함수나 클래스에 전달하여 데이터를 적절한 위치에 저장합니다.
 
-내가 이 "raw_microvolt.h5" 을 열어서 data 라는 np.array 를 만들고 이것을 저장하려고 해.
-그런데 이것을 ./대전성모병원/PSG group 2 (PD without RBD)/edf1/data.npy 로 저장을 하고 싶어.
+예시:
+    # data.npy 파일을 './대전성모병원/PSG group 2 (PD without RBD)/edf1/'에 저장
+    data_path = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/대전성모병원/PSG group 2 (PD without RBD)/edf1/raw_microvolt.h5"
+    unwanted_path = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/"
+    save_location = './'
+    file_name = 'data.npy'
+    save_data_as_npy(data, data_path, unwanted_path, save_location, file_name)
 
-나는 이 작업을 하는 function 이나 class 에 다음 3개의 정보를 줘서 해결하고 싶어.
-- data 위치: "/media/sac/WD4T/Projects_backup/eeg_data/RBD/대전성모병원/PSG group 2 (PD without RBD)/edf1/raw_microvolt.h5"
-- 필요없는 path: /media/sac/WD4T/Projects_backup/eeg_data/RBD/
-- 저장하고자 하는 위치: './'
-- 저장하자 하는 파일 이름: data.npy
-- data: np.array
-
-이 function 혹은 class 는 "data 위치" 에서 "필요없는 path" 를 지우고 대신 "저장하고자 하는 위치" 를 넣고, 파일이름을 붙여.
-그리고 directory 가 존재하지 않으면 reculsive 하게 만들어서 저장하게 하고 싶어.
-
-그러한 function 혹은 class 를 만들어줘.
-
-이 모듈은 내부에서 h5 파일을 열 필요 없고, 그냥 path 의 processing 과 저장만 담당하면 돼
-
+이 모듈은 파일 읽기 기능을 포함하지 않으며, 주어진 numpy array 데이터를 받아 path 를 처리하고 저장하는 역할만을 합니다.
 """
+
 
 import numpy as np
 import os
