@@ -69,6 +69,36 @@ def zip_files_df(df, fn_zip):
 	print(f"\n> size of the zip file: {os.path.getsize(fn_zip)/1e6:.2f} MB")
 
 
+
+def backup_keywords(fn_zip, key_in, key_out, src_loc="."):
+
+	"""
+	1. find files having some keywords in the file name
+	2. exclude files having some keywords in the file name
+	3. zip them and copy it to ./backup
+	"""
+
+	# find files having some keywords in the file name
+	df = search_files_by_pattern('.', r".*$")
+	"""
+		                                               File Path                        Parent                               Stem
+	0                                                 Dockerfile                             .                         Dockerfile
+	1                                              docker_run.sh                             .                         docker_run
+	2                                       docker_entrypoint.sh                             .                  docker_entrypoint
+	
+	# key_in and key_out
+	key_in = [".py", ".m", ".sh", ".txt", "Dockerfile"]
+	key_out = [".pyc", ".png", ".npy", "__pycache__", '.npz', '.pkl', '.zip', '.mat']
+	"""
+
+	# key_in and key_out
+	df = df[df['File Path'].apply(lambda x: any([k in str(x) for k in key_in]))]
+	df = df[~df['File Path'].apply(lambda x: any([k in str(x) for k in key_out]))]
+
+	# zip all
+	zip_files_df(df, fn_zip)
+
+
 def main():
 	pass
 
