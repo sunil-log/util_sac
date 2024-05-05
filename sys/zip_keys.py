@@ -40,67 +40,37 @@ def unzip_all(src, dst):
 
 
 
-def backup_keywords(fn_zip, key_must, key_in, key_out, src_loc="."):
+def zip_files_df(df, fn_zip):
 
 	"""
-	make zip file of given list of files
+	                             File Path             Parent                        Stem
+	1                        docker_run.sh                  .                  docker_run
+	2                 docker_entrypoint.sh                  .           docker_entrypoint
+	5                           bus_all.py                  .                     bus_all
+	6            src/99_batch_size_test.py                src          99_batch_size_test
+	7       src/03_collect_channel_data.py                src     03_collect_channel_data
 	"""
 
-	"""
-	1. get list of files to zip
-		find all files having extension 'py' or 'sh' or 'txt' from the all subdirs of the current dir
-	"""
+	# apply absolute path
+	df['File Path'] = df['File Path'].apply(lambda x: os.path.abspath(x))
 
-	"""
-	absolute path of src_loc
-		src_loc = ".." 인 경우가 있음. 이러면 문제가 발생할 수 있어서, 절대경로로 바꿔줌
-	"""
-	src_loc = os.path.abspath(src_loc)
+	# remove common path
+	common_path = os.path.commonpath(df['File Path'].tolist())
 
-	# find all files
-	fns = glob(f'{src_loc}/**/*.*', recursive=True)
-	print(f"found {len(fns)} files")
-
-	# make pandas dataframe
-	df = pd.DataFrame(fns, columns=['fn'])
-
-
-	"""
-	2. exclude some files	
-	"""
-	# take only include "util_sac" and "sys"
-	for ikey in key_must:
-		df = df[df['fn'].str.contains(ikey)]
-
-	# take only include "py" or "sh" or "txt"
-	df = df[df['fn'].str.contains('|'.join(key_in))]
-
-	# exclude "pyc" or "res"
-	df = df[~df['fn'].str.contains('|'.join(key_out))]
-
-	# print message for reduced list of files
-	print(f"reduced list of files: {df.shape[0]}")
-	print(df)
-
-
-	"""
-	3. make zip file of the list of files using zipfile
-	"""
-
-
-	# make zip file
-	with zipfile.ZipFile(fn_zip, 'w') as myzip:
-		for ifn in df['fn']:
-			myzip.write(ifn)
+	# ZIP 파일 만들기
+	with zipfile.ZipFile(fn_zip, 'w', zipfile.ZIP_DEFLATED) as zf:
+		for file_path in df['File Path']:
+			# 공통 경로 제거하기
+			arcname = os.path.relpath(file_path, common_path)
+			print(f"adding {arcname}")
+			zf.write(file_path, arcname=arcname)
 
 	# print size of the zip file in MB
 	print(f"\n> size of the zip file: {os.path.getsize(fn_zip)/1e6:.2f} MB")
 
 
-
 def main():
 	pass
-
 
 
 if __name__ == '__main__':
