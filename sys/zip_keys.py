@@ -7,10 +7,11 @@ import zipfile
 import os
 
 
-from util_sac.sys.check_dir import FileSystemManager, RenewDirectoryCommand
-fs_manager = FileSystemManager()
-renew_command = RenewDirectoryCommand(fs_manager)
+from util_sac.sys.check_dir import dir_manager
+from util_sac.sys.file_search import search_files_by_pattern
 
+
+fs_manager = dir_manager()
 
 from glob import glob
 import subprocess
@@ -31,13 +32,11 @@ def unzip_all(src, dst):
 	if len(fns) < 1:
 		print("no zip file placed in notion")
 
-	
 	# unzip all
-	renew_command.execute(dst)
+	fs_manager.renew_dir(dst)
 	for ifn in fns:
 		print(f"> unzipping {ifn}")
 		subprocess.call(['unzip', ifn, "-d", f"./{dst}/"])
-
 
 
 

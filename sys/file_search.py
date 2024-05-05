@@ -1,7 +1,8 @@
 import glob
 from pathlib import Path
-from typing import List, Pattern
+from typing import List, Pattern, Union
 import pandas as pd
+import re
 
 
 class FileSearcher:
@@ -18,7 +19,7 @@ class FileSearcher:
 	def _find_files(self, pattern: Pattern) -> List[Path]:
 		try:
 			return [Path(file) for file in glob.glob(str(self.root_dir / "**" / "*"), recursive=True) if
-			        pattern.search(file)]
+					pattern.search(file)]
 		except Exception as e:
 			raise FileSearchError(f"Error occurred while finding files: {e}")
 
@@ -38,8 +39,10 @@ class FileSearchError(Exception):
 	pass
 
 
-def search_files_by_pattern(root_dir: str, pattern: Pattern) -> pd.DataFrame:
+def search_files_by_pattern(root_dir: str, pattern: Union[str, Pattern]) -> pd.DataFrame:
 	try:
+		if isinstance(pattern, str):
+			pattern = re.compile(pattern)
 		searcher = FileSearcher(root_dir)
 		return searcher.search_files(pattern)
 	except FileSearchError as e:
@@ -47,15 +50,10 @@ def search_files_by_pattern(root_dir: str, pattern: Pattern) -> pd.DataFrame:
 		return pd.DataFrame()
 
 
-
 if __name__ == '__main__':
 
-	# Usage example
-
-	import re
 
 	root_directory = "/path/to/root/directory"
-	search_pattern = re.compile(r".*\.txt$")  # 파일 확장자가 .txt인 파일 검색
-
+	search_pattern = r".*\.txt$"  # 파일 확장자가 .txt인 파일 검색
 	result_df = search_files_by_pattern(root_directory, search_pattern)
 	print(result_df)
