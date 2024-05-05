@@ -7,7 +7,7 @@ import zipfile
 import os
 
 
-from util_sac.sys.check_dir import dir_manager
+from util_sac.sys.dir_manager import dir_manager
 from util_sac.sys.file_search import search_files_by_pattern
 
 
