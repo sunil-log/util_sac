@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Union
 import shutil
 
-class FileSystemManager:
+class dir_manager:
 	"""File system management class"""
 
 	def check_exists(self, path: Union[str, Path]) -> bool:
@@ -36,24 +36,18 @@ class FileSystemManager:
 		except OSError as e:
 			print(f"> Creation error: {e}")
 
+	def renew_dir(self, directory: Union[str, Path]) -> None:
+		"""Renew directory by removing it if it exists and then creating it"""
+		self.remove_dir(directory)
+		self.create_dir(directory)
 
-class RenewDirectoryCommand:
-	"""Command for renewing a directory"""
-
-	def __init__(self, file_system_manager: FileSystemManager) -> None:
-		self._file_system_manager = file_system_manager
-
-	def execute(self, directory: Union[str, Path]) -> None:
-		"""Renew directory"""
-		self._file_system_manager.remove_dir(directory)
-		self._file_system_manager.create_dir(directory)
 
 
 # Usage example
 if __name__ == "__main__":
-	fs_manager = FileSystemManager()
-	renew_command = RenewDirectoryCommand(fs_manager)
-
+	fs_manager = dir_manager()
 	directory = Path("path/to/directory")
-	renew_command.execute(directory)
+
+	# renew directory
+	fs_manager.renew_dir(directory)
 
