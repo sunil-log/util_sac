@@ -4,6 +4,11 @@ from typing import List, Pattern, Union
 import pandas as pd
 import re
 
+"""
+이 코드는 지정된 루트 디렉터리 내에서 정규 표현식 패턴에 일치하는 파일을 검색하고, 
+그 결과를 pandas DataFrame으로 반환하는 기능을 수행합니다.
+"""
+
 
 class FileSearcher:
 	def __init__(self, root_dir: str):
