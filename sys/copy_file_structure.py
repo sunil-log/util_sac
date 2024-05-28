@@ -19,7 +19,6 @@ def copy_path(source_path, target_path):
 	source_path 혹은  target_path 는 str 이나 Path() 일 수 있다.
 	"""
 
-
 	# source_path와 target_path를 Path 객체로 변환
 	source = Path(source_path)
 	target = Path(target_path)
