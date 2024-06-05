@@ -16,7 +16,7 @@ class MNIST_dataset(Dataset):
 		return self.data[idx]
 
 
-def prepare_data(train=True):
+def prepare_data(batch_size=64, train=True, flatten=True):
 	"""
 	MNIST class 는 dataloader 에 넣을 때 transform 을 한번에 적용하는 것이 아니라,
 	dataloader 에 의해서 호출될 때마다 transform 을 적용한다. 그래서 느려진다.
@@ -42,12 +42,13 @@ def prepare_data(train=True):
 	print(f"Range of data: [{data.min()}, {data.max()}]")
 
 	# data 를 1차원으로 변환
-	data = data.view(-1, 28*28)
+	if flatten:
+		data = data.view(-1, 28*28)
 
 	# data 를 MNIST_dataset class 로 변환
 	dataset = MNIST_dataset(data)
 
 	# data 를 dataloader 로 변환
-	dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
+	dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 	return dataloader
