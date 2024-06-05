@@ -22,7 +22,7 @@ class MNIST_dataset(Dataset):
 		return self.data[idx], self.targets[idx]
 
 
-def prepare_data(batch_size=64, train=True, flatten=True):
+def prepare_data(batch_size=64, train=True, flatten=True, cnn=True):
 	if train:
 		data = torchvision.datasets.MNIST(root='./data',
 		                                  train=True,
@@ -37,6 +37,9 @@ def prepare_data(batch_size=64, train=True, flatten=True):
 
 	if flatten:
 		images = images.view(-1, 28 * 28)
+
+	if cnn:
+		images = images.unsqueeze(1)
 
 	dataset = MNIST_dataset(images, targets)
 	dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
