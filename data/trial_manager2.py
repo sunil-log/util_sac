@@ -28,9 +28,8 @@ class trial_manager:
 		plt.savefig(f"{tm['reconstruction']}/epoch_{epoch}.png")
 	"""
 
-	def __init__(self, sub_dir_list, trial_name=None):
-		if trial_name is None:
-			trial_name = input("Enter the trial name: ")
+	def __init__(self, sub_dir_list, trial_name="test"):
+		# create trial directory
 		self.trial_dir = self.__create_trial_dir(trial_name)
 		self.sub_dir_dict = self.__create_sub_dirs(sub_dir_list)
 
