@@ -21,11 +21,12 @@ class trial_manager:
 		__getitem__(key): 인덱스 또는 키를 사용하여 하위 디렉토리 경로에 접근합니다.
 
 	사용 예시:
-		sub_dir_list = ["reconstruction", "latent_space"]
+		sub_dir_list = ["weights", "reconstruction", "latent_space"]
 		tm = trial_manager(sub_dir_list, trial_name="example")
 
 		plt.savefig(f"{tm.trial_dir}/train_test_metrics.png")
 		plt.savefig(f"{tm['reconstruction']}/epoch_{epoch}.png")
+		torch.save(model.state_dict(), tm['weights'] / f"model_{epoch}.pt")
 	"""
 
 	def __init__(self, sub_dir_list, trial_name="test"):
