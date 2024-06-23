@@ -1,6 +1,6 @@
 import torch
 
-def add_normal_noise(tensor, std):
+def add_normal_noise_to_tensor(tensor, std):
 	"""
 	주어진 텐서에 정규 분포 노이즈를 추가하는 함수
 
