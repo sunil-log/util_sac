@@ -14,3 +14,19 @@ def add_normal_noise(tensor, std):
 	noise = torch.randn_like(tensor) * std
 	noisy_tensor = tensor + noise
 	return noisy_tensor
+
+
+
+def inject_noise_to_parameters(module, noise_std):
+	"""
+	모듈 내부의 모든 Parameter에 Gaussian 노이즈를 주입하는 함수
+
+	Args:
+		module (torch.nn.Module): 노이즈를 주입할 모듈
+		noise_std (float): 주입할 Gaussian 노이즈의 표준편차
+	"""
+	with torch.no_grad():  # 노이즈 주입 시 gradient 계산 방지
+		for param in module.parameters():
+			noise = torch.randn_like(param) * noise_std
+			param.add_(noise)  # in-place 연산으로 노이즈 추가
+
