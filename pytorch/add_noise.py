@@ -1,7 +1,7 @@
 import torch
 
 
-def add_normal_noise(tensor, std):
+def add_normal_noise_to_tensor(tensor, noise_std):
 	"""
 	주어진 텐서에 정규 분포 노이즈를 추가하는 함수 (인플레이스 연산)
 
@@ -13,7 +13,7 @@ def add_normal_noise(tensor, std):
 		eeg = add_normal_noise(eeg, std=0.1)
 		eog = add_normal_noise(eog, std=0.05)
 	"""
-	noise = torch.randn_like(tensor) * std
+	noise = torch.randn_like(tensor) * noise_std
 	tensor.add_(noise)
 
 
