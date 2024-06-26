@@ -44,7 +44,7 @@ class trial_manager:
 		base_dir = Path("./trials")
 		base_dir.mkdir(exist_ok=True)
 
-		dir_name = datetime.now().strftime("%y-%m-%d_%H-%M-%S") + f"__{trial_name}"
+		dir_name = datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + f"__{trial_name}"
 		trial_dir = base_dir / dir_name
 		trial_dir.mkdir()
 
