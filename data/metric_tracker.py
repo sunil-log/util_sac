@@ -46,3 +46,6 @@ class MetricsTracker:
 
 	def get_all(self, metric):
 		return self.data.get(metric, [])
+
+	def __getitem__(self, metric):
+		return self.get_all(metric)
