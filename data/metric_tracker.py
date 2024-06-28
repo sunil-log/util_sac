@@ -49,3 +49,11 @@ class MetricsTracker:
 
 	def __getitem__(self, metric):
 		return self.get_all(metric)
+
+	def print_latest(self):
+		for metric in self.metrics:
+			latest = self.get_latest(metric)
+			if latest is not None:
+				print(f"{metric}: {latest}")
+			else:
+				print(f"{metric}: 데이터 없음")
