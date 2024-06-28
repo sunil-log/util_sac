@@ -51,9 +51,7 @@ class MetricsTracker:
 		return self.get_all(metric)
 
 	def print_latest(self):
-		for metric in self.metrics:
-			latest = self.get_latest(metric)
-			if latest is not None:
-				print(f"{metric}: {latest}", flush=True)
-			else:
-				print(f"{metric}: 데이터 없음", flush=True)
+		output = ", ".join(
+			f"{metric}: {self.get_latest(metric) if self.get_latest(metric) is not None else '데이터 없음'}" for metric in
+			self.metrics)
+		print(output, flush=True)
