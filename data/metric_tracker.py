@@ -54,6 +54,6 @@ class MetricsTracker:
 		for metric in self.metrics:
 			latest = self.get_latest(metric)
 			if latest is not None:
-				print(f"{metric}: {latest}")
+				print(f"{metric}: {latest}", flush=True)
 			else:
-				print(f"{metric}: 데이터 없음")
+				print(f"{metric}: 데이터 없음", flush=True)
