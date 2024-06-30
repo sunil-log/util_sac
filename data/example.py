@@ -7,6 +7,7 @@ import random
 from sklearn.metrics import accuracy_score, f1_score
 
 from util_sac.data.epoch_metric_tracker import metric_tracker
+from util_sac.data.batch_metric_tracker import batch_loss_tracker
 
 from torch.utils.data import TensorDataset, DataLoader
 
@@ -46,9 +47,9 @@ if __name__ == '__main__':
 	train_data, train_labels = generate_data(2000)
 	test_data, test_labels = generate_data(1000)
 	"""
-	train_data: torch.Size([3000, 10]),
+	train_data: torch.Size([3000, 10]), 
 	train_labels: torch.Size([3000, 1])
-	test_data: torch.Size([200, 10]),
+	test_data: torch.Size([200, 10]), 
 	test_labels: torch.Size([200, 1])
 	"""
 
@@ -73,46 +74,37 @@ if __name__ == '__main__':
 
 	# 학습 루프
 	num_epochs = 500
-	best_val_loss = float('inf')
 	mt = metric_tracker()
 
 	for epoch in range(num_epochs):
 		model.train()
-		train_loss = 0
+		loss_track = batch_loss_tracker()
 
 		for batch_data, batch_labels in train_loader:
 			# 순전파
 			outputs = model(batch_data)
 			loss = criterion(outputs, batch_labels)
+			loss_track.update({"train_loss": loss})
 
 			# 역전파 및 최적화
 			optimizer.zero_grad()
 			loss.backward()
 			optimizer.step()
 
-			train_loss += loss.item()
-
-		# 에폭당 평균 훈련 손실 계산
-		train_loss /= len(train_loader)
-
 
 		# 검증
 		model.eval()
-		val_loss = 0
-
 		with torch.no_grad():
 			for batch_data, batch_labels in test_loader:
 				outputs = model(batch_data)
 				loss = criterion(outputs, batch_labels)
-				val_loss += loss.item()
+				loss_track.update({"val_loss": loss})
 
-		val_loss /= len(test_loader)
-		mt.update(epoch=epoch, train_loss=train_loss, val_loss=val_loss)
+		mt.update(epoch=epoch, **loss_track.average())
 
 		# print
 		if epoch%50 == 0:
 			mt.print_latest()
-
 
 			plt.close()
 			fig, ax = plt.subplots(1, 2, figsize=(15, 6))
