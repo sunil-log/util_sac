@@ -16,7 +16,7 @@ class Metric:
 		return self.data
 
 	def get_epochs_and_values(self):
-		return list(map(list, zip(*self.data)))
+		return list(zip(*self.data))
 
 	def get_values(self):
 		return [value for _, value in self.data]
@@ -42,7 +42,8 @@ class metric_tracker:
 	def get_all(self, metric_name):
 		"""
 		Example:
-			x, y = tm["train_loss"]
+			x, y = mt["train_loss"]
+			ax.plot(*mt["train_loss"])
 		"""
 		if metric_name in self.metrics:
 			return self.metrics[metric_name].get_epochs_and_values()
@@ -51,7 +52,8 @@ class metric_tracker:
 	def __getitem__(self, metric_name):
 		"""
 		Example:
-			x, y = tm["train_loss"]
+			x, y = mt["train_loss"]
+			ax.plot(*mt["train_loss"])
 		"""
 		return self.get_all(metric_name)
 
