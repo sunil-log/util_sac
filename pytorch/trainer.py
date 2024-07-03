@@ -2,7 +2,6 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from typing import Callable, Optional
-import numpy as np
 from abc import ABC, abstractmethod
 
 
@@ -14,14 +13,13 @@ class MLTrainer(ABC):
 			test_loader: DataLoader,
 			optimizer: torch.optim.Optimizer,
 			criterion: Callable,
-			device: str = 'cuda' if torch.cuda.is_available() else 'cpu'
 	):
 		self.model = model
 		self.train_loader = train_loader
 		self.test_loader = test_loader
 		self.optimizer = optimizer
 		self.criterion = criterion
-		self.device = device
+		self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 		self.model.to(self.device)
 
 	@abstractmethod
@@ -52,13 +50,7 @@ class MLTrainer(ABC):
 				total_loss += loss.item()
 		return total_loss / len(self.test_loader.dataset)
 
-	def train(self, num_epochs: int, save_path: Optional[str] = None):
+	def train(self, num_epochs: int):
 		for epoch in range(num_epochs):
 			train_loss = self.train_epoch()
 			test_loss = self.test_epoch()
-			print(f'Epoch: {epoch + 1}, Train Loss: {train_loss:.4f}, Test Loss: {test_loss:.4f}')
-
-			if save_path:
-				torch.save(self.model.state_dict(), f"{save_path}_epoch_{epoch + 1}.pth")
-
-		return train_loss, test_loss
