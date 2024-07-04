@@ -11,6 +11,7 @@ one_step 만 implement 하면 된다.
 	
 	
 class VAETrainer(BaseTrainer):
+
 	def one_step(self, batch):
 		# data
 		x, _ = batch
@@ -22,11 +23,16 @@ class VAETrainer(BaseTrainer):
 		loss = loss_r + loss_kl
 
 		# collect loss
-		self.loss_tracker.update(
+		self.loss_collector.update(
 			reconstruction_loss=loss_r.item(),
 			kl_divergence=loss_kl.item(),
 			total_loss=loss.item()
 		)
+
+		# collect test data
+		if self.mode == 'test':
+			self.data_collector.update(x=x, x_hat=x_hat)
+
 		return loss
 """
 
