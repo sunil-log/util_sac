@@ -1,5 +1,5 @@
 import torch
-from util_sac.data.batch_data_collector import batch_loss_collector
+from util_sac.data.batch_data_collector import batch_loss_collector, batch_data_collector
 
 """
 one_step 만 implement 하면 된다.
@@ -43,18 +43,23 @@ class BaseTrainer:
 
 		# one_step 에서 사용해야 하므로 self 로 선언
 		self.loss_collector = None
+		self.data_collectors = None
 
-	def one_epoch(self, if_train=True):
+		# mode
+		self.mode = "train"
+
+	def one_epoch(self, mode='train'):
 		# set model mode
-		if if_train:
+		if mode == 'train':
 			self.model.train()
 			data_loader = self.train_loader
-		else:
+		elif mode == 'test':
 			self.model.eval()
 			data_loader = self.test_loader
 
 		# initialize loss tracker
 		self.loss_collector = batch_loss_collector()
+		self.data_collector = batch_data_collector()
 
 		# iterate over data
 		for batch_idx, batch in enumerate(data_loader):
@@ -62,19 +67,20 @@ class BaseTrainer:
 			self.optimizer.zero_grad()
 			loss = self.one_step(batch)
 			# backward
-			if if_train:
+			if mode == 'train':
 				loss.backward()
 				self.optimizer.step()
 
 		# return list of loss
 		d_loss = self.loss_collector.average()
+		d_data = self.data_collector.get_collected_data()
 
 		# modify keys and return
-		if if_train:
+		if mode == 'train':
 			d_loss = {"train_" + k: v for k, v in d_loss.items()}
-		else:
+		elif mode == 'test':
 			d_loss = {"test_" + k: v for k, v in d_loss.items()}
-		return d_loss
+		return d_loss, d_data
 
 	def one_step(self, batch):
 		raise NotImplementedError("Subclasses should implement this!")
