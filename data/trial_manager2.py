@@ -39,6 +39,8 @@ class trial_manager:
 		key_out = [".pyc", ".png", ".npy", "__pycache__", '.npz', '.pkl', '.zip', '.mat']
 		backup_keywords(self.trial_dir / "src.zip", key_in, key_out, src_loc=".")
 
+	def get_trial_dir(self):
+		return self.trial_dir
 
 	def __create_trial_dir(self, trial_name):
 		base_dir = Path("./trials")
