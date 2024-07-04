@@ -1,5 +1,6 @@
 from collections import defaultdict
-
+import numpy as np
+import torch
 
 """
 mini-batch loop 직전에 선언하여 initialize 하고,
@@ -36,13 +37,66 @@ class batch_loss_collector:
 
 
 
+class batch_data_collector:
+
+	"""
+	BatchCollector는 미니배치 학습 과정에서 다양한 데이터를 수집하고 관리하는 클래스입니다.
+
+	이 클래스는 다음과 같은 기능을 제공합니다:
+	1. 다양한 형태의 데이터(예: PyTorch 텐서, NumPy 배열, 리스트)를 수집합니다.
+	2. 수집된 모든 데이터를 NumPy 배열 형태로 변환하여 저장합니다.
+	3. 수집이 완료된 후 모든 데이터를 하나의 NumPy 배열로 병합하여 반환합니다.
+	"""
+
+	def __init__(self):
+		self.data = {}
+		self.num_batches = 0
+
+	def update(self, **batch_data):
+		for key, value in batch_data.items():
+			if key not in self.data:
+				self.data[key] = []
+
+			# Convert to numpy array if it's a torch tensor
+			if isinstance(value, torch.Tensor):
+				value = value.detach().cpu().numpy()
+
+			# Ensure the value is a numpy array
+			if not isinstance(value, np.ndarray):
+				value = np.array(value)
+
+			self.data[key].append(value)
+
+		self.num_batches += 1
+
+	def get_collected_data(self):
+		"""
+		Returns a dictionary where each value is a numpy array
+		containing all collected data for that key.
+		"""
+		return {key: np.concatenate(value) for key, value in self.data.items()}
+
+
+
+
+
 if __name__ == '__main__':
-	tracker = batch_loss_collector()
+
+	loss_col = batch_loss_collector()
+	data_col = batch_data_collector()
+
 	for batch in range(10):
-		tracker.update(
+		loss_col.update(
 			train_loss=torch.tensor(0.5),
 			val_loss=torch.tensor(0.3)
 		)
+		data_col.update(
+			x_hat = torch.randn(64, 784),
+			y_hat = torch.randn(64, 10),
+		)
 
-	average_losses = tracker.average()
+
+	average_losses = loss_col.average()
 	print("Average losses:", average_losses)
+
+
