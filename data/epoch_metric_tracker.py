@@ -33,6 +33,9 @@ class metric_tracker:
 			self.metrics[metric_name].update(epoch, value)
 
 	def get_latest(self, metric_name):
+		"""
+		:returns (epoch, value) tuple
+		"""
 		if metric_name in self.metrics:
 			latest = self.metrics[metric_name].get_latest()
 			return latest if latest else None
@@ -90,17 +93,19 @@ class metric_tracker:
 		for key in keys:
 			if key in self.metrics:
 				epochs, values = self.get_all(key)
-				ax.plot(epochs, values, label=key)
+				label = f"{key}: {values[-1]:.4f}"
+				ax.plot(epochs, values, label=label)
 
 		ax.set_xlabel('Epoch')
-		ax.set_ylabel('Metric Value')
+		ax.set_ylabel('Value')
 		ax.legend()
+		ax.grid(True)
+
+		title = f"Epoch: {epochs[-1]}; {keys[0]}"
+		ax.set_title(title)
 
 		if y_log:
 			ax.set_yscale('log')
-
-		ax.grid(True)
-		ax.set_title('Metrics over Epochs')
 
 
 
