@@ -61,15 +61,19 @@ class BaseTrainer:
 		self.loss_collector = batch_loss_collector()
 		self.data_collector = batch_data_collector()
 
+
 		# iterate over data
 		for batch_idx, batch in enumerate(data_loader):
-			# forward
 			self.optimizer.zero_grad()
-			loss = self.one_step(batch)
-			# backward
 			if mode == 'train':
+				# forward and backward
+				loss = self.one_step(batch)
 				loss.backward()
 				self.optimizer.step()
+			elif mode == 'test':
+				# only forward - no loss returned
+				with torch.no_grad():
+					self.one_step(batch)
 
 		# return list of loss
 		d_loss = self.loss_collector.average()
