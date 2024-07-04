@@ -1,19 +1,9 @@
 import torch
-from torch import nn
-from torch.utils.data import DataLoader
-from typing import Callable, Optional
-from abc import ABC, abstractmethod
+from util_sac.data.batch_metric_tracker import batch_loss_tracker
 
 
-class MLTrainer(ABC):
-	def __init__(
-			self,
-			model: nn.Module,
-			train_loader: DataLoader,
-			test_loader: DataLoader,
-			optimizer: torch.optim.Optimizer,
-			criterion: Callable,
-	):
+class BaseTrainer:
+	def __init__(self, model, train_loader, test_loader, optimizer, criterion):
 		self.model = model
 		self.train_loader = train_loader
 		self.test_loader = test_loader
@@ -21,36 +11,40 @@ class MLTrainer(ABC):
 		self.criterion = criterion
 		self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 		self.model.to(self.device)
+		self.loss_tracker = None
 
-	@abstractmethod
-	def train_step(self, batch):
-		pass
+	def one_epoch(self, if_train=True):
+		# set model mode
+		if if_train:
+			self.model.train()
+			data_loader = self.train_loader
+		else:
+			self.model.eval()
+			data_loader = self.test_loader
 
-	@abstractmethod
-	def test_step(self, batch):
-		pass
+		# set loss tracker
+		self.loss_tracker = batch_loss_tracker()
 
-	def train_epoch(self):
-		self.model.train()
-		total_loss = 0
-		for batch in self.train_loader:
-			self.optimizer.zero_grad()
-			loss = self.train_step(batch)
-			loss.backward()
-			self.optimizer.step()
-			total_loss += loss.item()
-		return total_loss / len(self.train_loader.dataset)
+		# iterate over data
+		for batch_idx, batch in enumerate(data_loader):
+			# forward
+			loss = self.one_step(batch)
+			# backward
+			if if_train:
+				loss.backward()
+				self.optimizer.step()
 
-	def test_epoch(self):
-		self.model.eval()
-		total_loss = 0
-		with torch.no_grad():
-			for batch in self.test_loader:
-				loss = self.test_step(batch)
-				total_loss += loss.item()
-		return total_loss / len(self.test_loader.dataset)
+		# return list of loss
+		d_loss = self.loss_tracker.average()
 
-	def train(self, num_epochs: int):
-		for epoch in range(num_epochs):
-			train_loss = self.train_epoch()
-			test_loss = self.test_epoch()
+		# modify keys and return
+		if if_train:
+			d_loss = {"train_" + k: v for k, v in d_loss.items()}
+		else:
+			d_loss = {"test_" + k: v for k, v in d_loss.items()}
+		return d_loss
+
+	def one_step(self, batch):
+		raise NotImplementedError("Subclasses should implement this!")
+
+
