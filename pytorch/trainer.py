@@ -1,5 +1,5 @@
 import torch
-from util_sac.data.batch_metric_tracker import batch_loss_tracker
+from util_sac.data.batch_data_collector import batch_loss_collector
 
 """
 one_step 만 implement 하면 된다.
@@ -40,7 +40,9 @@ class BaseTrainer:
 		self.criterion = criterion
 		self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 		self.model.to(self.device)
-		self.loss_tracker = None
+
+		# one_step 에서 사용해야 하므로 self 로 선언
+		self.loss_collector = None
 
 	def one_epoch(self, if_train=True):
 		# set model mode
@@ -51,8 +53,8 @@ class BaseTrainer:
 			self.model.eval()
 			data_loader = self.test_loader
 
-		# set loss tracker
-		self.loss_tracker = batch_loss_tracker()
+		# initialize loss tracker
+		self.loss_collector = batch_loss_collector()
 
 		# iterate over data
 		for batch_idx, batch in enumerate(data_loader):
@@ -65,7 +67,7 @@ class BaseTrainer:
 				self.optimizer.step()
 
 		# return list of loss
-		d_loss = self.loss_tracker.average()
+		d_loss = self.loss_collector.average()
 
 		# modify keys and return
 		if if_train:

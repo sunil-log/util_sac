@@ -15,7 +15,7 @@ mini-batch loop 이 끝나면, .average() 를 호출하여 각 loss 에 대해 n
 """
 
 
-class batch_loss_tracker:
+class batch_loss_collector:
 	def __init__(self):
 		self.losses = defaultdict(float)
 		self.num_batches = 0
@@ -37,7 +37,7 @@ class batch_loss_tracker:
 
 
 if __name__ == '__main__':
-	tracker = batch_loss_tracker()
+	tracker = batch_loss_collector()
 	for batch in range(10):
 		tracker.update(
 			train_loss=torch.tensor(0.5),
