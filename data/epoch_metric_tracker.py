@@ -72,3 +72,48 @@ class metric_tracker:
 		print_str = f"Epoch {curretn_epoch} | " + " | ".join(list_value)
 		print(print_str, flush=True)
 
+
+	def plot_metric(self, ax, keys, y_log=False):
+		"""
+		Plot multiple metrics on the given axes.
+
+		Args:
+			ax (matplotlib.axes.Axes): The axes to plot on.
+			keys (list): List of metric names to plot.
+			y_log (bool): Whether to use log scale for y-axis. Default is False.
+
+		Example:
+			fig, ax = plt.subplots()
+			mt.plot_metric(ax, keys=["train_loss", "val_loss"], y_log=True)
+			plt.show()
+		"""
+		for key in keys:
+			if key in self.metrics:
+				epochs, values = self.get_all(key)
+				ax.plot(epochs, values, label=key)
+
+		ax.set_xlabel('Epoch')
+		ax.set_ylabel('Metric Value')
+		ax.legend()
+
+		if y_log:
+			ax.set_yscale('log')
+
+		ax.grid(True)
+		ax.set_title('Metrics over Epochs')
+
+
+
+if __name__ == '__main__':
+
+	# train
+	n_epoch = 10
+	mt = metric_tracker()
+	for epoch in range(n_epoch):
+
+		train_loss = trainer.one_epoch(if_train=True)
+		test_loss = trainer.one_epoch(if_train=False)
+
+		mt.update(epoch, **train_loss, **test_loss)
+		mt.print_latest()
+
