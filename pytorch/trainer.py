@@ -48,12 +48,13 @@ class BaseTrainer:
 		# mode
 		self.mode = "train"
 
-	def one_epoch(self, mode='train'):
+	def one_epoch(self, mode):
 		# set model mode
-		if mode == 'train':
+		self.mode = mode
+		if self.mode == 'train':
 			self.model.train()
 			data_loader = self.train_loader
-		elif mode == 'test':
+		elif self.mode == 'test':
 			self.model.eval()
 			data_loader = self.test_loader
 
@@ -65,12 +66,12 @@ class BaseTrainer:
 		# iterate over data
 		for batch_idx, batch in enumerate(data_loader):
 			self.optimizer.zero_grad()
-			if mode == 'train':
+			if self.mode == 'train':
 				# forward and backward
 				loss = self.one_step(batch)
 				loss.backward()
 				self.optimizer.step()
-			elif mode == 'test':
+			elif self.mode == 'test':
 				# only forward - no loss returned
 				with torch.no_grad():
 					self.one_step(batch)
@@ -80,9 +81,9 @@ class BaseTrainer:
 		d_data = self.data_collector.get_collected_data()
 
 		# modify keys and return
-		if mode == 'train':
+		if self.mode == 'train':
 			d_loss = {"train_" + k: v for k, v in d_loss.items()}
-		elif mode == 'test':
+		elif self.mode == 'test':
 			d_loss = {"test_" + k: v for k, v in d_loss.items()}
 		return d_loss, d_data
 
