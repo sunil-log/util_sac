@@ -23,6 +23,25 @@ class MNIST_dataset(Dataset):
 
 
 def prepare_data(batch_size=64, train=True, flatten=True, cnn=True):
+	"""
+	MNIST 데이터셋을 로드하고 전처리하여 DataLoader 객체로 반환합니다.
+	정규화 과정에서 모든 픽셀 값을 255로 나누어 0-1 범위로 변환합니다.
+
+	이 함수는 다음과 같은 작업을 수행합니다:
+	1. MNIST 데이터셋을 다운로드합니다 (필요한 경우).
+	2. 이미지 픽셀 값을 0-255에서 0-1 범위로 정규화합니다.
+	3. 선택적으로 이미지를 1차원으로 평탄화하거나 CNN용 차원을 추가합니다.
+	4. DataLoader 객체를 생성하여 반환합니다.
+
+	매개변수:
+	batch_size (int): 배치 크기 (기본값: 64)
+	train (bool): 학습 데이터셋 사용 여부 (기본값: True)
+	flatten (bool): 이미지를 1차원으로 평탄화할지 여부 (기본값: True)
+	cnn (bool): CNN용 차원을 추가할지 여부 (기본값: True)
+
+	반환값:
+	DataLoader: 전처리된 MNIST 데이터를 포함하는 DataLoader 객체
+	"""
 	if train:
 		data = torchvision.datasets.MNIST(root='./data',
 		                                  train=True,
