@@ -22,7 +22,7 @@ class MNIST_dataset(Dataset):
 		return self.data[idx], self.targets[idx]
 
 
-def prepare_data(batch_size=64, train=True, flatten=True, cnn=True):
+def prepare_data(batch_size=64, train=True, flatten=True, cnn=True, std=False):
 	"""
 	MNIST 데이터셋을 로드하고 전처리하여 DataLoader 객체로 반환합니다.
 	정규화 과정에서 모든 픽셀 값을 255로 나누어 0-1 범위로 변환합니다.
@@ -59,6 +59,17 @@ def prepare_data(batch_size=64, train=True, flatten=True, cnn=True):
 
 	if cnn:
 		images = images.unsqueeze(1)
+
+	if std:
+		"""
+		위에서 255로 나누었기 때문에 [0~1] 범위에 있고 분산이 다음을 따른다. 
+		- Variance of data: 0.0932, log variance: -2.3733
+		
+		이는 output 에서 x_mu, x_log_var 를 구할 때, x_log_var<0 가 되어서 학습에 어려움을 준다.
+		VAE 등의 NLL 을 구하는 모델에서는 output 을 mean=0, var=1 로 normalization 하는 것이 좋다.
+		"""
+		images = (images - images.mean()) / images.std()
+		print(f"Mean of data: {images.mean():.4f}, std: {images.std():.4f}")
 
 	dataset = MNIST_dataset(images, targets)
 	dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
