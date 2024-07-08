@@ -9,29 +9,40 @@ one_step 만 implement 하면 된다.
 		- update 시에 "train_" prefix 는 붙일 필요 없다
 		- update 하는 loss 는 .item() 을 호출하여 scalar 로 변환하여 넣어야 한다.
 	
-	
+Example:
+	- [[concept, VAE, part 03, Implementation - MNIST (beta-VAE)]]
+
 class VAETrainer(BaseTrainer):
 
 	def one_step(self, batch):
 		# data
-		x, _ = batch
+		x, label = batch
+		x *= global_scale_factor
 		x = x.to(self.device)
 
 		# forward
-		x_hat, mu, log_var = self.model(x)
-		loss_r, loss_kl = self.criterion(x, x_hat, mu, log_var)
-		loss = loss_r + loss_kl
+		x_mu, z_mu, z_log_var, z_sample = self.model(x)
+		kl, uncertainty, reconstruction = self.criterion(z_mu, z_log_var, x, x_mu, self.model.x_log_var)
+		loss = uncertainty + reconstruction + global_beta * kl
+
 
 		# collect loss
 		self.loss_collector.update(
-			reconstruction_loss=loss_r.item(),
-			kl_divergence=loss_kl.item(),
-			total_loss=loss.item()
+			reconstruction_loss=reconstruction.item(),
+			uncertainty=uncertainty.item(),
+			kl_divergence=kl.item(),
+			total_loss=loss.item(),
+			x_log_var=self.model.x_log_var.item()
 		)
 
 		# collect test data
 		if self.mode == 'test':
-			self.data_collector.update(x=x, x_hat=x_hat)
+			self.data_collector.update(
+				x=x,
+				x_hat=x_mu,
+				z=z_sample,
+				label=label
+			)
 
 		return loss
 """
