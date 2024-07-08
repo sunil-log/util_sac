@@ -45,6 +45,26 @@ class VAETrainer(BaseTrainer):
 			)
 
 		return loss
+		
+		
+def main():
+	
+	# build model
+	vae = VAE(x_dim=784, h_dim1=512, h_dim2=256, z_dim=10)
+	optimizer = torch.optim.Adam(vae.parameters(), lr=1e-3)
+	trainer = VAETrainer(vae, train_loader, test_loader, optimizer, vae_loss)
+
+
+	# train
+	n_epoch = 100
+	mt = metric_tracker()
+	for epoch in range(n_epoch + 1):
+
+		train_loss, train_data = trainer.one_epoch(mode='train')
+		test_loss, test_data = trainer.one_epoch(mode='test')
+
+		mt.update(epoch, **train_loss, **test_loss)
+		mt.print_latest()
 """
 
 
