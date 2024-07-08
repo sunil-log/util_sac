@@ -22,7 +22,7 @@ class MNIST_dataset(Dataset):
 		return self.data[idx], self.targets[idx]
 
 
-def prepare_data(batch_size=64, train=True, flatten=True, cnn=True):
+def prepare_data(batch_size=64, train=True, flatten=True, cnn=True, shuffle=True):
 	"""
 	MNIST 데이터셋을 로드하고 전처리하여 DataLoader 객체로 반환합니다.
 	정규화 과정에서 모든 픽셀 값을 255로 나누어 0-1 범위로 변환합니다.
@@ -61,6 +61,6 @@ def prepare_data(batch_size=64, train=True, flatten=True, cnn=True):
 		images = images.unsqueeze(1)
 
 	dataset = MNIST_dataset(images, targets)
-	dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+	dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
 
 	return dataloader
