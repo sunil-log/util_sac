@@ -106,8 +106,9 @@ class BaseTrainer:
 			if self.mode == 'train':
 				# forward and backward
 				loss = self.one_step(batch)
-				loss.backward()
-				self.optimizer.step()
+				if loss is not None:
+					loss.backward()
+					self.optimizer.step()
 			elif self.mode == 'test':
 				# only forward - no loss returned
 				with torch.no_grad():
