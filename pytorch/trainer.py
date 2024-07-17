@@ -65,6 +65,8 @@ def main():
 
 		mt.update(epoch, **train_loss, **test_loss)
 		mt.print_latest()
+		
+		plt.hist(test_data['x_hat'].flatten(), bins=30, density=True)
 """
 
 
