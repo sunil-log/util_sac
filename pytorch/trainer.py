@@ -57,6 +57,7 @@ def main():
 
 	# train
 	n_epoch = 100
+	from util_sac.data.epoch_metric_tracker import metric_tracker
 	mt = metric_tracker()
 	for epoch in range(n_epoch + 1):
 
