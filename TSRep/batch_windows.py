@@ -82,7 +82,7 @@ def batch_windows(x, indices, window_size=10, future=False):
 
 
 
-class time_series_indexloader():
+class TimeSeriesIndexLoader():
 	def __init__(self,
 	             key_idx, idx_interval=1,
 	             batch_size=3,
@@ -157,12 +157,10 @@ def train_test_index_split(len_x,
 	return d
 
 
-def sample_data():
-	# 사용 예시
-	x1 = torch.arange(5000, dtype=torch.float32)
+def sample_data(size=5000):
+	x1 = torch.arange(size, dtype=torch.float32)
 	x2 = x1 + 1000
-	x = torch.stack([x1, x2], dim=0) + 0.5
-	return x
+	return torch.stack([x1, x2], dim=0) + 0.5
 
 
 
@@ -191,7 +189,7 @@ def main():
 	key_idx = {train: (10, 4000), valid: (4000, 4500), test: (4500, 4997)}
 	"""
 
-	train_indexloader = time_series_indexloader(
+	train_indexloader = TimeSeriesIndexLoader(
 		key_idx=key_idx['train'],
 		idx_interval=1, batch_size=3, shuffle=False)
 
@@ -232,6 +230,12 @@ def main():
 			  [1012.5 1013.5 1014.5]]]
 		"""
 
+		print(f"Batch {i}:")
+		print(f"x_past shape: {x_past.shape}")
+		print(f"x_future shape: {x_future.shape}")
+
+		if i >= 2:  # 처음 3개 배치만 출력
+			break
 
 
 if __name__ == '__main__':
