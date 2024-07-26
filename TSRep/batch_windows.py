@@ -1,6 +1,10 @@
 
 import torch
 
+"""
+see: module, TSRep, dataloader, part 01, extract window
+"""
+
 def batch_windows(x, indices, window_size=10, future=False):
 	"""
 	- x: 전체 시계열 데이터 (shape: [channel, sequence_length])
