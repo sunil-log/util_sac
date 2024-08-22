@@ -7,7 +7,7 @@ Envoronment
 
 
 # make an instance
-mygpt = ChatGPT()
+myGPT = chatgtp.ChatGPT(key_fn)
 
 def run_LLM(prompt):
 	# return 	mygpt.get_completion(prompt, model="gpt-4-0125-preview")
