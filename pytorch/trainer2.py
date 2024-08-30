@@ -111,10 +111,16 @@ class BaseTrainer:
 		for batch_idx, batch in enumerate(data_loader):
 			self.optimizer.zero_grad()
 			if mode == 'train':
-				loss = self.one_step(batch)
-				if loss is not None:
+				try:
+					loss = self.one_step(batch)
+					if loss == "skip_update":
+						continue
+					if loss is None:
+						raise ValueError("loss should be returned")
 					loss.backward()
 					self.optimizer.step()
+				except Exception as e:
+					print(f"Error in batch {batch_idx}: {e}")
 			else:
 				# only forward - no loss returned
 				with torch.no_grad():
