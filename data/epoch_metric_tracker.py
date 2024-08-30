@@ -1,4 +1,6 @@
 
+import pandas as pd
+
 
 class Metric:
 	def __init__(self, name):
@@ -106,6 +108,16 @@ class metric_tracker:
 
 		if y_log:
 			ax.set_yscale('log')
+
+	def generate_df(self):
+		metrics = self.get_metrics()
+		d = {'epoch': self.get_all(metrics[0])[0]}  # epoch을 먼저 추가
+		for metric in metrics:
+			_, values = self.get_all(metric)
+			d[metric] = values
+		df = pd.DataFrame(d)
+		return df
+
 
 
 

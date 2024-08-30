@@ -78,6 +78,24 @@ def main():
 		mt.print_latest()
 
 		plt.hist(test_data['x_hat'].flatten(), bins=30, density=True)
+		
+		if epoch % 5 == 0:
+
+			# save model
+			torch.save(model.state_dict(), f"{tm['weights']}/epoch_{epoch}.pth")
+
+			# save metrics
+			df_metrics = mt.generate_df()
+			df_metrics.to_csv(f"{tm.trial_dir}/train_test_metrics.csv", index=False)
+
+			# plot the train and test metrics
+			plt.close()
+			fig, axes = plt.subplots(2, 3, figsize=(20, 10))
+
+			# plot losses
+			mt.plot_metric(axes[0, 0], keys=["train_loss", "valid_loss", "test_loss"], y_log='log')
+			mt.plot_metric(axes[0, 1], keys=["valid_accuracy", "test_accuracy"])
+			mt.plot_metric(axes[0, 2], keys=["valid_macro_f1", "test_macro_f1"])
 """
 
 
