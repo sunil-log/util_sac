@@ -4,7 +4,7 @@ import torch
 import numpy as np
 
 
-def print_array_info(data_dict):
+def print_array_info_dict(data_dict):
 	print(f"{'Key':<10} {'Type':<15} {'Shape':<20} {'Memory':>10} {'Dtype':<10}")
 	print("-" * 70)
 	for key, data in data_dict.items():
@@ -23,3 +23,10 @@ def print_array_info(data_dict):
 			print(f"{key:<10} {data_type:<15} {str(shape):<20} {memory / 1024:>8.2f} KB {dtype}")
 		else:
 			print(f"{key:<10} {'Other':<15} {str(type(data)):<20} {'N/A':>10} {'N/A':<10}")
+
+
+
+def print_array_info_args(*args):
+	data_dict = {f"arg_{idx}": data for idx, data in enumerate(args)}
+	print_array_info_dict(data_dict)
+

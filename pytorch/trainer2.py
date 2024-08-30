@@ -71,6 +71,7 @@ def main():
 	for epoch in range(n_epoch + 1):
 
 		train_loss, train_data = trainer.one_epoch(mode='train')
+		valid_loss, valid_data = trainer.one_epoch(mode='valid')
 		test_loss, test_data = trainer.one_epoch(mode='test')
 
 		mt.update(epoch, **train_loss, **test_loss)
