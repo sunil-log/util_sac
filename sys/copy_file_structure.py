@@ -55,3 +55,28 @@ if __name__ == '__main__':
 
 	"""
 	pass
+
+
+"""
+다음 Bash code 를 쓰는것이 나을수도 있다. 
+
+#!/bin/bash
+
+# 원본 디렉토리와 대상 디렉토리 설정
+SOURCE_DIR="/media/sac/WD4T/Projects_backup/eeg_data/RBD/대전성모병원"
+TARGET_DIR="/home/sac/RBD_data"
+
+# 파일 찾기 및 복사
+find "$SOURCE_DIR" -name "*raw_microvolt.npz" | while read -r file; do
+	# 대상 경로 생성
+	target_file=$(echo "$file" | sed "s|$SOURCE_DIR|$TARGET_DIR|")
+	
+	# 대상 디렉토리 생성
+	mkdir -p "$(dirname "$target_file")"
+	
+	# 파일 복사
+	cp "$file" "$target_file"
+	
+	echo "Copied: $file to $target_file"
+done
+"""
