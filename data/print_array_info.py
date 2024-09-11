@@ -25,7 +25,7 @@ def print_array_info_dict(data_dict):
 			print(f"{key:<10} {'Other':<15} {str(type(data)):<20} {'N/A':>10} {'N/A':<10}")
 
 
-def print_array_info(*args, **kwargs):
+def print_array_info(*args):
 	if len(args) == 1 and isinstance(args[0], dict):
 		print_array_info_dict(args[0])
 	else:
