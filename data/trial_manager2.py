@@ -24,13 +24,14 @@ class trial_manager:
 		sub_dir_list = ["weights", "reconstruction", "latent_space"]
 		tm = trial_manager(sub_dir_list, trial_name="example")
 
-		plt.savefig(f"{tm.trial_dir}/train_test_metrics.png")
-		plt.savefig(f"{tm['reconstruction']}/epoch_{epoch}.png")
-		torch.save(model.state_dict(), tm['weights'] / f"model_{epoch}.pt")
+		plt.savefig(f"{tm.trial_dir}/{tm.date_prefix}__train_test_metrics.png")
+		plt.savefig(f"{tm['reconstruction']}/{tm.date_prefix}__epoch_{epoch}.png")
+		torch.save(model.state_dict(), tm['weights'] / f"{tm.date_prefix}__model_{epoch}.pt")
 	"""
 
 	def __init__(self, sub_dir_list, trial_name="test"):
 		# create trial directory
+		self.date_prefix = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 		self.trial_dir = self.__create_trial_dir(trial_name)
 		self.sub_dir_dict = self.__create_sub_dirs(sub_dir_list)
 
@@ -46,7 +47,7 @@ class trial_manager:
 		base_dir = Path("./trials")
 		base_dir.mkdir(exist_ok=True)
 
-		dir_name = datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + f"__{trial_name}"
+		dir_name = f"{self.date_prefix}__{trial_name}"
 		trial_dir = base_dir / dir_name
 		trial_dir.mkdir()
 
