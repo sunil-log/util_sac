@@ -16,7 +16,10 @@ Example:
 
 class VAETrainer(BaseTrainer):
 
-	def one_step(self, batch):
+	def one_step(self, batch, epoch):
+	
+		# Progress: epoch/self.n_epoch
+	
 		# data
 		x, label = batch
 		x *= global_scale_factor
@@ -61,18 +64,17 @@ def main():
 	# build model
 	vae = VAE(x_dim=784, h_dim1=512, h_dim2=256, z_dim=10)
 	optimizer = torch.optim.Adam(vae.parameters(), lr=1e-3)
-	trainer = VAETrainer(vae, dataloaders, optimizer, vae_loss)
+	trainer = VAETrainer(vae, dataloaders, optimizer, vae_loss, n_epoch=100)
 
 
 	# train
-	n_epoch = 100
 	from util_sac.data.epoch_metric_tracker import metric_tracker
 	mt = metric_tracker()
-	for epoch in range(n_epoch + 1):
+	for epoch in range(trainer.n_epoch):
 
-		train_loss, train_data = trainer.one_epoch(mode='train')
-		valid_loss, valid_data = trainer.one_epoch(mode='valid')
-		test_loss, test_data = trainer.one_epoch(mode='test')
+		train_loss, train_data = trainer.one_epoch(mode='train', epoch=epoch)
+		valid_loss, valid_data = trainer.one_epoch(mode='valid', epoch=epoch)
+		test_loss, test_data = trainer.one_epoch(mode='test', epoch=epoch)
 
 		mt.update(epoch, **train_loss, **test_loss)
 		mt.print_latest()
@@ -114,7 +116,7 @@ class BaseTrainer:
 		self.data_collectors = None
 
 		# n_epoch
-		self.n_epoch = n_epoch
+		self.n_epoch = n_epoch + 1
 
 		# mode
 		self.mode = "train"
