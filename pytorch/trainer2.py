@@ -117,6 +117,8 @@ class BaseTrainer:
 
 		# n_epoch
 		self.n_epoch = n_epoch + 1
+		if not isinstance(self.n_epoch, int):
+			raise ValueError("n_epoch should be integer type")
 
 		# mode
 		self.mode = "train"
