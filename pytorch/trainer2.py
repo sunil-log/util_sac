@@ -149,7 +149,7 @@ class BaseTrainer:
 			else:
 				# only forward - no loss returned
 				with torch.no_grad():
-					self.one_step(batch)
+					self.one_step(batch, epoch)
 
 		# return list of loss
 		d_loss = self.loss_collector.average()
