@@ -101,7 +101,7 @@ def main():
 
 
 class BaseTrainer:
-	def __init__(self, model, dataloaders, optimizer, criterion):
+	def __init__(self, model, dataloaders, optimizer, criterion, n_epoch):
 		self.model = model
 		self.dataloaders = dataloaders
 		self.optimizer = optimizer
@@ -113,10 +113,13 @@ class BaseTrainer:
 		self.loss_collector = None
 		self.data_collectors = None
 
+		# n_epoch
+		self.n_epoch = n_epoch
+
 		# mode
 		self.mode = "train"
 
-	def one_epoch(self, mode):
+	def one_epoch(self, mode, epoch):
 		self.mode = mode
 		self.model.train() if mode == 'train' else self.model.eval()
 		data_loader = self.dataloaders[mode]
@@ -130,7 +133,7 @@ class BaseTrainer:
 			self.optimizer.zero_grad()
 			if mode == 'train':
 				try:
-					loss = self.one_step(batch)
+					loss = self.one_step(batch, epoch)
 					if loss == "skip_update":
 						continue
 					if loss is None:
@@ -152,5 +155,5 @@ class BaseTrainer:
 		d_loss = {f"{mode}_{k}": v for k, v in d_loss.items()}
 		return d_loss, d_data
 
-	def one_step(self, batch):
+	def one_step(self, batch, epoch):
 		raise NotImplementedError("Subclasses should implement this!")
