@@ -42,7 +42,7 @@ class ChatGPT:
 			self.client = OpenAI(api_key=data["key"])
 
 
-	def get_completion(self, prompt, model="gpt-3.5-turbo"):
+	def get_completion(self, prompt, model="gpt-4o-mini"):
 		"""
 		GPT 모델로부터 완성된 텍스트를 얻습니다.
 
