@@ -44,10 +44,17 @@ class FileSearchError(Exception):
 	pass
 
 
+def escape_special_chars(pattern: str) -> str:
+	special_chars = r'()'
+	return ''.join([f'\\{c}' if c in special_chars else c for c in pattern])
+
+
 def search_files_by_pattern(root_dir: str, pattern: Union[str, Pattern]) -> pd.DataFrame:
 	try:
 		if isinstance(pattern, str):
-			pattern = re.compile(pattern)
+			escaped_pattern = escape_special_chars(pattern)
+			print(escaped_pattern)
+			pattern = re.compile(escaped_pattern)
 		searcher = FileSearcher(root_dir)
 		return searcher.search_files(pattern)
 	except FileSearchError as e:
