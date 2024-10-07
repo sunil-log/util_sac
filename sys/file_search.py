@@ -53,7 +53,6 @@ def search_files_by_pattern(root_dir: str, pattern: Union[str, Pattern]) -> pd.D
 	try:
 		if isinstance(pattern, str):
 			escaped_pattern = escape_special_chars(pattern)
-			print(escaped_pattern)
 			pattern = re.compile(escaped_pattern)
 		searcher = FileSearcher(root_dir)
 		return searcher.search_files(pattern)
