@@ -69,7 +69,49 @@ class dataloader_collector:
 
 
 def main():
-	pass
+
+	dc = dataloader_collector(
+		{"REM_emg": "float32",
+		 "REM_mask": "float32",
+		 "NREM_emg": "float32",
+		 "NREM_mask": "float32",
+		 "class_rbd": "int32",
+		 "class_pd": "int32",
+		 "hospital": "int32"}
+	)
+
+	for idx, row in df_fn.iterrows():
+		print(f"Loading {idx+1}/{len(df_fn)}: {row['File Path']}", flush=True)
+
+		# load z data
+		z = load_reduced_data(row["File Path"], n_REM, n_NREM)
+		dc.add_sample(z)
+		"""
+		print_array_info(z)
+
+		Key        Type            Shape                    Memory Dtype     
+		----------------------------------------------------------------------
+		REM_emg    NumPy Array     (300, 1, 1, 10)         11.72 KB float32
+		REM_mask   NumPy Array     (300, 1, 1, 10)         11.72 KB float32
+		NREM_emg   NumPy Array     (700, 1, 1, 10)         27.34 KB float32
+		NREM_mask  NumPy Array     (700, 1, 1, 10)         27.34 KB float32
+		class_rbd  Other           <class 'numpy.int32'>        N/A N/A       
+		class_pd   Other           <class 'numpy.int32'>        N/A N/A       
+		hospital   NumPy Array     (5,)                     0.04 KB int64
+		"""
+
+	tensor_data = dc.to_tensor()
+	"""
+	print_array_info(tensor_data)
+	REM_emg    PyTorch Tensor  (4, 300, 1, 1, 10)      46.88 KB torch.float32
+	REM_mask   PyTorch Tensor  (4, 300, 1, 1, 10)      46.88 KB torch.float32
+	NREM_emg   PyTorch Tensor  (4, 700, 1, 1, 10)     109.38 KB torch.float32
+	NREM_mask  PyTorch Tensor  (4, 700, 1, 1, 10)     109.38 KB torch.float32
+	class_rbd  PyTorch Tensor  (4,)                     0.02 KB torch.int32
+	class_pd   PyTorch Tensor  (4,)                     0.02 KB torch.int32
+	hospital   PyTorch Tensor  (4, 5)                   0.08 KB torch.int32
+	"""
+
 
 if __name__ == "__main__":
 	main()
