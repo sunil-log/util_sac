@@ -108,9 +108,9 @@ def main():
 		 "REM_mask": "float32",
 		 "NREM_emg": "float32",
 		 "NREM_mask": "float32",
-		 "class_rbd": "int32",
-		 "class_pd": "int32",
-		 "hospital": "int32"}
+		 "class_rbd": "int64",
+		 "class_pd": "int64",
+		 "hospital": "int64"}
 	)
 
 	for idx, row in df_fn.iterrows():
