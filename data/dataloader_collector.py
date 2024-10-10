@@ -9,7 +9,29 @@ Created on  Oct 10 2024
 
 import numpy as np
 import torch
+from torch.utils.data import Dataset, DataLoader
+from util_sac.data.print_array_info import print_array_info
 
+
+class TensorDataset(Dataset):
+	def __init__(self, tensor_data):
+		self.tensor_data = tensor_data
+		self.length = len(next(iter(tensor_data.values())))
+		"""
+		self.length = 4
+		self.tensor_data = 
+			Key        Type            Shape                    Memory Dtype     
+			----------------------------------------------------------------------
+			REM_emg    PyTorch Tensor  (4, 300, 1, 1, 10)      46.88 KB torch.float32
+			REM_mask   PyTorch Tensor  (4, 300, 1, 1, 10)      46.88 KB torch.float32
+			...
+		"""
+
+	def __len__(self):
+		return self.length
+
+	def __getitem__(self, idx):
+		return {key: value[idx] for key, value in self.tensor_data.items()}
 
 
 class dataloader_collector:
@@ -58,18 +80,29 @@ class dataloader_collector:
 			numpy_data[key] = np.array(value_list, dtype=numpy_type)
 		return numpy_data
 
-
 	def to_tensor(self):
 		"""Convert collected data to PyTorch tensors."""
+		numpy_data = self.to_numpy()
 		tensor_data = {}
-		for key, value_list in self.data.items():
-			torch_type = self.ALLOWED_TYPES[self.structure[key]][1]
-			tensor_data[key] = torch.tensor(value_list, dtype=torch_type)
+		for key, value in numpy_data.items():
+			tensor_data[key] = torch.tensor(value)
 		return tensor_data
+
+
+	def to_dataloader(self, batch_size, shuffle):
+		"""Convert collected data to a PyTorch DataLoader."""
+		tensor_data = self.to_tensor()
+		dataset = TensorDataset(tensor_data)
+		return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
 
 
 def main():
 
+	# get only first 3
+	df_fn = df_fn.head(50)
+	# print_partial_markdown(df_fn)
+
+	# prepare subject list
 	dc = dataloader_collector(
 		{"REM_emg": "float32",
 		 "REM_mask": "float32",
@@ -81,7 +114,7 @@ def main():
 	)
 
 	for idx, row in df_fn.iterrows():
-		print(f"Loading {idx+1}/{len(df_fn)}: {row['File Path']}", flush=True)
+		print(f"Loading {idx + 1}/{len(df_fn)}: {row['File Path']}", flush=True)
 
 		# load z data
 		z = load_reduced_data(row["File Path"], n_REM, n_NREM)
@@ -100,17 +133,25 @@ def main():
 		hospital   NumPy Array     (5,)                     0.04 KB int64
 		"""
 
-	tensor_data = dc.to_tensor()
+	loader = dc.to_dataloader(batch_size=n_batch, shuffle=True)
+
+	# print batch
 	"""
-	print_array_info(tensor_data)
-	REM_emg    PyTorch Tensor  (4, 300, 1, 1, 10)      46.88 KB torch.float32
-	REM_mask   PyTorch Tensor  (4, 300, 1, 1, 10)      46.88 KB torch.float32
-	NREM_emg   PyTorch Tensor  (4, 700, 1, 1, 10)     109.38 KB torch.float32
-	NREM_mask  PyTorch Tensor  (4, 700, 1, 1, 10)     109.38 KB torch.float32
-	class_rbd  PyTorch Tensor  (4,)                     0.02 KB torch.int32
-	class_pd   PyTorch Tensor  (4,)                     0.02 KB torch.int32
-	hospital   PyTorch Tensor  (4, 5)                   0.08 KB torch.int32
+	batch = next(iter(loader))
+	print_array_info(batch)
+
+	Key        Type            Shape                    Memory Dtype     
+	----------------------------------------------------------------------
+	REM_emg    PyTorch Tensor  (16, 300, 1, 1, 10)    187.50 KB torch.float32
+	REM_mask   PyTorch Tensor  (16, 300, 1, 1, 10)    187.50 KB torch.float32
+	NREM_emg   PyTorch Tensor  (16, 700, 1, 1, 10)    437.50 KB torch.float32
+	NREM_mask  PyTorch Tensor  (16, 700, 1, 1, 10)    437.50 KB torch.float32
+	class_rbd  PyTorch Tensor  (16,)                    0.06 KB torch.int32
+	class_pd   PyTorch Tensor  (16,)                    0.06 KB torch.int32
+	hospital   PyTorch Tensor  (16, 5)                  0.31 KB torch.int32
 	"""
+
+	return loader
 
 
 if __name__ == "__main__":
