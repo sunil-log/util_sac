@@ -23,8 +23,8 @@ from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, roc_auc_
 
 
 def pred_by_threshold(data, threshold):
-	# calculate metrics; data["logits"].shape = (subject, 2)
-	prob = softmax(data["logits"], axis=1)
+	# calculate metrics; data["logit"].shape = (subject, 2)
+	prob = softmax(data["logit"], axis=1)
 	prob = prob[:, 1]
 	pred = prob > threshold
 	label = data["label"].tolist()
@@ -33,7 +33,7 @@ def pred_by_threshold(data, threshold):
 
 
 def find_threshold_based_on_roc(data):
-	prob = softmax(data["logits"], axis=1)
+	prob = softmax(data["logit"], axis=1)
 	prob = prob[:, 1]
 	label = data["label"]
 
