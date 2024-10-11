@@ -166,7 +166,7 @@ def binary_metrics(train_data, valid_data, test_data):
 	{'train_confusion_matrix': array([[ 6,  0], [14,  0]] ...}
 	"""
 
-	return {**res_acc, **res_f1, **res_auc}, res_conf_mat
+	return {**res_acc, **res_f1, **res_auc, "threshold": th}, res_conf_mat
 
 
 
