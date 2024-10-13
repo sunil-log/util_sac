@@ -52,6 +52,18 @@ class VAETrainer(BaseTrainer):
 		return loss
 
 
+from torch.optim.lr_scheduler import LambdaLR
+
+lr_schedule = {
+	0: 1.0,	   # 0-49 에폭: 초기 학습률 유지 (초기 학습률: 0.01)
+	100: 0.1,   # 50-299 에폭: 초기 학습률의 1/10
+	800: 0.01  # 300 에폭 이후: 초기 학습률의 1/100
+}
+
+def lr_lambda(epoch):
+	return next((mult for start, mult in sorted(lr_schedule.items(), reverse=True) if epoch >= start), 1.0)
+
+
 def main():
 
 	# dataloader
@@ -64,6 +76,7 @@ def main():
 	# build model
 	vae = VAE(x_dim=784, h_dim1=512, h_dim2=256, z_dim=10)
 	optimizer = torch.optim.Adam(vae.parameters(), lr=1e-3)
+	scheduler = LambdaLR(optimizer, lr_lambda)
 	trainer = VAETrainer(vae, dataloaders, optimizer, vae_loss, n_epoch=100)
 
 
@@ -76,7 +89,10 @@ def main():
 		valid_loss, valid_data = trainer.one_epoch(mode='valid', epoch=epoch)
 		test_loss, test_data = trainer.one_epoch(mode='test', epoch=epoch)
 
-		mt.update(epoch, **train_loss, **test_loss)
+		scheduler.step()
+		lr_item = {"lr": optimizer.param_groups[0]['lr']}
+
+		mt.update(epoch, **train_loss, **test_loss, **lr_item)
 		mt.print_latest()
 
 		plt.hist(test_data['x_hat'].flatten(), bins=30, density=True)
