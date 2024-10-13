@@ -79,7 +79,7 @@ def backup_keywords(fn_zip, key_in, key_out, src_loc="."):
 	"""
 
 	# find files having some keywords in the file name
-	df = search_files_by_pattern('.', r".*$")
+	df = search_files_by_pattern(src_loc, r".*$")
 	"""
 		                                               File Path                        Parent                               Stem
 	0                                                 Dockerfile                             .                         Dockerfile

@@ -47,14 +47,14 @@ class trial_manager:
 
 	사용 예시:
 		sub_dir_list = ["weights", "reconstruction", "latent_space"]
-		tm = trial_manager(sub_dir_list, trial_name="example")
+		tm = trial_manager(sub_dir_list, trial_name="example", zip_src_loc="../")
 
 		plt.savefig(f"{tm.trial_dir}/{tm.date_prefix}__train_test_metrics.png")
 		plt.savefig(f"{tm['reconstruction']}/{tm.date_prefix}__epoch_{epoch}.png")
 		torch.save(model.state_dict(), tm['weights'] / f"{tm.date_prefix}__model_{epoch}.pt")
 	"""
 
-	def __init__(self, sub_dir_list, trial_name="test"):
+	def __init__(self, sub_dir_list, trial_name="test", zip_src_loc="."):
 
 		# validate trial name
 		validate_trial_name(trial_name)
@@ -75,7 +75,7 @@ class trial_manager:
 		# backup source code
 		key_in = [".py", ".m", ".sh", ".txt", "Dockerfile"]
 		key_out = [".pyc", ".png", ".npy", "__pycache__", '.npz', '.pkl', '.zip', '.mat']
-		backup_keywords(self.source_path, key_in, key_out, src_loc=".")
+		backup_keywords(self.source_path, key_in, key_out, src_loc=zip_src_loc)
 
 	def get_trial_dir(self):
 		return self.trial_dir
