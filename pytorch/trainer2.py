@@ -15,6 +15,21 @@ Example:
 	- [[concept, VAE, part 03, Implementation - MNIST (beta-VAE)]]
 
 class VAETrainer(BaseTrainer):
+	
+    def __init__(self, **kwargs):
+        # BaseTrainer를 상속받으며, my_param 파라미터를 추가로 받는 클래스입니다.
+        super().__init__(**kwargs)
+        
+        # 여기서 검증이나 로직이 필요하면 명시적으로 꺼낸다.
+        if not hasattr(self, 'my_param'):
+            raise ValueError("my_param이 필요합니다.")
+        
+        if self.my_param < 0:
+            print("my_param이 음수입니다. 0으로 보정합니다.")
+            self.my_param = 0
+
+        # 필요한 추가 초기화 ...
+
 
 	def one_step(self, batch, epoch):
 	
@@ -121,11 +136,42 @@ def main():
 
 
 class BaseTrainer:
-	def __init__(self, model, dataloaders, optimizer, criterion, n_epoch):
+	def __init__(
+			self,
+			model=None,
+			dataloaders=None,
+			optimizer=None,
+			criterion=None,
+			n_epoch=None,
+			**kwargs
+	):
+
+		"""
+		:param model: PyTorch model
+		:param dataloaders: dict 형태의 dataloaders (예: {"train": ..., "val": ...})
+		:param optimizer: PyTorch optimizer
+		:param criterion: loss function
+		:param n_epoch: 학습 epoch 수
+		:param kwargs: 추가로 받아야 할 파라미터가 있을 경우를 대비 (확장성)
+		"""
+		# 필수 파라미터 체크 (예: None이면 에러)
+		if model is None:
+			raise ValueError("model is required")
+		if dataloaders is None:
+			raise ValueError("dataloaders is required")
+		if optimizer is None:
+			raise ValueError("optimizer is required")
+		if criterion is None:
+			raise ValueError("criterion is required")
+		if n_epoch is None:
+			raise ValueError("n_epoch is required")
+
+
 		self.model = model
 		self.dataloaders = dataloaders
 		self.optimizer = optimizer
 		self.criterion = criterion
+
 		self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 		self.model.to(self.device)
 
@@ -140,6 +186,11 @@ class BaseTrainer:
 
 		# mode
 		self.mode = "train"
+
+		# kwargs로 추가 전달된 파라미터들 저장 (필요한 경우)
+		for k, v in kwargs.items():
+			setattr(self, k, v)
+
 
 	def one_epoch(self, mode, epoch):
 		self.mode = mode
