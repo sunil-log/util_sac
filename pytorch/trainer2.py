@@ -92,8 +92,13 @@ def main():
 	vae = VAE(x_dim=784, h_dim1=512, h_dim2=256, z_dim=10)
 	optimizer = torch.optim.Adam(vae.parameters(), lr=1e-3)
 	scheduler = LambdaLR(optimizer, lr_lambda)
-	trainer = VAETrainer(vae, dataloaders, optimizer, vae_loss, n_epoch=100)
-
+	trainer = VAETrainer(			
+				model=vae,
+				dataloaders=dataloaders,
+				optimizer=optimizer,
+				criterion=vae_loss,
+				n_epoch=100,
+				other_param="hello")
 
 	# train
 	from util_sac.data.epoch_metric_tracker import metric_tracker
