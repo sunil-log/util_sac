@@ -114,6 +114,8 @@ def main():
 			mt.plot_metric(axes[0, 0], keys=["train_loss", "valid_loss", "test_loss"], y_log='log')
 			mt.plot_metric(axes[0, 1], keys=["valid_accuracy", "test_accuracy"])
 			mt.plot_metric(axes[0, 2], keys=["valid_macro_f1", "test_macro_f1"])
+			plt.tight_layout()
+			plt.savefig(tm.trial_dir / "train_test_loss.png")
 """
 
 
