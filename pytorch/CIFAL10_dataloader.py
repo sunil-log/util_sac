@@ -20,11 +20,11 @@ class CIFAR_dataset(Dataset):
         return self.data[idx], self.targets[idx]
 
 
-def load_dataloader(batch_size=64, train=True, flatten=True, shuffle=True):
+def load_dataloader(batch_size=64, train=True, flatten=False, shuffle=True):
     """
     미리 변환된 CIFAR 이미지를 CIFAR_dataset 클래스에 담아 DataLoader로 반환합니다.
     """
-    images, targets = prepare_data(train, flatten, cnn)
+    images, targets = prepare_data(train, flatten)
     dataset = CIFAR_dataset(images, targets)
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
 
