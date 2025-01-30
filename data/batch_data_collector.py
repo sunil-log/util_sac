@@ -57,13 +57,12 @@ class batch_data_collector:
 			if key not in self.data:
 				self.data[key] = []
 
-			# Convert to numpy array if it's a torch tensor
+			# 이미 PyTorch tensor면 detach, cpu로 이동
 			if isinstance(value, torch.Tensor):
-				value = value.detach().cpu().numpy()
-
-			# Ensure the value is a numpy array
-			if not isinstance(value, np.ndarray):
-				value = np.array(value)
+				value = value.detach().cpu()
+			else:
+				# 그 외 타입(NumPy array, list 등)은 PyTorch tensor로 변환
+				value = torch.tensor(value)
 
 			self.data[key].append(value)
 
@@ -71,13 +70,9 @@ class batch_data_collector:
 
 	def get_collected_data(self):
 		"""
-		Returns a dictionary where each value is a numpy array
-		containing all collected data for that key.
+		모든 key별로 저장된 데이터를 하나의 PyTorch tensor로 cat하여 반환합니다.
 		"""
-		return {key: np.concatenate(value) for key, value in self.data.items()}
-
-
-
+		return {key: torch.cat(value_list, dim=0) for key, value_list in self.data.items()}
 
 
 if __name__ == '__main__':
