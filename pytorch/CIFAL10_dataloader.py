@@ -1,6 +1,7 @@
 import torch
 import torchvision
 from torch.utils.data import DataLoader, Dataset
+import matplotlib.pyplot as plt
 
 import os
 
@@ -74,3 +75,20 @@ def prepare_data_cached(train=True, flatten=True, cache_path=None):
 
 	return images, targets
 
+
+
+def plot_samples(train_dataloader):
+	# 처음 10개 이미지 시각화
+	images, labels = next(iter(train_dataloader))
+
+	plt.close()
+	fig, axes = plt.subplots(2, 5, figsize=(12, 5))
+	for i in range(10):
+		ax = axes[i // 5, i % 5]
+		# (채널, 높이, 너비) 순서를 (높이, 너비, 채널)로 바꿈
+		ax.imshow(images[i].permute(1, 2, 0).cpu().numpy())
+		ax.set_title(f"Label: {labels[i].item()}")
+		ax.axis('off')  # 축 숨기기
+
+	plt.tight_layout()
+	return fig
