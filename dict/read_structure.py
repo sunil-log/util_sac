@@ -18,18 +18,15 @@ def build_tree(data, tree: Tree) -> None:
 				build_tree(value, branch)
 			elif isinstance(value, list):
 				branch = tree.add(f"[bold]{key}[/bold]: <list> (길이: {len(value)})")
-				# 리스트의 첫 번째 요소가 dict인 경우 예시 구조를 추가합니다.
+				# 리스트의 첫 번째 요소가 dict인 경우, 바로 구조를 추가합니다.
 				if value and isinstance(value[0], dict):
-					example_branch = branch.add("(예시 요소 구조:)")
-					build_tree(value[0], example_branch)
+					build_tree(value[0], branch)
 			else:
 				tree.add(f"[bold]{key}[/bold]: {type(value).__name__}")
 	elif isinstance(data, list):
 		branch = tree.add(f"<list> (길이: {len(data)})")
-		# 리스트의 첫 번째 요소가 dict인 경우 예시 구조를 추가합니다.
 		if data and isinstance(data[0], dict):
-			example_branch = branch.add("(예시 요소 구조:)")
-			build_tree(data[0], example_branch)
+			build_tree(data[0], branch)
 	else:
 		tree.add(str(data))
 
