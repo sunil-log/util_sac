@@ -1,7 +1,5 @@
 
 from rich.tree import Tree
-
-import json
 from rich.console import Console
 
 
@@ -64,3 +62,10 @@ def print_tree(data: dict, root_label: str = "[bold green]JSON 구조[/bold gree
 	console.print(tree)
 
 
+
+if __name__ == "__main__":
+	output_dit = "output"
+	json_file = f"{output_dit}/2pv7_confidences.json"
+	with open(json_file, "r") as f:
+		data = json.load(f)
+	print_tree(data)
