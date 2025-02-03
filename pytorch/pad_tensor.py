@@ -1,6 +1,8 @@
 
 import torch
+import numpy as np
 import matplotlib.pyplot as plt
+from util_sac.data.print_array_info import print_array_info
 
 
 def pad_tensor(z, pad_size, pad_value=0):
@@ -39,39 +41,48 @@ def pad_tensor(z, pad_size, pad_value=0):
 
 	return z_pad, z_mask
 
-
 def show_padding(z_pad, z_mask):
 	"""
-	주어진 z_pad와 z_mask를 받아서 padding 결과를 시각화합니다.
+	z_pad: PyTorch Tensor (1000, 12, 64), torch.float32
+	z_mask: PyTorch Tensor (1000,), torch.int32
 
-	z_pad는 (pad_size, a, b, c, ...) 형태일 수 있으므로, 배치 차원 이후의 모든 차원을 flatten하여
-	(pad_size, -1) 형태의 2차원 배열로 변환한 후 imshow로 그립니다.
-
-	z_mask는 (pad_size,) 형태이므로, (1, pad_size)로 reshape한 후 imshow로 그려서,
-	원래 데이터 영역(1)과 padding 영역(0)이 올바르게 구성되었는지 확인할 수 있습니다.
-
-	Parameters:
-		z_pad (torch.Tensor): padding이 적용된 텐서, shape = (pad_size, a, b, c, ...)
-		z_mask (torch.Tensor): mask 텐서, shape = (pad_size,), 원래 데이터 영역은 1, padding 영역은 0
+	이 함수는 z_pad와 z_mask를 각각 imshow로 시각화하는
+	위아래로 배치된 2개의 Subplot으로 구성된 Figure를 생성하고 반환한다.
+	각 Subplot에는 colorbar를 추가하고, color 범위는 data의 mean ± std(1 sigma)로 설정한다.
 	"""
-	# 텐서를 numpy 배열로 변환 (배치 차원 이후의 모든 차원을 flatten)
-	z_pad_vis = z_pad.view(z_pad.size(0), -1).detach().cpu().numpy()
-	z_mask_vis = z_mask.view(1, -1).detach().cpu().numpy()
 
-	# 시각화를 위한 서브플롯 생성
+	# PyTorch Tensor를 NumPy array로 변환
+	z_pad_np = z_pad.detach().cpu().numpy()
+	z_pad_np = z_pad_np[:, 0, :].T  # (64, 1000)
+
+	z_mask_np = z_mask.detach().cpu().numpy()
+	z_mask_np = z_mask_np.reshape(-1, 1).T  # (1, 1000)
+
+	# z_pad_np의 mean과 std 계산
+	z_pad_mean = np.mean(z_pad_np)
+	z_pad_std = np.std(z_pad_np)
+	vmin_pad = z_pad_mean - z_pad_std
+	vmax_pad = z_pad_mean + z_pad_std
+
+	# z_mask_np의 mean과 std 계산
+	z_mask_mean = np.mean(z_mask_np)
+	z_mask_std = np.std(z_mask_np)
+	vmin_mask = z_mask_mean - z_mask_std
+	vmax_mask = z_mask_mean + z_mask_std
+
+	# Figure와 Subplot(위아래 배치) 생성
 	plt.close()
-	fig, axes = plt.subplots(2, 1, figsize=(12, 6))
+	fig, axes = plt.subplots(2, 1, figsize=(16, 8))
 
-	# z_pad 시각화
-	im1 = axes[0].imshow(z_pad_vis, aspect='auto', interpolation='nearest')
-	axes[0].set_title('z_pad visualization')
-	plt.colorbar(im1, ax=axes[0])
+	# 첫 번째 Subplot - z_pad
+	im0 = axes[0].imshow(z_pad_np, aspect='auto', vmin=vmin_pad, vmax=vmax_pad)
+	axes[0].set_title("z_pad")
+	fig.colorbar(im0, ax=axes[0])
 
-	# z_mask 시각화 (흑백 cmap 사용)
-	im2 = axes[1].imshow(z_mask_vis, aspect='auto', interpolation='nearest', cmap='gray')
-	axes[1].set_title('z_mask visualization')
-	plt.colorbar(im2, ax=axes[1])
+	# 두 번째 Subplot - z_mask
+	im1 = axes[1].imshow(z_mask_np, aspect='auto', vmin=vmin_mask, vmax=vmax_mask)
+	axes[1].set_title("z_mask")
+	fig.colorbar(im1, ax=axes[1])
 
 	plt.tight_layout()
 	return fig
-
