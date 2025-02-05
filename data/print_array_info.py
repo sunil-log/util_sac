@@ -26,8 +26,26 @@ def print_array_info_dict(data_dict):
 
 
 def print_array_info(*args):
-	if len(args) == 1 and isinstance(args[0], dict):
-		print_array_info_dict(args[0])
+	"""
+	주어진 args에 대해:
+	- 단일 인자인 경우:
+	  - dict이면 그대로 print_array_info_dict 함수 호출
+	  - NpzFile이면 내부를 unpack하여 dict로 변환 후 print_array_info_dict 함수 호출
+	  - 그 외(일반 array 등)는 통상적인 방식으로 dict로 묶어 처리
+	- 여러 인자인 경우:
+	  - 각 인자를 dict로 묶은 후 print_array_info_dict 함수 호출
+	"""
+
+	if len(args) == 1:
+		if isinstance(args[0], dict):
+			print_array_info_dict(args[0])
+		elif isinstance(args[0], np.lib.npyio.NpzFile):
+			data_dict = {k: args[0][k] for k in args[0].files}
+			print_array_info_dict(data_dict)
+		else:
+			data_dict = {f"arg_{idx}": data for idx, data in enumerate(args)}
+			print_array_info_dict(data_dict)
 	else:
 		data_dict = {f"arg_{idx}": data for idx, data in enumerate(args)}
 		print_array_info_dict(data_dict)
+
