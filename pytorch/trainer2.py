@@ -1,4 +1,5 @@
 import torch
+from pathlib import Path
 from util_sac.data.batch_data_collector import batch_loss_collector, batch_data_collector
 
 """
@@ -136,8 +137,40 @@ def main():
 			mt.plot_metric(axes[0, 2], keys=["valid_macro_f1", "test_macro_f1"])
 			plt.tight_layout()
 			plt.savefig(tm.trial_dir / "train_test_loss.png")
+			
+	
+	# read all train_test_metrics.csv files
+	keywords = ['classify_stage', '__epoch_1000']
+	result_df = concat_train_test_metrics(keywords)
+	print(result_df)
 """
 
+
+def concat_train_test_metrics(keywords):
+	"""
+	주어진 keywords 리스트를 모두 포함하는 디렉토리를 찾아, 해당 디렉토리 내부의 train_test_metrics.csv 파일을 읽은 후,
+	각 DataFrame에 디렉토리 이름을 'fn' 컬럼으로 추가하고, 모든 DataFrame을 axis=0으로 concat하여 반환합니다.
+
+	Parameters:
+	- keywords (list of str): 디렉토리 이름에 포함되어야 하는 문자열들의 리스트
+
+	Returns:
+	- pd.DataFrame: 모든 csv 데이터를 합친 DataFrame
+	"""
+	base_path = Path('.')  # 현재 작업 디렉토리
+	dfs = []
+	# 현재 디렉토리 내의 모든 폴더 순회
+	for directory in base_path.iterdir():
+		if directory.is_dir() and all(kw in directory.name for kw in keywords):
+			csv_path = directory / 'train_test_metrics.csv'
+			if csv_path.exists():
+				df = pd.read_csv(csv_path)
+				df['fn'] = directory.name
+				dfs.append(df)
+	if dfs:
+		return pd.concat(dfs, axis=0, ignore_index=True)
+	else:
+		return pd.DataFrame()
 
 
 class BaseTrainer:
