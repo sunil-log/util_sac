@@ -141,13 +141,14 @@ def main():
 			
 	
 	# read all train_test_metrics.csv files
+	base_path = Path('./trials')  # 현재 작업 디렉토리
 	keywords = ['classify_stage', '__epoch_1000']
 	result_df = concat_train_test_metrics(keywords)
 	print(result_df)
 """
 
 
-def concat_train_test_metrics(keywords):
+def concat_train_test_metrics(base_path, keywords):
 	"""
 	주어진 keywords 리스트를 모두 포함하는 디렉토리를 찾아, 해당 디렉토리 내부의 train_test_metrics.csv 파일을 읽은 후,
 	각 DataFrame에 디렉토리 이름을 'fn' 컬럼으로 추가하고, 모든 DataFrame을 axis=0으로 concat하여 반환합니다.
@@ -158,7 +159,6 @@ def concat_train_test_metrics(keywords):
 	Returns:
 	- pd.DataFrame: 모든 csv 데이터를 합친 DataFrame
 	"""
-	base_path = Path('.')  # 현재 작업 디렉토리
 	dfs = []
 	# 현재 디렉토리 내의 모든 폴더 순회
 	for directory in base_path.iterdir():
