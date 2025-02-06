@@ -29,7 +29,30 @@ class metric_tracker:
 		self.metrics = {}
 
 	def update(self, epoch, **kwargs):
+		"""
+		각 metric의 값을 업데이트 할 때, 값이 1원소짜리 Tensor 혹은 numpy array이면
+		이를 float으로 변환하여 저장합니다.
+
+		:param epoch: 현재 epoch
+		:param kwargs: metric 이름과 그에 대응하는 값들
+		"""
+
 		for metric_name, value in kwargs.items():
+
+			# value를 float으로 변환
+			if isinstance(value, torch.Tensor):
+				value = value.item()
+			elif isinstance(value, np.ndarray):
+				if value.size == 1:
+					value = value.item()
+				else:
+					raise ValueError(
+						f"Expected single element numpy array for metric '{metric_name}', got array with shape {value.shape}."
+					)
+			else:
+				value = float(value)
+
+			# metric 업데이트
 			if metric_name not in self.metrics:
 				self.metrics[metric_name] = Metric(metric_name)
 			self.metrics[metric_name].update(epoch, value)
