@@ -1,3 +1,7 @@
+
+import torch
+import numpy as np
+
 def move_dict_tensors_to_device(d, device, float_dtype=torch.float32, int_dtype=torch.int64):
 	"""
 	이 함수는 dictionary 형태로 주어진 데이터를 torch Tensor 로 변환하고,
