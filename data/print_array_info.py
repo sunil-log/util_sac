@@ -3,10 +3,21 @@
 import torch
 import numpy as np
 
+def format_memory_size(memory_bytes):
+	"""
+	바이트 단위의 크기를 받아 적절한 단위(B, KB, MB, GB, TB)로 변환하여 문자열로 반환합니다.
+	"""
+	for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+		if memory_bytes < 1024:
+			return f"{memory_bytes:.2f} {unit}"
+		memory_bytes /= 1024
+	return f"{memory_bytes:.2f} PB"  # TB 이상인 경우
+
+
 
 def print_array_info_dict(data_dict):
-	print(f"{'Key':<10} {'Type':<15} {'Shape':<20} {'Memory':>10} {'Dtype':<10}")
-	print("-" * 70)
+	print(f"{'Key':<10} {'Type':<20} {'Shape':<20} {'Memory':>15} {'Dtype':<10}")
+	print("-" * 80)
 	for key, data in data_dict.items():
 		if isinstance(data, (torch.Tensor, np.ndarray)):
 			if isinstance(data, torch.Tensor):
@@ -20,9 +31,10 @@ def print_array_info_dict(data_dict):
 				dtype = data.dtype
 				data_type = "NumPy Array"
 
-			print(f"{key:<10} {data_type:<15} {str(shape):<20} {memory / 1024:>8.2f} KB {dtype}")
+			mem_str = format_memory_size(memory)
+			print(f"{key:<10} {data_type:<20} {str(shape):<20} {mem_str:>15} {dtype}")
 		else:
-			print(f"{key:<10} {'Other':<15} {str(type(data)):<20} {'N/A':>10} {'N/A':<10}")
+			print(f"{key:<10} {'Other':<20} {str(type(data)):<20} {'N/A':>15} {'N/A':<10}")
 
 
 def print_array_info(*args):
