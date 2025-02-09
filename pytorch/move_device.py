@@ -1,16 +1,12 @@
-
-import torch
-import numpy as np
-
 def move_dict_tensors_to_device(d, device, float_dtype=torch.float32, int_dtype=torch.int64):
 	"""
 	이 함수는 dictionary 형태로 주어진 데이터를 torch Tensor 로 변환하고,
 	지정된 device 로 이동시켜줍니다. 데이터는 torch Tensor, numpy array,
-	list 형태를 지원하며, float 과 int 값은 보통 PyTorch 에서 많이 사용하는
-	float32 와 int64 로 변환됩니다.
+	list, 그리고 숫자 형태 (예: <class 'numpy.int32'>) 를 지원하며,
+	float 과 int 값은 보통 PyTorch 에서 많이 사용하는 float32 와 int64 로 변환됩니다.
 
 	Args:
-		d (dict): 여러 torch Tensor, numpy array, list 를 값으로 가지는 dictionary.
+		d (dict): 여러 torch Tensor, numpy array, list, 숫자 를 값으로 가지는 dictionary.
 		device (torch.device): Tensor 를 옮길 대상 device.
 		float_dtype (torch.dtype): float 타입 변환에 사용할 dtype (기본값: torch.float32).
 		int_dtype (torch.dtype): int 타입 변환에 사용할 dtype (기본값: torch.int64).
@@ -18,7 +14,6 @@ def move_dict_tensors_to_device(d, device, float_dtype=torch.float32, int_dtype=
 	Returns:
 		dict: 각 값이 torch Tensor 로 변환되어, 지정된 dtype 및 device 로 이동된 dictionary.
 	"""
-
 
 	new_d = {}
 	for k, v in d.items():
@@ -40,6 +35,12 @@ def move_dict_tensors_to_device(d, device, float_dtype=torch.float32, int_dtype=
 				new_d[k] = torch.tensor(v, device=device, dtype=float_dtype)
 			else:
 				new_d[k] = torch.tensor(v, device=device, dtype=int_dtype)
+		elif isinstance(v, (int, float, np.number)):
+			# 숫자인 경우, 1개의 element를 가지는 tensor 로 변환
+			if isinstance(v, (float, np.floating)):
+				new_d[k] = torch.tensor([v], device=device, dtype=float_dtype)
+			else:
+				new_d[k] = torch.tensor([v], device=device, dtype=int_dtype)
 		else:
 			raise TypeError(f"Unsupported data type for key '{k}': {type(v)}")
 
