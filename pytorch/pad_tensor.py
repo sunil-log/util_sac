@@ -75,12 +75,12 @@ def show_padding(z_pad, z_mask):
 	fig, axes = plt.subplots(2, 1, figsize=(16, 8))
 
 	# 첫 번째 Subplot - z_pad
-	im0 = axes[0].imshow(z_pad_np, aspect='auto', vmin=vmin_pad, vmax=vmax_pad)
+	im0 = axes[0].imshow(z_pad_np, aspect='auto', vmin=vmin_pad, vmax=vmax_pad, interpolation='none')
 	axes[0].set_title("z_pad")
 	fig.colorbar(im0, ax=axes[0])
 
 	# 두 번째 Subplot - z_mask
-	im1 = axes[1].imshow(z_mask_np, aspect='auto', vmin=vmin_mask, vmax=vmax_mask)
+	im1 = axes[1].imshow(z_mask_np, aspect='auto', vmin=vmin_mask, vmax=vmax_mask, interpolation='none')
 	axes[1].set_title("z_mask")
 	fig.colorbar(im1, ax=axes[1])
 
