@@ -120,6 +120,10 @@ def apply_mask_dict(
 		- True/False 값을 사용해 필터링할 때 사용
 	Returns:
 		필터링된 dictionary (key는 그대로, 값은 mask를 적용한 Tensor)
+
+	2D mask:
+		2D mask (e.g. batch. epoch) 는 함부로 적용하면 tensor 구조가 깨질 수 있어서 구현하지 않는다.
+		다만 create_mask 함수에서 dim을 지정하면 2D mask 를 생성하는 것은 가능하다.
 	"""
 	out_dict = {}
 	for k, v in tensor_dict.items():
