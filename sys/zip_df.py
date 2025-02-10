@@ -8,7 +8,7 @@ import os
 
 
 from util_sac.sys.dir_manager import dir_manager
-from util_sac.sys.file_search import search_files_by_pattern
+from util_sac.sys.search_files import search_items_df
 
 
 fs_manager = dir_manager()
@@ -52,14 +52,14 @@ def zip_files_df(df, fn_zip):
 	"""
 
 	# apply absolute path
-	df['File Path'] = df['File Path'].apply(lambda x: os.path.abspath(x))
+	df['Path'] = df['Path'].apply(lambda x: os.path.abspath(x))
 
 	# remove common path
-	common_path = os.path.commonpath(df['File Path'].tolist())
+	common_path = os.path.commonpath(df['Path'].tolist())
 
 	# ZIP 파일 만들기
 	with zipfile.ZipFile(fn_zip, 'w', zipfile.ZIP_DEFLATED) as zf:
-		for file_path in df['File Path']:
+		for file_path in df['Path']:
 			# 공통 경로 제거하기
 			arcname = os.path.relpath(file_path, common_path)
 			print(f"adding {arcname}")
@@ -79,7 +79,7 @@ def backup_keywords(fn_zip, key_in, key_out, src_loc="."):
 	"""
 
 	# find files having some keywords in the file name
-	df = search_files_by_pattern(src_loc, r".*$")
+	df = search_items_df(src_loc, r".*$")
 	"""
 		                                               File Path                        Parent                               Stem
 	0                                                 Dockerfile                             .                         Dockerfile
@@ -92,8 +92,8 @@ def backup_keywords(fn_zip, key_in, key_out, src_loc="."):
 	"""
 
 	# key_in and key_out
-	df = df[df['File Path'].apply(lambda x: any([k in str(x) for k in key_in]))]
-	df = df[~df['File Path'].apply(lambda x: any([k in str(x) for k in key_out]))]
+	df = df[df['Path'].apply(lambda x: any([k in str(x) for k in key_in]))]
+	df = df[~df['Path'].apply(lambda x: any([k in str(x) for k in key_out]))]
 
 	# zip all
 	zip_files_df(df, fn_zip)
