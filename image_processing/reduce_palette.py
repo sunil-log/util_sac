@@ -2,7 +2,7 @@ from PIL import Image
 import numpy as np
 import io
 
-def reduce_palette_from_matplotlib_image(figure, palette_size):
+def reduce_palette(figure, palette_size):
 	"""
 	Matplotlib으로 그려진 이미지의 컬러 팔레트를 지정된 크기로 줄이는 함수.
 
