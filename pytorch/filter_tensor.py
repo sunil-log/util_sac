@@ -132,51 +132,6 @@ def apply_mask_dict(
 
 
 
-def filter_data_by_target(
-	data: dict,
-	target: dict
-) -> dict:
-	"""
-	data와 target 정보를 받아 mask를 생성하고,
-	해당 mask로 data를 필터링한 결과를 반환한다.
-
-	Args:
-		data (dict):
-			필터링 대상이 되는 {key: torch.Tensor} 형태의 dictionary
-		target (dict):
-			{
-			  "key": str,		# 예: "label"
-			  "data": list,	  # 예: [0, 1, 0, 0, 0]
-			  "dim": int,		# 예: -1
-			  "multi": bool	  # 예: False
-			  ...			   # 필요하면 match_mode 등 추가
-			}
-
-	Returns:
-		dict: mask가 적용된 필터링 결과 {key: torch.Tensor}
-	"""
-	# target에서 필요한 정보 파싱
-	key = target["key"]
-	target_value = target["data"]
-	dim = target.get("dim", -1)
-	multi = target.get("multi", False)
-	match_mode = target.get("match_mode", "all")
-
-	# mask 생성
-	mask = create_mask(
-		data[key],
-		target=target_value,
-		dim=dim,
-		match_mode=match_mode,
-		multi=multi
-	)
-
-	# mask 적용
-	filtered_data = apply_mask_dict(data, mask)
-	return filtered_data
-
-
-
 
 if __name__ == '__main__':
 
