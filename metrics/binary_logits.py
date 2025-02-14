@@ -20,6 +20,17 @@ from util_sac.image_processing.reduce_palette import reduce_palette_from_matplot
 from scipy.special import softmax
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, roc_auc_score, roc_curve
 
+"""
+이 스크립트는 Binary Classification 문제에서 Validation Set을 통해
+ROC Curve 및 Youden's J Statistic으로 최적 Threshold를 찾고,
+Accuracy, F1, AUC, Confusion Matrix 등 다양한 Performance Metric을 계산 및 시각화하기 위한 것입니다.
+
+주요 기능:
+1. Validation Set의 ROC Curve와 Youden's J Statistic을 이용해 Threshold 탐색
+2. Softmax로 계산된 확률에 기반한 예측 레이블 생성
+3. Accuracy, F1, AUC, Confusion Matrix 등 성능 지표 산출
+4. Confusion Matrix 등 시각화
+"""
 
 
 def pred_by_threshold(data, threshold):
