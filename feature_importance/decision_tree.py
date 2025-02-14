@@ -132,24 +132,35 @@ def feature_importance_tree(X_train, y_train, X_test, y_test, feature_names):
 	# feature importance 출력 및 시각화
 	importances = model.feature_importances_
 
+	# 시각화
 	plt.close()
-	plt.figure(figsize=(8, 6))
-	plt.barh(feature_names, importances)
-	plt.xlabel('Importance')
-	plt.title('Feature Importances')
-	plt.gca().invert_yaxis()  # 가독성을 위해 위에서부터 중요한 feature가 오도록 설정
-	plt.savefig("feature_importance.png")
+	fig, axes = plt.subplots(1, 2, figsize=(12, 6))
 
-	# 트리 시각화
-	from sklearn.tree import plot_tree
+	# 첫 번째 subplot: Feature Importance
+	axes[0].barh(feature_names, importances, color='skyblue')
+	axes[0].set_xlabel('Importance')
+	axes[0].set_title('Feature Importances (Random Forest)')
+	axes[0].invert_yaxis()
 
-	plt.close()
-	plt.figure(figsize=(20, 10))
-	plot_tree(model, feature_names=feature_names, filled=True)
-	plt.title('Decision Tree Visualization')
-	plt.savefig("decision_tree.png")
+	# 두 번째 subplot: Confusion Matrix (matplotlib imshow 사용)
+	im = axes[1].imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+	axes[1].set_title(f'Confusion Matrix\nAccuracy: {accuracy:.2f}, Macro-F1: {macro_f1:.2f}')
+	axes[1].set_xlabel('Predicted Label')
+	axes[1].set_ylabel('True Label')
 
-	return model
+	# Colorbar 추가
+	fig.colorbar(im, ax=axes[1])
+
+	# 각 셀에 숫자 표기 (값에 따라 글자색 변경)
+	thresh = cm.max() / 2.0
+	for i in range(cm.shape[0]):
+		for j in range(cm.shape[1]):
+			color = "white" if cm[i, j] > thresh else "black"
+			axes[1].text(j, i, format(cm[i, j], 'd'),
+						 ha="center", va="center", color=color)
+
+	plt.tight_layout()
+	return model, fig
 
 
 if __name__ == '__main__':
