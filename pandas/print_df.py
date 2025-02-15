@@ -1,40 +1,37 @@
 
 
-def print_partial_markdown(df, n_rows=10):
-	"""
-	Prints the top and bottom n_rows of the dataframe in Markdown format with ellipses in between.
 
-	Args:
-	df (pd.DataFrame): The dataframe to be printed.
-	n_rows (int): Number of rows to display from the top and bottom of the dataframe.
+def print_partial_markdown(df, n_rows=10, file_name=None):
+    """
+    DataFrame을 Markdown 형태로 부분 출력하고, file_name이 주어지면 전체 데이터를 파일에 저장합니다.
 
-	Returns:
-	None
-	"""
-	# 데이터프레임을 Markdown 형식으로 변환
-	markdown_str = df.to_markdown()
+    Args:
+        df (pd.DataFrame): Markdown으로 변환할 DataFrame.
+        n_rows (int, optional): DataFrame에서 상단과 하단에 출력할 행의 개수. 기본값은 10입니다.
+        file_name (str, optional): 지정할 경우, 전체 DataFrame을 Markdown 형태로 file_name에 저장합니다.
+                                  주어지지 않으면 파일로 저장하지 않습니다.
 
-	if n_rows is None:
-		print(markdown_str)
-		print(f"Total number of rows: {len(df)}")
-		return
+    Returns:
+        None
+    """
+    # DataFrame을 전체 Markdown 문자열로 변환
+    markdown_str = df.to_markdown()
 
-	# 개행 문자로 분리하여 행 리스트로 변환
-	lines = markdown_str.split('\n')
+    # 화면에 출력할 부분(상·하단 n_rows)
+    lines = markdown_str.split('\n')
+    if len(lines) < 2 * n_rows:
+        partial_str = markdown_str
+    else:
+        # 상위 n_rows + 헤더 2행 + ... + 하위 n_rows
+        selected_lines = lines[:n_rows + 2] + ['...'] + lines[-n_rows:]
+        partial_str = '\n'.join(selected_lines)
 
-	if len(lines) < 2*n_rows:
-		print(markdown_str)
-		print(f"Total number of rows: {len(df)}")
-		return
+    # 부분 출력
+    print(partial_str)
+    print(f"Total number of rows: {len(df)}")
 
-	else:
-		# 상위 n_rows + 헤더 행 + 하위 n_rows 선택
-		# 헤더와 구분선(---|---|--- 형태)은 항상 첫 두 행에 위치
-		selected_lines = lines[:n_rows + 2] + ['...'] + lines[-n_rows:]
-
-		# 선택된 행들을 다시 하나의 문자열로 합치기
-		result_str = '\n'.join(selected_lines)
-
-		print(result_str)
-		print(f"Total number of rows: {len(df)}")
-		return
+    # file_name이 주어지면 전체 Markdown을 파일에 저장
+    if file_name is not None:
+        with open(file_name, 'w', encoding='utf-8') as f:
+            f.write(markdown_str)
+            f.write(f"\nTotal number of rows: {len(df)}\n")
