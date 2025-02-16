@@ -22,6 +22,9 @@ def print_vram_usage(device='cuda'):
 
 	Args:
 		device (str): 확인할 디바이스, 기본값은 'cuda'입니다.
+
+	Epoch마다 VRAM 사용량 출력 (정확한 측정을 위해서는 torch.cuda.synchronize() 후 확인)
+	다른 터미널에서 'watch -n 1 nvidia-smi' 등의 명령으로 실시간 모니터링 가능
 	"""
 	# 정확한 측정을 위해서는 필요에 따라 torch.cuda.synchronize() 호출 가능
 	allocated = torch.cuda.memory_allocated(device) / (1024**2)  # MB 단위
