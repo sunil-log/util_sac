@@ -5,13 +5,13 @@ import torch
 def estimate_model_size(model):
 	# 파라미터 개수 계산
 	num_params = sum(p.numel() for p in model.parameters())
-	print(f"파라미터 개수: {num_params:,}")
+	print(f"파라미터 개수: {num_params:,}", flush=True)
 
 	# 메모리 사용량 계산 (bytes)
 	mem_params = sum(p.numel() * p.element_size() for p in model.parameters())
 	mem_bufs = sum(buf.numel() * buf.element_size() for buf in model.buffers())
 	mem_total = mem_params + mem_bufs
-	print(f"메모리 사용량: {mem_total:,} bytes")
+	print(f"메모리 사용량: {mem_total:,} bytes", flush=True)
 
 
 def print_vram_usage(device='cuda'):
@@ -27,5 +27,5 @@ def print_vram_usage(device='cuda'):
 	allocated = torch.cuda.memory_allocated(device) / (1024**2)  # MB 단위
 	reserved  = torch.cuda.memory_reserved(device)  / (1024**2)  # MB 단위
 
-	print(f"[{device}] 현재 할당량(allocated): {allocated:.2f} MB")
-	print(f"[{device}] 현재 예약량(reserved) : {reserved:.2f} MB")
+	print(f"[{device}] 현재 할당량(allocated): {allocated:.2f} MB", flush=True)
+	print(f"[{device}] 현재 예약량(reserved) : {reserved:.2f} MB", flush=True)
