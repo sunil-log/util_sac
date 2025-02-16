@@ -70,3 +70,20 @@ def prepare_data(train=True, flatten=True, cnn=True):
 
 	return images, targets
 
+
+if __name__ == "__main__":
+	# train용 DataLoader
+	train_loader = load_dataloader(batch_size=64, train=True, flatten=True, cnn=True, shuffle=True)
+	test_loader = load_dataloader(batch_size=64, train=False, flatten=True, cnn=True, shuffle=False)
+
+	# 간단한 테스트 코드 (train)
+	for batch_idx, (images, targets) in enumerate(train_loader):
+		print(f"[Train] Batch {batch_idx} - images.shape: {images.shape}, targets.shape: {targets.shape}")
+		# 필요한 로직을 여기에 추가
+		break
+
+	# 간단한 테스트 코드 (test)
+	for batch_idx, (images, targets) in enumerate(test_loader):
+		print(f"[Test] Batch {batch_idx} - images.shape: {images.shape}, targets.shape: {targets.shape}")
+		# 필요한 로직을 여기에 추가
+		break
