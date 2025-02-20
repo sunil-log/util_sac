@@ -98,9 +98,14 @@ def search_items_df(root_dir: str,
 if __name__ == "__main__":
 	# 사용 예시
 
-	# 1) txt 파일 검색 후 DataFrame
+	"""
+	1) txt 파일 검색 후 DataFrame
+		re 는 파일 이름만 검색. 
+		- good: r"chunk_.*\.npz" 
+		- bad: r".*/chunk_.*\.npz"
+	"""
 	root_directory = "/path/to/root/directory"
-	search_pattern = r".*\.txt$"  # 정규표현식 (문자열)
+	search_pattern = r".*\.txt$"  # 정규표현식
 	result_df = search_items_df(root_directory, search_pattern, search_type="files")
 	print(result_df)
 
