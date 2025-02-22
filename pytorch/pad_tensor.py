@@ -41,48 +41,48 @@ def pad_tensor(z, pad_size, pad_value=0):
 
 	return z_pad, z_mask
 
-def show_padding(z_pad, z_mask):
+
+def show_multi_tensors(**kwargs):
 	"""
-	z_pad: PyTorch Tensor (1000, 12, 64), torch.float32
-	z_mask: PyTorch Tensor (1000,), torch.int32
+	여러 개의 PyTorch Tensor를 **kwargs 형태로 받아,
+	각각의 데이터를 Subplot으로 시각화하여 하나의 Figure로 반환합니다.
 
-	이 함수는 z_pad와 z_mask를 각각 imshow로 시각화하는
-	위아래로 배치된 2개의 Subplot으로 구성된 Figure를 생성하고 반환한다.
-	각 Subplot에는 colorbar를 추가하고, color 범위는 data의 mean ± std(1 sigma)로 설정한다.
+	용례:
+		fig = show_multi_tensors(eeg=z_eeg, eog=z_eog, emg=z_emg, pad_mask=pad_mask)
+
+	각 Tensor는 다음 형태 중 하나로 가정합니다:
+	(1000,) 혹은 (1000, c), (1000, c, d) 등
+
+	- 1차원 (1000,)일 경우: (1, 1000) 형태로 변환하여 시각화합니다.
+	- 2차원 (1000, c)일 경우: (c, 1000) 형태로 변환(전치)하여 시각화합니다.
+	- 3차원 (1000, c, d)일 경우: 두 번째 축(채널 중 첫 번째)만 사용 후 전치하여 (d, 1000) 형태로 시각화합니다.
+
+	시각화 범위(vmin, vmax)는 각 데이터의 mean ± std(1 sigma)로 설정하고,
+	데이터마다 colorbar를 추가합니다.
 	"""
-
-	# PyTorch Tensor를 NumPy array로 변환
-	z_pad_np = z_pad.detach().cpu().numpy()
-	z_pad_np = z_pad_np[:, 0, :].T  # (64, 1000)
-
-	z_mask_np = z_mask.detach().cpu().numpy()
-	z_mask_np = z_mask_np.reshape(-1, 1).T  # (1, 1000)
-
-	# z_pad_np의 mean과 std 계산
-	z_pad_mean = np.mean(z_pad_np)
-	z_pad_std = np.std(z_pad_np)
-	vmin_pad = z_pad_mean - z_pad_std
-	vmax_pad = z_pad_mean + z_pad_std
-
-	# z_mask_np의 mean과 std 계산
-	z_mask_mean = np.mean(z_mask_np)
-	z_mask_std = np.std(z_mask_np)
-	vmin_mask = z_mask_mean - z_mask_std
-	vmax_mask = z_mask_mean + z_mask_std
-
-	# Figure와 Subplot(위아래 배치) 생성
 	plt.close()
-	fig, axes = plt.subplots(2, 1, figsize=(16, 8))
+	fig, axes = plt.subplots(len(kwargs), 1, figsize=(16, 3 * len(kwargs)), squeeze=False)
 
-	# 첫 번째 Subplot - z_pad
-	im0 = axes[0].imshow(z_pad_np, aspect='auto', vmin=vmin_pad, vmax=vmax_pad, interpolation='none')
-	axes[0].set_title("z_pad")
-	fig.colorbar(im0, ax=axes[0])
+	for i, (key, val) in enumerate(kwargs.items()):
+		data = val.detach().cpu().numpy()
 
-	# 두 번째 Subplot - z_mask
-	im1 = axes[1].imshow(z_mask_np, aspect='auto', vmin=vmin_mask, vmax=vmax_mask, interpolation='none')
-	axes[1].set_title("z_mask")
-	fig.colorbar(im1, ax=axes[1])
+		# 데이터 형태에 따라 2D 형태로 변환
+		if data.ndim == 1:  # (1000,)
+			data = data.reshape(1, -1)  # (1, 1000)
+		elif data.ndim == 2:  # (1000, c)
+			data = data.T  # (c, 1000)
+		elif data.ndim == 3:  # (1000, c, d)
+			data = data[:, 0, :].T  # (d, 1000)
+
+		# mean ± std 범위 설정
+		d_mean = np.mean(data)
+		d_std = np.std(data)
+		vmin = d_mean - d_std
+		vmax = d_mean + d_std
+
+		im = axes[i, 0].imshow(data, aspect='auto', vmin=vmin, vmax=vmax, interpolation='none')
+		axes[i, 0].set_title(key)
+		fig.colorbar(im, ax=axes[i, 0])
 
 	plt.tight_layout()
 	return fig
