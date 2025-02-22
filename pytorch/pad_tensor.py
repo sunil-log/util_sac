@@ -86,3 +86,52 @@ def show_multi_tensors(**kwargs):
 
 	plt.tight_layout()
 	return fig
+
+
+if __name__ == "__main__":
+
+	# 각 데이터를 인코더에 통과시켜 임베딩 얻기
+	z_eeg = encoder_eeg(d["eeg"])
+	z_eog = encoder_eog(d["eog"])
+	z_emg = encoder_emg(d["emg"])
+	"""
+	print_array_info({"z_eeg": z_eeg, "z_eog": z_eog, "z_emg": z_emg,})
+	z_eeg      PyTorch Tensor       (710, 12, 64)                2.08 MB torch.float32
+	z_eog      PyTorch Tensor       (710, 12, 32)                1.04 MB torch.float32
+	z_emg      PyTorch Tensor       (710, 12, 32)                1.04 MB torch.float32
+	"""
+
+	# 각 padding
+	z_eeg, pad_mask = pad_tensor(z_eeg, 1000)
+	z_eog, _ = pad_tensor(z_eog, 1000)
+	z_emg, _ = pad_tensor(z_emg, 1000)
+	stage, _ = pad_tensor(d["stage"], 1000)
+	class_rbd, _ = pad_tensor(d["class_rbd"], 1000)
+	class_pd, _ = pad_tensor(d["class_pd"], 1000)
+	hospital, _ = pad_tensor(d["hospital"], 1000)
+	subject_id, _ = pad_tensor(d["subject_id"], 1000)
+	"""
+	print_array_info({
+		"z_eeg": z_eeg, "z_eog": z_eog, "z_emg": z_emg,
+		"pad_mask": pad_mask
+	})
+	z_eeg      PyTorch Tensor       (1000, 12, 64)               2.93 MB torch.float32
+	z_eog      PyTorch Tensor       (1000, 12, 32)               1.46 MB torch.float32
+	z_emg      PyTorch Tensor       (1000, 12, 32)               1.46 MB torch.float32
+	stage      PyTorch Tensor       (1000, 5)                   39.06 KB torch.int64
+	class_rbd  PyTorch Tensor       (1000,)                      7.81 KB torch.int64
+	class_pd   PyTorch Tensor       (1000,)                      7.81 KB torch.int64
+	hospital   PyTorch Tensor       (1000, 5)                   39.06 KB torch.int64
+	subject_id PyTorch Tensor       (1000, 413)                  3.15 MB torch.int64
+	"""
+
+	fig = show_multi_tensors(
+		eeg=z_eeg,
+		eog=z_eog,
+		emg=z_emg,
+		stage=stage,
+		pad_mask=pad_mask,
+	)
+	img = reduce_palette(fig, 32)
+	img.save(f"padding_{i}__weight_{id_weight}.png")
+	exit()
