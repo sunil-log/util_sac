@@ -61,7 +61,7 @@ def show_multi_tensors(**kwargs):
 	데이터마다 colorbar를 추가합니다.
 	"""
 	plt.close()
-	fig, axes = plt.subplots(len(kwargs), 1, figsize=(16, 3 * len(kwargs)), squeeze=False)
+	fig, axes = plt.subplots(len(kwargs), 1, figsize=(16, 2 * len(kwargs)), squeeze=False)
 
 	for i, (key, val) in enumerate(kwargs.items()):
 		data = val.detach().cpu().numpy()
@@ -72,7 +72,8 @@ def show_multi_tensors(**kwargs):
 		elif data.ndim == 2:  # (1000, c)
 			data = data.T  # (c, 1000)
 		elif data.ndim == 3:  # (1000, c, d)
-			data = data[:, 0, :].T  # (d, 1000)
+			data = data.max(axis=1).T  # (d, 1000)
+			# data = data[:, 0, :].T  # (d, 1000)
 
 		# mean ± std 범위 설정
 		d_mean = np.mean(data)
