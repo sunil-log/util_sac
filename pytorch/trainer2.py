@@ -119,6 +119,9 @@ def main():
 
 		plt.hist(test_data['x_hat'].flatten(), bins=30, density=True)
 		
+		print_array_info(train_data)
+
+		
 		if epoch % 5 == 0:
 
 			# save model
