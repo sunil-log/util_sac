@@ -36,7 +36,6 @@ def calculate_f1(data, name="test"):
 	"""
 	tensor([0.8598, 0.0979])
 	"""
-	print(f1_per_class)
 
 	# 2) 전체 클래스에 대해 Macro average F1Score 계산
 	f1_metric_macro = F1Score(

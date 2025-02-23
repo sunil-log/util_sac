@@ -120,7 +120,7 @@ class CustomDataset(Dataset):
 
 
 
-def score_neural_net(
+def train_neural_net(
 		X_train, y_train,
 		X_test, y_test,
 		n_epoch, lr
