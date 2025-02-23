@@ -122,7 +122,9 @@ class CustomDataset(Dataset):
 
 def score_neural_net(
 		X_train, y_train,
-		X_test, y_test):
+		X_test, y_test,
+		n_epoch, lr
+):
 
 	"""
 	X_train    NumPy Array          (1442, 64)                 360.50 KB float32
@@ -149,7 +151,7 @@ def score_neural_net(
 		hidden_size=16,
 		num_classes=n_class
 	)
-	optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+	optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 	criterion = nn.CrossEntropyLoss()
 
 	# trainer
@@ -158,7 +160,7 @@ def score_neural_net(
 		dataloaders=dataloaders,
 		optimizer=optimizer,
 		criterion=criterion,
-		n_epoch=30,
+		n_epoch=n_epoch,
 	)
 
 	# train
@@ -199,4 +201,23 @@ def score_neural_net(
 
 
 if __name__ == "__main__":
-	pass
+
+	# concatenate
+	X = np.concatenate(list_eeg, axis=0)
+	y = np.concatenate(list_label, axis=0)
+	feature_names = [f'feature_{i}' for i in range(X.shape[1])]
+	"""
+	X        NumPy Array          (2061, 64)                 515.25 KB float32
+	y        NumPy Array          (2061,)                     16.10 KB int64
+	"""
+
+	from sklearn.model_selection import train_test_split
+
+	X_train, X_test, y_train, y_test = train_test_split(
+		X,
+		y,
+		test_size=0.3,
+		random_state=42
+	)
+
+	res = score_neural_net(X_train, y_train, X_test, y_test, n_epoch=100, lr=1e-4)
