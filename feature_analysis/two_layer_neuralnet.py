@@ -122,9 +122,7 @@ class CustomDataset(Dataset):
 
 def score_neural_net(
 		X_train, y_train,
-		X_test, y_test,
-		feature_names,
-):
+		X_test, y_test):
 
 	"""
 	X_train    NumPy Array          (1442, 64)                 360.50 KB float32
@@ -183,7 +181,20 @@ def score_neural_net(
 
 	df = mt.generate_df()
 	max_f1_dict = df.loc[df["f1_class_macro_test"].idxmax()].to_dict()
-	print(max_f1_dict)
+	"""
+	{
+		'epoch': 20.0, 
+		'train_loss': 0.20217878970762956, 
+		'test_loss': 0.24036466106772422, 
+		'f1_class_0_train': 0.9549980163574219, 
+		'f1_class_1_train': 0.697050929069519, 
+		'f1_class_macro_train': 0.8260244727134705, 
+		'f1_class_0_test': 0.9438877701759338, 
+		'f1_class_1_test': 0.7666666507720947, 
+		'f1_class_macro_test': 0.8552771806716919
+	}
+	"""
+	return max_f1_dict
 
 
 
