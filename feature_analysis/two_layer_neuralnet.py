@@ -169,8 +169,8 @@ def train_neural_net(
 		train_loss, train_data = trainer.one_epoch(mode='train', epoch=epoch)
 		test_loss, test_data = trainer.one_epoch(mode='test', epoch=epoch)
 
-		print_array_info(train_data)
 		"""
+		print_array_info(train_data)
 		logits     PyTorch Tensor       (1442, 2)                   11.27 KB torch.float32
 		y          PyTorch Tensor       (1442,)                     11.27 KB torch.int64
 		"""
