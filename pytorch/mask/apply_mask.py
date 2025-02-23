@@ -35,7 +35,7 @@ def apply_mask_1d(tensor_dict: dict, mask: torch.Tensor, device: torch.device) -
 		# device로 이동
 		v = v.to(device)
 		# 인덱싱
-		out_dict[k] = v[mask]
+		out_dict[k] = v[mask].cpu()  # 여기서 .cpu()로 VRAM 절감
 	return out_dict
 
 
@@ -80,7 +80,7 @@ def apply_mask_2d(tensor_dict: dict, mask: torch.Tensor, device: torch.device) -
 
 		# (B,T, ...) -> (B*T, ...)
 		flat_v = v.view(-1, *v.shape[2:])
-		out_dict[k] = flat_v[mask_1d]
+		out_dict[k] = flat_v[mask_1d].cpu()  # 여기서 .cpu()로 VRAM 절감
 	return out_dict
 
 
