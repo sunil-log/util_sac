@@ -184,5 +184,5 @@ if __name__ == '__main__':
 		random_state=42
 	)
 
-	feature_importance(X_train, y_train, X_test, y_test, feature_names)
+	feature_importance_tree(X_train, y_train, X_test, y_test, feature_names)
 
