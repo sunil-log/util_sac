@@ -124,6 +124,8 @@ def apply_mask_dict(tensor_dict: dict, mask, device: torch.device) -> dict:
 
 if __name__ == "__main__":
 
+	from util_sac.pytorch.mask.apply_mask import apply_mask_dict
+
 	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 	# 예: B=3, T=2
