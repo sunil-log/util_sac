@@ -56,7 +56,7 @@ def objective_rf(trial, X, y):
 	return -scores.mean()  # Optuna가 최소화를 수행하므로 음수 부호를 붙여 반환
 
 
-def run_optimize_forest(X, y):
+def run_optimize_forest(X, y, n_trials=100):
 	"""
 	Random Forest 하이퍼파라미터를 Optuna로 최적화한 뒤,
 	최적의 하이퍼파라미터로 학습된 모델을 반환합니다.
@@ -74,7 +74,7 @@ def run_optimize_forest(X, y):
 		최적의 하이퍼파라미터로 학습된 Random Forest 모델을 반환합니다.
 	"""
 	study = optuna.create_study(direction='minimize')
-	study.optimize(lambda trial: objective_rf(trial, X, y), n_trials=100)
+	study.optimize(lambda trial: objective_rf(trial, X, y), n_trials=n_trials)
 
 	best_params = study.best_params
 	print("Best hyperparameters:", best_params)
@@ -86,7 +86,12 @@ def run_optimize_forest(X, y):
 	return model
 
 
-def feature_importance_forest(X_train, y_train, X_test, y_test, feature_names):
+def feature_importance_forest(
+		X_train, y_train,
+		X_test, y_test,
+		feature_names,
+		n_trials=100,
+):
 	"""
 	run_optimize_forest로 구한 최적화된 Random Forest 모델을 이용하여
 	test set에 대한 accuracy, confusion matrix, macro-F1 score를 출력하고,
@@ -114,7 +119,7 @@ def feature_importance_forest(X_train, y_train, X_test, y_test, feature_names):
 
 
 	# 최적화된 모델 학습
-	model = run_optimize_forest(X_train, y_train)
+	model = run_optimize_forest(X_train, y_train, n_trials)
 
 	# 예측 및 평가
 	y_pred = model.predict(X_test)
