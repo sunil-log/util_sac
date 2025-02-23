@@ -5,6 +5,8 @@ import numpy as np
 def apply_mask_1d(tensor_dict: dict, mask: torch.Tensor, device: torch.device) -> dict:
 	"""
 	1차원 mask (shape=(B,)) 또는 (B,1) 처리 전용 함수.
+		예를 들어 (epoch, dim) 이 있는데,
+		mask 가 (epoch) or (epoch, 1)= valid epoch 인 경우 사용
 
 	1) mask가 numpy.ndarray라면 torch.Tensor로 변환
 	2) mask가 0/1 (int/float)이면 bool로 변환 (mask != 0)
@@ -40,6 +42,8 @@ def apply_mask_1d(tensor_dict: dict, mask: torch.Tensor, device: torch.device) -
 def apply_mask_2d(tensor_dict: dict, mask: torch.Tensor, device: torch.device) -> dict:
 	"""
 	2차원 mask (shape=(B,T)) 처리 전용 함수.
+		예를 들어 (subject, epoch, dim) 이 있는데,
+		mask 가 (subject, epoch) = valid epoch 인 경우 사용
 
 	1) mask가 numpy.ndarray라면 torch.Tensor로 변환
 	2) mask가 0/1 (int/float)이면 bool로 변환 (mask != 0)
@@ -83,6 +87,14 @@ def apply_mask_2d(tensor_dict: dict, mask: torch.Tensor, device: torch.device) -
 def apply_mask_dict(tensor_dict: dict, mask, device: torch.device) -> dict:
 	"""
 	하나의 함수에서 1D/2D mask를 구분해서 처리.
+
+		1차원 mask (shape=(B,)) 또는 (B,1)
+			예를 들어 (epoch, dim) 이 있는데,
+			mask 가 (epoch) or (epoch, 1)= valid epoch 인 경우 사용
+
+		2차원 mask (shape=(B,T))
+			예를 들어 (subject, epoch, dim) 이 있는데,
+			mask 가 (subject, epoch) = valid epoch 인 경우 사용
 
 	Args:
 		tensor_dict (dict): {key: torch.Tensor or np.ndarray} 형태
