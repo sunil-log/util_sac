@@ -104,6 +104,7 @@ class TwoLayerNet(nn.Module):
 		return x
 
 
+
 class CustomDataset(Dataset):
 	def __init__(self, X, y):
 		self.X = X
@@ -123,7 +124,7 @@ class CustomDataset(Dataset):
 def train_neural_net(
 		X_train, y_train,
 		X_test, y_test,
-		n_epoch, lr
+		n_epoch=100, batch_size=32, lr=1e-4
 ):
 
 	"""
@@ -138,8 +139,8 @@ def train_neural_net(
 	train_dataset = CustomDataset(X_train, y_train)
 	test_dataset = CustomDataset(X_test, y_test)
 	dataloaders = {
-	    'train': DataLoader(train_dataset, batch_size=32, shuffle=True),
-	    'test': DataLoader(test_dataset, batch_size=32, shuffle=False)
+	    'train': DataLoader(train_dataset, batch_size=batch_size, shuffle=True),
+	    'test': DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 	}
 
 
