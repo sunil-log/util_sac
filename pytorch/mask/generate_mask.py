@@ -2,6 +2,38 @@ import torch
 import numpy as np
 
 
+"""
+이 모듈은 PyTorch Tensor 데이터를 특정 target 조건과 비교하여 boolean mask를 생성하고,
+해당 mask를 사용해 dictionary 형태의 Tensor 데이터를 효율적으로 필터링하기 위한
+유틸리티 함수들을 제공합니다.
+
+주요 기능:
+- create_mask_single:
+    주어진 data Tensor와 하나의 target을 비교해 boolean mask를 생성합니다.
+- create_mask_multi_targets:
+    여러 target을 OR 연산으로 결합해 boolean mask를 생성합니다.
+- create_mask:
+    단일 또는 복수의 target에 대해 boolean mask를 생성할 수 있도록 관리하는 함수입니다.
+- apply_mask_dict_1D:
+    생성된 boolean mask를 dictionary 형태의 Tensor 데이터에 적용해 필터링을 수행합니다.
+
+용례:
+1) 단일 target에 대한 필터링
+    예를 들어, data["label"]에 1이 포함된 row만 골라내고 싶다면:
+    >>> mask = create_mask(data["label"], target=1, dim=-1, match_mode='any', multi=False)
+    >>> filtered_data = apply_mask_dict_1D(data, mask)
+
+2) 다중 target에 대한 필터링
+    예를 들어, data["label"]에서 [0,1,0,0,0] 또는 [0,0,1,0,0]을 가진 row만 필터링하려면:
+    >>> target_info = { "data": [[0,1,0,0,0], [0,0,1,0,0]], "dim": -1, "multi": True }
+    >>> mask = create_mask(data["label"], **target_info)
+
+이를 통해 다차원 Tensor에서 특정 조건('all' 혹은 'any')을 만족하는 요소들만 빠르게 추출하고,
+추가 연산을 용이하게 수행할 수 있습니다.
+"""
+
+
+
 def create_mask_single(
 		data: torch.Tensor,	  # 필터 조건을 확인할 텐서 (예: stage, class_rbd 등)
 		target,				  # 단일 타겟 (int 또는 1D/2D 텐서 가능, list나 numpy로도 가능)
@@ -110,7 +142,7 @@ def create_mask(
 
 
 
-def apply_mask_dict(
+def apply_mask_dict_1D(
 	tensor_dict: dict,
 	mask: torch.Tensor
 ) -> dict:
