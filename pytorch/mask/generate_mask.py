@@ -20,13 +20,11 @@ import numpy as np
 용례:
 1) 단일 target에 대한 필터링
     예를 들어, data["label"]에 1이 포함된 row만 골라내고 싶다면:
-    >>> mask = create_mask(data["label"], target=1, dim=-1, match_mode='any', multi=False)
-    >>> filtered_data = apply_mask_dict_1D(data, mask)
+    >>> mask = create_mask(data["label"], target=1, dim=-1)
 
 2) 다중 target에 대한 필터링
     예를 들어, data["label"]에서 [0,1,0,0,0] 또는 [0,0,1,0,0]을 가진 row만 필터링하려면:
-    >>> target_info = { "data": [[0,1,0,0,0], [0,0,1,0,0]], "dim": -1, "multi": True }
-    >>> mask = create_mask(data["label"], **target_info)
+    >>> mask = create_mask(data["label"], target=[[0,1,0,0,0], [0,0,1,0,0]], dim=-1, multi=True)
 
 이를 통해 다차원 Tensor에서 특정 조건('all' 혹은 'any')을 만족하는 요소들만 빠르게 추출하고,
 추가 연산을 용이하게 수행할 수 있습니다.
@@ -143,52 +141,33 @@ def create_mask(
 
 if __name__ == '__main__':
 
-	# from util_sac.data.print_array_info import print_array_info
-	# from util_sac.pytorch.filter_tensor import filter_data_by_target
-
-	# 예시 data 생성: [B, ts, feature] = [6, 10, 3]
-	x1 = torch.randn(6, 10, 3)
-	x2 = torch.randn(6, 2, 3)
-
-	# 예시 label 생성: [B, 5] = [6, 5]
-	label = torch.tensor([
-		[0, 1, 0, 0, 0],
-		[0, 0, 1, 0, 0],
-		[1, 0, 0, 0, 0],
-		[0, 1, 0, 0, 0],
-		[0, 1, 0, 0, 0],
-		[1, 0, 0, 0, 0]
-	], dtype=torch.int64)
-
-	data = {"x1": x1, "x2": x2, "label": label}
+	# load data
+	fn = './data/encoded__weight_4990__normalize_False.npz'
+	data = np.load(fn)
 	"""
-	target_info = {
-		"key": "label",
-		"data": [0, 1, 0, 0, 0],
-		"dim": -1,
-		"multi": False
-	}
+	z_eeg      NumPy Array          (413, 1000, 12, 64)          1.18 GB float32
+	z_eog      NumPy Array          (413, 1000, 12, 32)        604.98 MB float32
+	z_emg      NumPy Array          (413, 1000, 12, 32)        604.98 MB float32
+	z_mask     NumPy Array          (413, 1000)                  1.58 MB int32
+	stage      NumPy Array          (413, 1000, 5)              15.75 MB int64
+	class_rbd  NumPy Array          (413, 1000)                  3.15 MB int64
+	class_pd   NumPy Array          (413, 1000)                  3.15 MB int64
+	hospital   NumPy Array          (413, 1000, 5)              15.75 MB int64
+	subject_id NumPy Array          (413, 1000, 413)             1.27 GB int64
 	"""
-	target_info = {
-		"key": "label",
-		"data": [[0, 1, 0, 0, 0], [0, 0, 1, 0, 0]],
-		"dim": -1,
-		"multi": True
-	}
 
-
-	filtered_data = filter_data_by_target(data, target_info)
-
+	mask = data['z_mask'].copy()
+	data = apply_mask_dict(data, mask, device)
 	"""
-	print_array_info(filtered_data)
-	print(filtered_data["label"])
-	
-	x1         PyTorch Tensor       (4, 10, 3)                  480.00 B torch.float32
-	x2         PyTorch Tensor       (4, 2, 3)                    96.00 B torch.float32
-	label      PyTorch Tensor       (4, 5)                      160.00 B torch.int64
-
-	tensor([[0, 1, 0, 0, 0],
-	        [0, 0, 1, 0, 0],
-	        [0, 1, 0, 0, 0],
-	        [0, 1, 0, 0, 0]])
+	z_eeg      PyTorch Tensor       (273419, 12, 64)           801.03 MB torch.float32
+	z_eog      PyTorch Tensor       (273419, 12, 32)           400.52 MB torch.float32
+	z_emg      PyTorch Tensor       (273419, 12, 32)           400.52 MB torch.float32
+	z_mask     PyTorch Tensor       (273419,)                    1.04 MB torch.int32
+	stage      PyTorch Tensor       (273419, 5)                 10.43 MB torch.int64
+	class_rbd  PyTorch Tensor       (273419,)                    2.09 MB torch.int64
+	class_pd   PyTorch Tensor       (273419,)                    2.09 MB torch.int64
+	hospital   PyTorch Tensor       (273419, 5)                 10.43 MB torch.int64
+	subject_id PyTorch Tensor       (273419, 413)              861.53 MB torch.int64
 	"""
+
+	REM_label = create_mask(data["stage"], target=[0, 0, 0, 0, 1])
