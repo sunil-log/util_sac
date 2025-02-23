@@ -182,3 +182,47 @@ if __name__ == "__main__":
 	print("\nmask_2d (B,T) 결과:")
 	for k, v in out3.items():
 		print(f"  {k} shape={v.shape}, device={v.device}")
+
+
+	# ------------------------
+	# (4) Label 로 사용하는 예제
+	# ------------------------
+
+	mask = data['z_mask'].copy()
+	data = apply_mask_dict(data, mask, device)
+	"""
+	z_eeg      PyTorch Tensor       (273419, 12, 64)           801.03 MB torch.float32
+	z_eog      PyTorch Tensor       (273419, 12, 32)           400.52 MB torch.float32
+	z_emg      PyTorch Tensor       (273419, 12, 32)           400.52 MB torch.float32
+	z_mask     PyTorch Tensor       (273419,)                    1.04 MB torch.int32
+	stage      PyTorch Tensor       (273419, 5)                 10.43 MB torch.int64
+	class_rbd  PyTorch Tensor       (273419,)                    2.09 MB torch.int64
+	class_pd   PyTorch Tensor       (273419,)                    2.09 MB torch.int64
+	hospital   PyTorch Tensor       (273419, 5)                 10.43 MB torch.int64
+	subject_id PyTorch Tensor       (273419, 413)              861.53 MB torch.int64
+	"""
+
+	X = data['z_eeg']     # (273419, 12, 64)
+	X = X.max(axis=1)[0]  # (273419, 64)
+	y = create_mask(data["stage"], target=[0, 0, 0, 0, 1])  # torch.bool
+	y = y.long()  # torch.int64
+	"""
+	X          PyTorch Tensor       (273419, 64)                66.75 MB torch.float32
+	y          PyTorch Tensor       (273419,)                    2.09 MB torch.int64
+	"""
+
+	from sklearn.model_selection import train_test_split
+
+	X_train, X_test, y_train, y_test = train_test_split(
+		X,
+		y,
+		test_size=0.3,
+		random_state=42
+	)
+
+
+	res = train_neural_net(
+		X_train, y_train,
+		X_test, y_test,
+		n_epoch=100, batch_size=128, lr=1e-4)
+	print(res)
