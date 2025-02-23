@@ -160,7 +160,7 @@ def score_neural_net(
 		dataloaders=dataloaders,
 		optimizer=optimizer,
 		criterion=criterion,
-		n_epoch=100,
+		n_epoch=30,
 	)
 
 	# train
@@ -178,9 +178,12 @@ def score_neural_net(
 		f1_train = calculate_f1(train_data, name="train")
 		f1_test = calculate_f1(test_data, name="test")
 
-
 		mt.update(epoch, **train_loss, **test_loss, **f1_train, **f1_test)
 		mt.print_latest()
+
+	df = mt.generate_df()
+	max_f1_dict = df.loc[df["f1_class_macro_test"].idxmax()].to_dict()
+	print(max_f1_dict)
 
 
 

@@ -82,7 +82,9 @@ def main():
 		mt.print_latest()
 
 
-
+	df = mt.generate_df()
+	max_f1_dict = df.loc[df["f1_class_macro_test"].idxmax()].to_dict()
+	print(max_f1_dict)
 
 if __name__ == "__main__":
 	main()
