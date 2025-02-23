@@ -21,12 +21,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+
 from util_sac.pandas.print_df import print_partial_markdown
 from util_sac.data.print_array_info import print_array_info
 from util_sac.image_processing.reduce_palette import reduce_palette
 from util_sac.data.epoch_metric_tracker import metric_tracker
 from util_sac.pytorch.trainer2 import BaseTrainer
-
+from util_sac.metrics.multi_class_matrics import calculate_f1
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -116,6 +117,9 @@ class CustomDataset(Dataset):
 
 
 
+
+
+
 def score_neural_net(
 		X_train, y_train,
 		X_test, y_test,
@@ -166,12 +170,16 @@ def score_neural_net(
 		test_loss, test_data = trainer.one_epoch(mode='test', epoch=epoch)
 
 		print_array_info(train_data)
-		exit()
+		"""
+		logits     PyTorch Tensor       (1442, 2)                   11.27 KB torch.float32
+		y          PyTorch Tensor       (1442,)                     11.27 KB torch.int64
+		"""
+
+		f1_train = calculate_f1(train_data, name="train")
+		f1_test = calculate_f1(test_data, name="test")
 
 
-
-
-		mt.update(epoch, **train_loss, **test_loss)
+		mt.update(epoch, **train_loss, **test_loss, **f1_train, **f1_test)
 		mt.print_latest()
 
 
