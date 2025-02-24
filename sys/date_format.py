@@ -3,6 +3,16 @@ import numpy as np
 
 
 
+
+def add_timestamp_to_string(input_string: str) -> str:
+	"""
+	주어진 string 앞에 현재 시간을 'yyyy-mm-dd_hh-mm-ss__' 형태로 붙여 반환합니다.
+	"""
+	current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S__")
+	return current_time + input_string
+
+
+
 """
 string to datetime
 """
@@ -39,7 +49,7 @@ timestamp_to_UTC = {
 
 	
 
-def convert_datetime64_to_datetime(dt64):	
+def convert_datetime64_to_datetime(dt64):
 	"""
 	numpy 의 datetime64 를 datetime 로 convert
 	"""	
