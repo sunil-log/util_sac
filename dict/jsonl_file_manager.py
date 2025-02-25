@@ -36,7 +36,7 @@ import pandas as pd
 """
 
 
-class JsonlFileManager:
+class jsonl_file_manager:
     """
     Line-based JSON 파일(.jsonl)을 관리하는 클래스입니다.
     - __init__(filepath): 파일 경로를 받아 self에 저장합니다.
