@@ -56,8 +56,15 @@ class jsonl_file_manager:
 		"""
 		data(dict): 파일에 JSON 형식으로 한 줄 저장할 데이터
 		"""
+		converted_data = {}
+		for k, v in data.items():
+			if isinstance(v, Path):
+				converted_data[k] = str(v)
+			else:
+				converted_data[k] = v
+
+		json_string = json.dumps(converted_data, ensure_ascii=False)
 		with open(self.filepath, 'a', encoding='utf-8') as f:
-			json_string = json.dumps(data, ensure_ascii=False)
 			f.write(json_string + '\n')
 
 	def read(self):
