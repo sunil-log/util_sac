@@ -1,4 +1,3 @@
-```python
 """
 이 모듈은 Line-based JSON 파일(.jsonl)을 효율적으로 관리하기 위해 설계되었습니다.
 각 줄에 하나의 JSON 형태 데이터를 저장하고, 이를 읽어오는 과정에서 dict 타입의 리스트를 얻을 수 있습니다.
@@ -91,4 +90,3 @@ class jsonl_file_manager:
 		"""
 		data_list = self.read()
 		return pd.DataFrame(data_list)
-```
