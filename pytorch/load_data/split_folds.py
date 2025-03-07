@@ -8,7 +8,8 @@ def make_k_fold_splits(
 	data: dict,
 	n_fold: int = 5,
 	i_fold: int = 0,
-	seed: int = 42
+	seed: int = 42,
+	display_folds: bool = True  # fold 정보를 표시할지 여부
 ) -> dict:
 	"""
 	data: Dictionary 형태. key별 value가 (num_samples, ...) 형상을 가정한다.
@@ -55,6 +56,15 @@ def make_k_fold_splits(
 		if f_idx not in [test_fold_idx, valid_fold_idx]:
 			train_idx.extend(folds[f_idx])
 	train_idx = np.array(train_idx)
+
+
+	# display_folds: fold 정보 표시 여부
+	if display_folds:
+		print(f"==== Fold Information ====")
+		print(f"> Total samples: {num_samples}")
+		for idx in [train_idx, valid_idx, test_idx]:
+			print(f"> Fold shape: {idx.shape}, samples: {idx[:10]}")
+
 
 	# (6) Dictionary 형태로 분할 데이터 구성
 	data_train = {}
