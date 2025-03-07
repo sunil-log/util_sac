@@ -45,23 +45,3 @@ def dict_to_tensors(d, float_dtype=torch.float32, int_dtype=torch.int64):
 
 	return new_d
 
-
-def move_dict_tensors_to_device(d, device):
-	"""
-	dictionary 내 value들이 이미 torch Tensor라고 가정하고,
-	모두 지정된 device로 옮긴다.
-
-	Args:
-		d (dict): value가 torch Tensor인 dictionary.
-		device (torch.device): 데이터를 옮길 대상 device.
-
-	Returns:
-		dict: value들이 지정된 device로 옮겨진 dictionary.
-	"""
-	new_d = {}
-	for k, v in d.items():
-		if not isinstance(v, torch.Tensor):
-			raise TypeError(f"Value for key '{k}' is not a torch.Tensor. Found: {type(v)}")
-
-		new_d[k] = v.to(device)
-	return new_d
