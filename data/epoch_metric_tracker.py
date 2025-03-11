@@ -118,18 +118,30 @@ class metric_tracker:
 			plt.show()
 		"""
 		for key in keys:
-			if key in self.metrics:
-				epochs, values = self.get_all(key)
-				label = f"{key}: {values[-1]:.4f}"
-				ax.plot(epochs, values, label=label)
+			# 해당 metric이 등록되어 있는지 확인한다.
+			if key not in self.metrics:
+				print(f"[Warning] '{key}'는 등록된 metric이 아니므로 스킵한다.")
+				continue
+
+			epochs, values = self.get_all(key)
+			# 실제로 그릴 값이 존재하는지 확인한다.
+			if not epochs or not values:
+				print(f"[Warning] '{key}'에 대한 데이터가 없으므로 스킵한다.")
+				continue
+
+			label = f"{key}: {values[-1]:.4f}"
+			ax.plot(epochs, values, label=label)
 
 		ax.set_xlabel('Epoch')
 		ax.set_ylabel('Value')
 		ax.legend()
 		ax.grid(True)
 
-		title = f"Epoch: {epochs[-1]}; {keys[0]}"
-		ax.set_title(title)
+		# keys 중 첫 번째 metric의 최근 epoch 정보를 활용해 타이틀을 설정한다.
+		if keys and keys[0] in self.metrics:
+			epochs, _ = self.get_all(keys[0])
+			if epochs:
+				ax.set_title(f"Epoch: {epochs[-1]}; {keys[0]}")
 
 		if y_log:
 			ax.set_yscale('log')
