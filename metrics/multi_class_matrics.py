@@ -84,7 +84,6 @@ def calculate_f1(data, name="test"):
 
 
 def main():
-	def main():
 	"""
 	이 메인 함수는 training과 testing을 반복 수행한 뒤,
 	train_data와 test_data를 통해 F1Score를 계산한다.
