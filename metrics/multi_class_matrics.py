@@ -11,6 +11,30 @@ from torchmetrics import F1Score
 
 
 def calculate_f1(data, name="test"):
+	"""
+	이 함수는 입력으로 주어진 data에서 logits와 레이블 y를 추출한 뒤,
+	예측 라벨을 계산하고 PyTorch의 torchmetrics 라이브러리를 활용하여
+	Multiclass F1Score를 산출한 뒤 딕셔너리 형태로 반환한다.
+
+	Args:
+	    data (dict):
+	    {
+			"logits": (batch_size, num_classes) 형태의 PyTorch Tensor,
+			"y":      (batch_size,)             형태의 PyTorch Tensor
+		}
+	    name (str, optional):
+	        결과 딕셔너리에 부가적으로 붙일 suffix이다. 기본값은 "test"이다.
+
+	Returns:
+	    dict:
+	        {
+	            "f1_class_0_{name}": float 값,
+	            "f1_class_1_{name}": float 값,
+	            ...,
+	            "f1_class_macro_{name}": float 값
+	        }
+	        과 같은 형태로 각 클래스별 F1Score와 macro average F1Score를 모두 담는다.
+	"""
 
 	# Extract Data
 	logits = data["logits"]
@@ -60,7 +84,17 @@ def calculate_f1(data, name="test"):
 
 
 def main():
+	def main():
+	"""
+	이 메인 함수는 training과 testing을 반복 수행한 뒤,
+	train_data와 test_data를 통해 F1Score를 계산한다.
 
+	train_data, test_data는 다음과 같은 key와 구조를 가진 dict여야 한다:
+		{
+			"logits": (batch_size, num_classes) 형태의 PyTorch Tensor,
+			"y":      (batch_size,)             형태의 PyTorch Tensor
+		}
+	"""
 
 	mt = metric_tracker()
 	for epoch in range(trainer.n_epoch):
