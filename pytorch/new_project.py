@@ -25,7 +25,7 @@ from util_sac.image_processing.reduce_palette import reduce_palette
 
 from util_sac.data.trial_manager2 import trial_manager
 from util_sac.data.epoch_metric_tracker import metric_tracker
-from util_sac.pytorch.trainer2 import BaseTrainer
+from util_sac.pytorch.trainer2 import BaseTrainer, current_lr
 from util_sac.pytorch.move_device import move_dict_tensors_to_device
 
 
@@ -121,6 +121,10 @@ def main():
 	model = None
 	optimizer = None
 	criterion = None
+	lr_schedule = {
+		10: 1e-4,
+		100: 1e-5,
+	}
 
 
 	# 5) Trainer 생성
@@ -129,6 +133,7 @@ def main():
 		dataloaders=dataloaders,
 		optimizer=optimizer,
 		criterion=criterion,
+		lr_dict=lr_schedule,
 		n_epoch=100,
 	)
 
@@ -140,8 +145,9 @@ def main():
 		train_loss, train_data = trainer.one_epoch(mode='train', epoch=epoch)
 		valid_loss, valid_data = trainer.one_epoch(mode='valid', epoch=epoch)
 		test_loss, test_data = trainer.one_epoch(mode='test', epoch=epoch)
+		lr = current_lr(optimizer)
 
-		mt.update(epoch, **train_loss, **test_loss, **lr_item)
+		mt.update(epoch, **train_loss, **test_loss, **lr)
 		mt.print_latest()
 
 		if epoch % 10 == 0:

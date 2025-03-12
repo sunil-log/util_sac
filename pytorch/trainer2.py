@@ -200,7 +200,7 @@ def current_lr(optimizer):
 	"""
 	현재 optimizer의 learning rate를 반환한다.
 	"""
-	return optimizer.param_groups[0]['lr']
+	return {"lr": optimizer.param_groups[0]['lr']}
 
 
 
