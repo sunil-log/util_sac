@@ -26,7 +26,7 @@ from util_sac.image_processing.reduce_palette import reduce_palette
 from util_sac.data.trial_manager2 import trial_manager
 from util_sac.data.epoch_metric_tracker import metric_tracker
 from util_sac.pytorch.trainer2 import BaseTrainer, current_lr
-from util_sac.pytorch.move_device import move_dict_tensors_to_device
+from util_sac.pytorch.load_data.move_device import move_dict_tensors_to_device
 
 
 
