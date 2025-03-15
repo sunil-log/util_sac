@@ -20,6 +20,7 @@ from util_sac.pytorch.trainer.update_lr import current_lr
 from util_sac.pytorch.load_data.move_device import move_dict_tensors_to_device
 from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1
 from util_sac.dict.save_args import save_args
+from util_sac.pandas.save_npz import save_df_as_npz
 
 
 
@@ -167,6 +168,7 @@ def main():
 		# save metrics
 		df_metrics = mt.generate_df()
 		df_metrics.to_csv(f"{tm.trial_dir}/train_test_metrics.csv", index=False)
+		save_df_as_npz(df_metrics, f"{tm.trial_dir}/train_test_metrics.npz")
 		save_args(args, f"{tm.trial_dir}/hyperparameters.json")
 
 
