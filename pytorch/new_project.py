@@ -152,7 +152,7 @@ def main():
 		f1_valid = calculate_f1(valid_data, name="valid")
 		f1_test = calculate_f1(test_data, name="test")
 
-		mt.update(epoch, **train_loss, **test_loss, **f1_train, **f1_test, lr=lr)
+		mt.update(epoch, **train_loss, **test_loss, **f1_train, **f1_test, **lr)
 		mt.print_latest()
 
 		if epoch % 10 == 0:
@@ -171,7 +171,7 @@ def main():
 			# plot losses
 			mt.plot_metric(axes[0, 0], keys=["train_loss", "valid_loss", "test_loss"], y_log='log')
 			mt.plot_metric(axes[0, 1], keys=["train_accuracy", "test_accuracy"])
-			mt.plot_metric(axes[0, 2], keys=["train_macro_f1", "test_macro_f1"])
+			mt.plot_metric(axes[0, 2], keys=["f1_class_macro_train", "f1_class_macro_test"])
 			plt.tight_layout()
 			plt.savefig(tm.trial_dir / "train_test_loss.png")
 
