@@ -19,8 +19,94 @@ from util_sac.data.epoch_metric_tracker import metric_tracker
 from util_sac.data.print_array_info import print_array_info
 from util_sac.pytorch.trainer.trainer import BaseTrainer
 
+from captum.attr import IntegratedGradients
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+class FeatureAttributionInspector:
+	def __init__(self, model, X_all, y_all, feature_names):
+		"""
+		model: 이미 학습된 PyTorch 모델
+		X_all: 전체 (train+test) Feature (numpy.ndarray, shape: [N, D])
+		y_all: 전체 (train+test) Target (numpy.ndarray, shape: [N])
+		feature_names: Feature 이름 리스트 (ex: ['input_dim', 'n_head', 'q_dim'])
+		"""
+		self.model = model
+		self.X_all = X_all
+		self.y_all = y_all
+		self.feature_names = feature_names
+
+		# 모델의 디바이스 추론 후 맞춰두기
+		self.device = next(model.parameters()).device
+		self.model.eval().to(self.device)
+
+		# Captum IntegratedGradients 객체
+		self.ig = IntegratedGradients(self.model)
+
+	def top_k_indices(self, k=3):
+		"""
+		y_all에서 값이 큰 상위 k개 인덱스를 반환한다
+		"""
+		# numpy.ndarray이면 argsort() 활용
+		# (-y_all)을 정렬하면 큰 값부터 인덱스 확보 가능
+		idx_sorted = self.y_all.argsort()[::-1]  # 내림차순
+		idx_top_k = idx_sorted[:k]
+		return idx_top_k
+
+	def interpret_one_sample(self, x, baseline=None, n_steps=50):
+		"""
+		X 하나의 샘플 x (shape: [D])에 대하여 IntegratedGradients로 Feature 기여도를 계산
+		baseline: None이면 0 벡터 사용
+		n_steps: alpha 보간 단계(기본 50)
+		return: (attributions, delta)
+		"""
+		# x -> (1, D) 텐서
+		x_tensor = torch.FloatTensor(x).unsqueeze(0).to(self.device)
+
+		if baseline is None:
+			baseline_tensor = torch.zeros_like(x_tensor)
+		else:
+			baseline_tensor = torch.FloatTensor(baseline).unsqueeze(0).to(self.device)
+
+		# 회귀 문제이므로 target=None or target=0 지정 가능
+		attributions, delta = self.ig.attribute(
+			x_tensor,
+			baselines=baseline_tensor,
+			n_steps=n_steps,
+			return_convergence_delta=True
+		)
+
+		return attributions, delta
+
+	def interpret_top_k(self, k=3, baseline=None, n_steps=50):
+		"""
+		y가 큰 상위 k개에 대해서 IntegratedGradients 결과를 출력
+		"""
+		# 상위 k개 인덱스 추출
+		idx_top_k = self.top_k_indices(k)
+
+		for rank, idx in enumerate(idx_top_k, start=1):
+			x_sample = self.X_all[idx]
+			y_value = self.y_all[idx]
+
+			# IG 계산
+			attributions, delta = self.interpret_one_sample(
+				x_sample,
+				baseline=baseline,
+				n_steps=n_steps
+			)
+
+			# CPU로 가져와서 numpy 변환
+			attributions_np = attributions.detach().cpu().numpy()[0]  # shape: (D,)
+			delta_np = float(delta.detach().cpu().numpy())
+
+			# 출력
+			print(f"--- Top {rank} ---")
+			print(f"Sample index: {idx}")
+			print(f"X: {x_sample} -> y: {y_value:.4f}")
+			for f_name, attr_value in zip(self.feature_names, attributions_np):
+				print(f"  Feature: {f_name:>10} | Attribution: {attr_value:.4f}")
+			print(f"Convergence Delta: {delta_np:.6f}")
+			print("", flush=True)
 
 
 class TwoLayerNetTrainer(BaseTrainer):
@@ -32,8 +118,8 @@ class TwoLayerNetTrainer(BaseTrainer):
 		y		  PyTorch Tensor	   (32,)					   256.00 B torch.int64
 		"""
 
-		X = X.to(device)
-		y = y.to(device)
+		X = X.to(self.device)
+		y = y.to(self.device)
 
 		# 필요하다면 (batch,) -> (batch, 1)
 		y = y.unsqueeze(-1)
@@ -146,6 +232,8 @@ def train_nn_regression(
 
 
 
+
+
 if __name__ == "__main__":
 
 	# concatenate
@@ -166,4 +254,17 @@ if __name__ == "__main__":
 		random_state=42
 	)
 
-	res = train_nn_regression(X_train, y_train, X_test, y_test, n_epoch=100, lr=1e-4)
+	model, df = train_nn_regression(
+		X_train, y_train, X_test, y_test, n_epoch=100, lr=1e-3
+	)
+
+	# 인스펙터 생성
+	inspector = FeatureAttributionInspector(
+		model=model,
+		X_all=X,
+		y_all=y,
+		feature_names=feature_names
+	)
+
+	# 상위 3개 해석
+	inspector.interpret_top_k(k=3)
