@@ -29,3 +29,24 @@ def positional_encoding(max_len=1000, d_model=64):
 	# Shape을 (1, max_len, d_model)로 만들어 batch 단위 연산에서 더 쉽게 사용
 	pe = pe.unsqueeze(0)
 	return pe
+
+
+"""
+class attpool_classifier(nn.Module):
+	def __init__(self):
+		super().__init__()
+
+        # 학습 대상이 아닌 Positional Encoding을 생성
+		pe = positional_encoding(32, 96)
+		
+		# register_buffer를 통해 모델과 함께 이동하되 학습은 되지 않도록 등록
+		self.register_buffer("pe", pe)
+
+		self.attn_pool = MultiHeadAttnPoolingWithMask(
+			input_dim=32,
+			hidden_dim=64,
+			num_heads=4,
+			output_dim=2,
+			dropout_p=0.1
+		)
+"""
