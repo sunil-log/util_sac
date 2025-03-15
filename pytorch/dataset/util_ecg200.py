@@ -122,7 +122,7 @@ def load_ECG200(fn_train, fn_test, batch_size=32, shuffle=True):
 	train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
 	test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
-	return train_loader, test_loader
+	return {'train': train_loader, 'test': test_loader}
 
 
 def plot_random_test_samples(
