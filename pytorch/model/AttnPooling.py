@@ -82,7 +82,7 @@ class MultiHeadAttnPoolingWithMask(nn.Module):
 		# --- 5) softmax
 		att_weights = F.softmax(s, dim=1)  # (batch, seq, num_heads)
 
-		# **중요**: Attention weight에 Dropout 적용
+		# Attention weight에 Dropout 적용
 		att_weights = self.attn_dropout(att_weights)
 
 		# --- 6) weighted sum
@@ -103,7 +103,7 @@ class MultiHeadAttnPoolingWithMask(nn.Module):
 		return out
 
 
-# ---- 간단 테스트 ----
+
 if __name__ == "__main__":
 	model = MultiHeadAttnPoolingWithMask(
 		input_dim=32,
