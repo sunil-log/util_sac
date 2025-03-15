@@ -106,7 +106,7 @@ def main():
 		y          PyTorch Tensor       (1442,)                     11.27 KB torch.int64
 		"""
 
-		from util_sac.metrics.multi_class_matrics import calculate_f1
+		from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1
 		f1_train = calculate_f1(train_data, name="train")
 		f1_test = calculate_f1(test_data, name="test")
 

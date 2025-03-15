@@ -70,7 +70,7 @@ class NewTrainer(BaseTrainer):
 		if self.mode == 'test':
 			self.data_collector.update(
 				logits=y_hat,  # logits 가 있어야 metric 계산 가능
-				y_hat=y_hat
+				y=batch['label'],  # y 가 있어야 metric 계산 가능
 			)
 
 		return loss

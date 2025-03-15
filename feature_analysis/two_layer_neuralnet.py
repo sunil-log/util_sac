@@ -6,12 +6,7 @@ Created on  Feb 23 2025
 @author: sac
 """
 
-
-import pandas as pd
 import numpy as np
-from pathlib import Path
-
-import matplotlib.pyplot as plt
 
 from torch.utils.data import DataLoader, Dataset
 
@@ -20,14 +15,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
-
-from util_sac.pandas.print_df import print_partial_markdown
-from util_sac.data.print_array_info import print_array_info
-from util_sac.image_processing.reduce_palette import reduce_palette
 from util_sac.data.epoch_metric_tracker import metric_tracker
 from util_sac.pytorch.trainer2 import BaseTrainer
-from util_sac.metrics.multi_class_matrics import calculate_f1
+from util_sac.pytorch.metrics import calculate_f1
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
