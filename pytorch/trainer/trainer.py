@@ -2,6 +2,7 @@ import torch
 from pathlib import Path
 import pandas as pd
 from util_sac.data.batch_data_collector import batch_loss_collector, batch_data_collector
+from util_sac.pytorch.trainer.update_lr import update_lr_with_dict
 
 """
 trainer.py 대비 dataloader 를 dict 로 모아서 받는다.
@@ -153,54 +154,6 @@ def main():
 	result_df = concat_train_test_metrics(keywords)
 	print(result_df)
 """
-
-
-def concat_train_test_metrics(base_path, keywords):
-	"""
-	주어진 keywords 리스트를 모두 포함하는 디렉토리를 찾아, 해당 디렉토리 내부의 train_test_metrics.csv 파일을 읽은 후,
-	각 DataFrame에 디렉토리 이름을 'fn' 컬럼으로 추가하고, 모든 DataFrame을 axis=0으로 concat하여 반환합니다.
-
-	Parameters:
-	- keywords (list of str): 디렉토리 이름에 포함되어야 하는 문자열들의 리스트
-
-	Returns:
-	- pd.DataFrame: 모든 csv 데이터를 합친 DataFrame
-	"""
-	dfs = []
-	# 현재 디렉토리 내의 모든 폴더 순회
-	for directory in base_path.iterdir():
-		if directory.is_dir() and all(kw in directory.name for kw in keywords):
-			csv_path = directory / 'train_test_metrics.csv'
-			if csv_path.exists():
-				df = pd.read_csv(csv_path)
-				df['fn'] = directory.name
-				dfs.append(df)
-	if dfs:
-		return pd.concat(dfs, axis=0, ignore_index=True)
-	else:
-		return pd.DataFrame()
-
-
-def update_lr_with_dict(optimizer, epoch, lr_dict):
-	"""
-	lr_dict에 정의된 epoch가 되면 learning rate를 해당 값으로 갱신한다.
-	예) lr_dict = {30: 1e-4, 80: 1e-5}
-
-	호출 후, 현재(첫 번째 param group의) learning rate를 반환한다.
-	"""
-	# epoch가 lr_dict에 존재할 경우 learning rate 갱신
-	if epoch in lr_dict:
-		new_lr = lr_dict[epoch]
-		for param_group in optimizer.param_groups:
-			param_group['lr'] = new_lr
-		print(f"[Epoch {epoch}] Learning rate가 {new_lr}로 조정되었다.", flush=True)
-
-
-def current_lr(optimizer):
-	"""
-	현재 optimizer의 learning rate를 반환한다.
-	"""
-	return {"lr": optimizer.param_groups[0]['lr']}
 
 
 
