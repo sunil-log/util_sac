@@ -60,7 +60,25 @@ def load_metrics(base_path, keywords):
 	return df
 
 
+def main():
 
+	# read all train_test_metrics.csv files
+	base_path = Path('./trials')  # 현재 작업 디렉토리
+	keywords = ['__ID_2338__']
+	df = load_metrics(base_path, keywords)
+	"""
+	print_partial_markdown(df)
+	|      |   epoch |   train_loss |   test_loss |   f1_class_0_train |   f1_class_1_train |   f1_class_macro_train |   f1_class_0_test |   f1_class_1_test |   f1_class_macro_test |     lr |   input_dim |   n_head |   q_dim | trial_id            |
+	|-----:|--------:|-------------:|------------:|-------------------:|-------------------:|-----------------------:|------------------:|------------------:|----------------------:|-------:|------------:|---------:|--------:|:--------------------|
+	|    0 |       0 |     0.660726 |    0.667487 |          0         |          0.816568  |               0.408284 |         0         |         0.780488  |              0.390244 | 0.001  |           2 |        8 |       2 | 2025-03-15_14-40-08 |
+	|    1 |       1 |     0.645456 |    0.66232  |          0         |          0.816568  |               0.408284 |         0         |         0.780488  |              0.390244 | 0.001  |           2 |        8 |       2 | 2025-03-15_14-40-08 |
+	|    2 |       2 |     0.631349 |    0.660944 |          0         |          0.816568  |               0.408284 |         0         |         0.780488  |              0.390244 | 0.001  |           2 |        8 |       2 | 2025-03-15_14-40-08 |
+	|    3 |       3 |     0.675514 |    0.662108 |          0         |          0.816568  |               0.408284 |         0         |         0.780488  |              0.390244 | 0.001  |           2 |        8 |       2 | 2025-03-15_14-40-08 |
+	"""
+
+	# select the best f1_class_macro_test
+	df_max = df.loc[df.groupby("trial_id")["f1_class_macro_test"].idxmax()].reset_index(drop=True)
+	print_partial_markdown(df_max)
 
 
 
