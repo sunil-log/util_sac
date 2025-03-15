@@ -7,9 +7,10 @@ Created on  Mar 15 2025
 """
 
 import torch
+import math
 
 
-def get_positional_encoding(max_len=1000, d_model=64):
+def positional_encoding(max_len=1000, d_model=64):
 	# pos: [0, 1, 2, ..., max_len-1] (shape: (max_len, 1))
 	pos = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
 
