@@ -142,7 +142,7 @@ def train_nn_regression(
 		mt.print_latest()
 
 	df = mt.generate_df()
-	return df
+	return model, df
 
 
 
