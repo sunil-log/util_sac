@@ -27,6 +27,7 @@ from util_sac.data.trial_manager2 import trial_manager
 from util_sac.data.epoch_metric_tracker import metric_tracker
 from util_sac.pytorch.trainer2 import BaseTrainer, current_lr
 from util_sac.pytorch.load_data.move_device import move_dict_tensors_to_device
+from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1
 
 
 
@@ -147,7 +148,11 @@ def main():
 		test_loss, test_data = trainer.one_epoch(mode='test', epoch=epoch)
 		lr = current_lr(optimizer)
 
-		mt.update(epoch, **train_loss, **test_loss, **lr)
+		f1_train = calculate_f1(train_data, name="train")
+		f1_valid = calculate_f1(valid_data, name="valid")
+		f1_test = calculate_f1(test_data, name="test")
+
+		mt.update(epoch, **train_loss, **test_loss, **f1_train, **f1_test, lr=lr)
 		mt.print_latest()
 
 		if epoch % 10 == 0:
