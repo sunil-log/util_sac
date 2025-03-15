@@ -69,7 +69,7 @@ class NewTrainer(BaseTrainer):
 		# collect test data
 		if self.mode == 'test':
 			self.data_collector.update(
-				label=d['label'],
+				logits=y_hat,  # logits 가 있어야 metric 계산 가능
 				y_hat=y_hat
 			)
 
