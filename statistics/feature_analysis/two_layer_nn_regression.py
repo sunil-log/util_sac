@@ -268,3 +268,31 @@ if __name__ == "__main__":
 
 	# 상위 3개 해석
 	inspector.interpret_top_k(k=3)
+
+	"""
+	각 Attribution 은 local linear regression 의 coefficient 비스무리 한 의미를 가진다.
+	
+	--- Top 1 ---
+	Sample index: 106
+	X: [ 8 64 32] -> y: 0.8581
+	  Feature:  input_dim | Attribution: -0.3412
+	  Feature:     n_head | Attribution: 1.3516
+	  Feature:      q_dim | Attribution: 0.0779
+	Convergence Delta: 0.009939
+	
+	--- Top 2 ---
+	Sample index: 176
+	X: [32 64  8] -> y: 0.8498
+	  Feature:  input_dim | Attribution: -1.3414
+	  Feature:     n_head | Attribution: 1.3337
+	  Feature:      q_dim | Attribution: 0.0111
+	Convergence Delta: 0.005541
+	
+	--- Top 3 ---
+	Sample index: 177
+	X: [32 64 16] -> y: 0.8481
+	  Feature:  input_dim | Attribution: -1.3559
+	  Feature:     n_head | Attribution: 1.3526
+	  Feature:      q_dim | Attribution: 0.0294
+	Convergence Delta: 0.009286
+	"""
