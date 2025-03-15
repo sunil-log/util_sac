@@ -19,6 +19,7 @@ from util_sac.pytorch.trainer.trainer import BaseTrainer
 from util_sac.pytorch.trainer.update_lr import current_lr
 from util_sac.pytorch.load_data.move_device import move_dict_tensors_to_device
 from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1
+from util_sac.dict.save_args import save_args
 
 
 
@@ -151,10 +152,6 @@ def main():
 			# save model
 			torch.save(model.state_dict(), f"{tm['weights']}/epoch_{epoch}.pth")
 
-			# save metrics
-			df_metrics = mt.generate_df()
-			df_metrics.to_csv(f"{tm.trial_dir}/train_test_metrics.csv", index=False)
-
 			# plot the train and test metrics
 			plt.close()
 			fig, axes = plt.subplots(2, 3, figsize=(20, 10))
@@ -165,6 +162,14 @@ def main():
 			mt.plot_metric(axes[0, 2], keys=["f1_class_macro_train", "f1_class_macro_test"])
 			plt.tight_layout()
 			plt.savefig(tm.trial_dir / "train_test_loss.png")
+
+
+		# save metrics
+		df_metrics = mt.generate_df()
+		df_metrics.to_csv(f"{tm.trial_dir}/train_test_metrics.csv", index=False)
+		save_args(args, f"{tm.trial_dir}/hyperparameters.json")
+
+
 
 
 
