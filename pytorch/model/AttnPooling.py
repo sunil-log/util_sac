@@ -100,7 +100,7 @@ class MultiHeadAttnPoolingWithMask(nn.Module):
 
 		# 최종 출력
 		out = self.fc(z)  # (batch, output_dim)
-		return out
+		return out, att_weights
 
 
 
