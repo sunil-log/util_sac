@@ -8,9 +8,47 @@ import torch.nn.functional as F
 
 class MultiHeadAttnPoolingWithMask(nn.Module):
 	"""
-	(batch, seq, input_dim) 형태의 입력 x와 (batch, seq) 형태의 mask를 받아
-	multi-head attention pooling을 수행한 뒤,
+	(batch, seq, input_dim) 형태의 입력 x와 (batch, seq) 형태의 mask를 받아 multi-head attention pooling을 수행한 뒤,
 	(batch, output_dim) 형태로 요약 벡터(또는 class logits)를 산출한다.
+
+	Parameters
+	----------
+	input_dim : int
+	    입력 벡터의 차원 (예: 32).
+	hidden_dim : int
+	    Attention 연산에서 사용하는 내부 차원 (예: 64). num_heads의 배수여야 한다.
+	num_heads : int
+	    병렬로 Attention을 수행할 head의 개수 (예: 4).
+	output_dim : int
+	    최종 산출되는 벡터(또는 class logits)의 차원 (예: 2).
+	dropout_p : float
+	    Attention weight에 적용할 Dropout의 비율 (예: 0.1).
+
+	Inputs
+	------
+	x : torch.Tensor
+	    (batch, seq, input_dim) 형태의 입력. 시계열이나 문장 등 순차 데이터로 가정.
+	mask : torch.Tensor or None
+	    (batch, seq) 형태의 binary mask. 1이면 해당 위치를 사용(keep)하고, 0이면 무시(ignore)한다.
+	    기본값(None)이면 전체 시퀀스를 사용한다.
+
+	    ※ 주의: Transformer에서 사용하는 mask는 보통 1이 "ignore," 0이 "keep"인 반면,
+	      본 모듈의 mask는 1이 "keep," 0이 "ignore"로 해석되므로 혼동에 유의한다.
+
+	Returns
+	-------
+	out : torch.Tensor
+	    (batch, output_dim) 형태의 최종 출력 벡터.
+	att_weights : torch.Tensor
+	    (batch, seq, num_heads, 1) 형태의 Attention 가중치.
+	    seq 차원에 대해 softmax가 적용된 결과이며, 각 head별로 입력 시퀀스 위치에 대한 가중치를 나타낸다.
+
+	Notes
+	-----
+	1) Key와 Value는 입력 x에 대해 별도의 linear 변환을 거쳐 계산한다.
+	2) Query는 (num_heads, q_dim) 형태의 학습 가능한 파라미터로 구성한다.
+	3) 최종적으로 multi-head로 구한 벡터들을 concat한 뒤, linear를 통과시켜 (batch, output_dim)을 산출한다.
+	4) mask가 주어지면, mask가 0인 위치는 Attention score에 -inf를 더해 softmax에서 제외한다.
 	"""
 
 	def __init__(self,
