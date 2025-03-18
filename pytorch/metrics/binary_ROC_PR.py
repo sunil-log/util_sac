@@ -13,7 +13,7 @@ from torchmetrics.classification import (
 	BinaryAveragePrecision
 )
 
-def calculate_roc(data, name="test"):
+def calculate_roc(data, auc_only=True, name="test"):
 	"""
 	이 함수는 이진분류를 위한 (logits, label) 데이터를 입력받아
 	ROC 커브 (FPR, TPR)와 AUC를 계산하여 반환한다.
@@ -57,15 +57,20 @@ def calculate_roc(data, name="test"):
 	auroc_metric.update(probs, y)
 	roc_auc = auroc_metric.compute()
 
-	return {
-		f"fpr_{name}": fpr,
-		f"tpr_{name}": tpr,
-		f"thresholds_roc_{name}": thresholds_roc,
-		f"auc_roc_{name}": float(roc_auc.item())
-	}
+	if auc_only:
+		d = {f"auc_roc_{name}": float(roc_auc.item())}
+	else:
+		d = {
+			f"fpr_{name}": fpr,
+			f"tpr_{name}": tpr,
+			f"thresholds_roc_{name}": thresholds_roc,
+			f"auc_roc_{name}": float(roc_auc.item())
+		}
+
+	return d
 
 
-def calculate_pr(data, name="test"):
+def calculate_pr(data, auc_only=True, name="test"):
 	"""
 	이 함수는 이진분류를 위한 (logits, label) 데이터를 입력받아
 	Precision-Recall (PR) 커브와 PR-AUC를 계산하여 반환한다.
@@ -109,12 +114,17 @@ def calculate_pr(data, name="test"):
 	ap_metric.update(probs, y)
 	pr_auc = ap_metric.compute()
 
-	return {
-		f"precision_{name}": precision,
-		f"recall_{name}": recall,
-		f"thresholds_pr_{name}": thresholds_pr,
-		f"auc_pr_{name}": float(pr_auc.item())
-	}
+	if auc_only:
+		d = {f"auc_pr_{name}": float(pr_auc.item())}
+	else:
+		d = {
+			f"precision_{name}": precision,
+			f"recall_{name}": recall,
+			f"thresholds_pr_{name}": thresholds_pr,
+			f"auc_pr_{name}": float(pr_auc.item())
+		}
+
+	return d
 
 
 def main():
