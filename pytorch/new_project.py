@@ -129,6 +129,7 @@ def main():
 		criterion=criterion,
 		lr_dict=lr_schedule,
 		n_epoch=100,
+		args=args,
 	)
 
 
