@@ -7,10 +7,9 @@ Created on  Mar 01 2025
 """
 
 
-import argparse
+from types import SimpleNamespace
 
 import torch
-
 import matplotlib.pyplot as plt
 
 from util_sac.data.trial_manager2 import trial_manager
@@ -22,6 +21,25 @@ from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1
 from util_sac.dict.save_args import save_args
 from util_sac.pandas.save_npz import save_df_as_npz
 
+
+import optuna
+from util_sac.pytorch.optuna.sample_params import sample_params
+
+
+param_space = {
+	"input_dim": {
+		"type": "categorical",
+		"choices": [2, 4, 8, 16, 32, 64, 128]
+	},
+	"n_head": {
+		"type": "categorical",
+		"choices": [2, 4, 8, 16, 32, 64, 128]
+	},
+	"q_dim": {
+		"type": "categorical",
+		"choices": [2, 4, 8, 16, 32, 64, 128]
+	}
+}
 
 
 
@@ -70,33 +88,12 @@ class NewTrainer(BaseTrainer):
 		return loss
 
 
-def parse_arguments():
 
-	parser = argparse.ArgumentParser(description="Hyperparameters")
-
-	parser.add_argument(
-		"--signal_type",
-		type=str,
-		choices=["EEG", "EOG", "EMG"],
-		required=True,
-		help="EEG, EOG, EMG 중 하나를 선택하세요."
-	)
-
-	args = parser.parse_args()
-
-	return args
-
-
-
-def main():
-
-	# 1) Hyperparameters with argparse
-	args = parse_arguments()
-	signal_type = args.signal_type
+def train_session(args):
 
 
 	# 2) trial manager
-	trial_name = f"ID_2151__ts2vec_{signal_type}"
+	trial_name = f"ID_2151__ts2vec"
 	sub_dir_list = ["weights", "reconstruction", "latent_space"]
 	tm = trial_manager(sub_dir_list, trial_name=trial_name, zip_src_loc="../../")
 
@@ -173,6 +170,59 @@ def main():
 		save_args(args, f"{tm.trial_dir}/hyperparameters.json")
 
 
+		# best score
+		best_f1 = df_metrics["f1_class_macro_test"].max()
+		return best_f1
+
+
+def objective(trial: optuna.trial.Trial):
+	# 2) sample_params 함수를 통해 dict 획득
+	args_dict = sample_params(trial, param_space)
+
+	# 3) SimpleNamespace로 감싸서 사용 (편의를 위해)
+	args = SimpleNamespace(**args_dict)
+
+	# 4) 이 args를 활용해 학습/검증
+	score = train_session(args)
+
+	return score
+
+
+def main():
+
+	"""
+	main
+	"""
+
+	"""
+	1. Single Trial
+	"""
+	args_dict = {
+		"input_dim": 32,
+		"n_head": 8,
+		"q_dim": 16
+	}
+	args = SimpleNamespace(**args_dict)
+	score = train_session(args)
+	print("Single Trial Score:", score)
+	exit()
+
+	"""
+	2. Optuna Optimization 
+	"""
+	# 이미 study가 존재하면 불러오고, 없다면 새로 만든다
+	study = optuna.create_study(
+		study_name="my_study",
+		storage="sqlite:///my_study.db",
+		load_if_exists=True,
+		direction="maximize"
+	)
+
+	# 원하는 만큼 trial 실행
+	study.optimize(objective, n_trials=2)
+
+	print("Best value:", study.best_value)
+	print("Best params:", study.best_params)
 
 
 
