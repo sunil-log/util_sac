@@ -98,7 +98,7 @@ def main():
 	# 2) trial manager
 	trial_name = f"ID_2151__ts2vec_{signal_type}"
 	sub_dir_list = ["weights", "reconstruction", "latent_space"]
-	tm = trial_manager(sub_dir_list, trial_name=trial_name, zip_src_loc="../")
+	tm = trial_manager(sub_dir_list, trial_name=trial_name, zip_src_loc="../../")
 
 
 	# 3) load data
