@@ -106,7 +106,7 @@ def train_session(args):
 
 
 	# 2) trial manager
-	trial_name = f"ID_2151__ts2vec"
+	trial_name = f"ID_1116__optunaIdx_{args.optuna_trial_index}"
 	sub_dir_list = ["weights", "reconstruction", "latent_space"]
 	tm = trial_manager(sub_dir_list, trial_name=trial_name, zip_src_loc="../../")
 
@@ -192,6 +192,9 @@ def objective(trial: optuna.trial.Trial):
 	# 3) SimpleNamespace로 감싸서 사용 (편의를 위해)
 	args = SimpleNamespace(**args_dict)
 	args.lr_dict = lr_dicts[args.lr_dict_idx]
+
+	# optuna의 trial에 이름 부여
+	args.optuna_trial_index = trial.number
 
 	# 4) 이 args를 활용해 학습/검증
 	score = train_session(args)
