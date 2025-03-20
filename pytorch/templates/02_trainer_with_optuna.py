@@ -218,7 +218,7 @@ def main():
 	1. Single Trial
 	"""
 	args_dict = {
-		"trial_name": "Building a new model",
+		"trial_name": "Building",
 		"input_dim": 32,
 		"n_head": 8,
 		"q_dim": 16,
