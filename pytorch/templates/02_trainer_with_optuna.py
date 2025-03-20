@@ -170,15 +170,21 @@ def train_session(args):
 			plt.savefig(tm.trial_dir / "train_test_loss.png")
 
 
+
 		# save metrics
 		df_metrics = mt.generate_df()
 		df_metrics.to_csv(f"{tm.trial_dir}/train_test_metrics.csv", index=False)
 		save_df_as_npz(df_metrics, f"{tm.trial_dir}/train_test_metrics.npz")
-		save_args(args, f"{tm.trial_dir}/hyperparameters.json")
-
 
 		# best score
 		best_f1 = df_metrics["f1_class_macro_test"].max()
+
+
+		# save hyperparameters
+		args.best_score = best_f1
+		save_args(args, f"{tm.trial_dir}/hyperparameters.json")
+
+
 		return best_f1
 
 
