@@ -25,6 +25,13 @@ import optuna
 from util_sac.pytorch.optuna.sample_params import sample_params
 
 
+lr_dicts = [
+    {10: 1e-4, 40: 1e-5},
+    {50: 1e-4, 80: 1e-5},
+    {99: 1e-4, 100: 1e-5}
+]
+
+
 param_space = {
 	"input_dim": {
 		"type": "categorical",
@@ -38,13 +45,12 @@ param_space = {
 		"type": "categorical",
 		"choices": [2, 4, 8, 16, 32, 64, 128]
 	},
-	"lr_dict": {
-		"type": "categorical",
-		"choices": [
-			{10: 1e-4, 40: 1e-5},
-			{50: 1e-4, 80: 1e-5},
-			{99: 1e-4, 100: 1e-5},
-		]
+	"lr_dict_idx": {
+		"type": "int",
+		"low": 0,
+		"high": len(lr_dicts) - 1,
+		"step": 1,
+		"log": False
 	}
 }
 
@@ -185,6 +191,7 @@ def objective(trial: optuna.trial.Trial):
 
 	# 3) SimpleNamespace로 감싸서 사용 (편의를 위해)
 	args = SimpleNamespace(**args_dict)
+	args.lr_dict = lr_dicts[args.lr_dict_idx]
 
 	# 4) 이 args를 활용해 학습/검증
 	score = train_session(args)
