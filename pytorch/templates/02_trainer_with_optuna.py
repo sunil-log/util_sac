@@ -104,12 +104,9 @@ class NewTrainer(BaseTrainer):
 
 def train_session(args):
 
-
 	# 2) trial manager
-	trial_name = f"ID_1116__optunaIdx_{args.optuna_trial_index}"
 	sub_dir_list = ["weights", "reconstruction", "latent_space"]
-	tm = trial_manager(sub_dir_list, trial_name=trial_name, zip_src_loc="../../")
-
+	tm = trial_manager(sub_dir_list, trial_name=args.trial_name, zip_src_loc="../")
 
 	# 3) load data
 	dataloader_train = None
@@ -185,21 +182,24 @@ def train_session(args):
 		return best_f1
 
 
-def objective(trial: optuna.trial.Trial):
-	# 2) sample_params 함수를 통해 dict 획득
-	args_dict = sample_params(trial, param_space)
+def get_objective(study_name: str):
+	def objective(trial: optuna.trial.Trial) -> float:
+		# 여기서, study_name이 클로저 형태로 바깥에서 넘어온다.
+		# (예: trial_name 설정 시 study_name과 trial.number를 묶어서 사용)
 
-	# 3) SimpleNamespace로 감싸서 사용 (편의를 위해)
-	args = SimpleNamespace(**args_dict)
-	args.lr_dict = lr_dicts[args.lr_dict_idx]
+		args_dict = sample_params(trial, param_space)
+		args = SimpleNamespace(**args_dict)
+		args.lr_dict = lr_dicts[args.lr_dict_idx]
 
-	# optuna의 trial에 이름 부여
-	args.optuna_trial_index = trial.number
+		# trial 이름을 일관성 있게 지정
+		args.optuna_trial_index = trial.number
+		args.trial_name = f"{study_name}_Trial_{trial.number}"  # 원하는 형식으로
 
-	# 4) 이 args를 활용해 학습/검증
-	score = train_session(args)
+		# 이제 train_session에 넘겨서 학습
+		score = train_session(args)
+		return score
 
-	return score
+	return objective
 
 
 def main():
@@ -212,9 +212,10 @@ def main():
 	1. Single Trial
 	"""
 	args_dict = {
+		"trial_name": "Building a new model",
 		"input_dim": 32,
 		"n_head": 8,
-		"q_dim": 16
+		"q_dim": 16,
 	}
 	args = SimpleNamespace(**args_dict)
 	score = train_session(args)
@@ -224,16 +225,18 @@ def main():
 	"""
 	2. Optuna Optimization 
 	"""
-	# 이미 study가 존재하면 불러오고, 없다면 새로 만든다
+	# 1) study 생성 (이미 존재하면 로드)
+	study_name = "my_study2"
 	study = optuna.create_study(
-		study_name="my_study",
-		storage="sqlite:///my_study.db",
+		study_name=study_name,
+		storage=f"sqlite:///{study_name}.db",
 		load_if_exists=True,
 		direction="maximize"
 	)
 
-	# 원하는 만큼 trial 실행
-	study.optimize(objective, n_trials=2)
+	# get_objective(study_name)로부터 objective 함수를 얻어서 optimize
+	objective_func = get_objective(study_name)
+	study.optimize(objective_func, n_trials=100)
 
 	print("Best value:", study.best_value)
 	print("Best params:", study.best_params)
