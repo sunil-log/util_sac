@@ -193,7 +193,7 @@ def get_objective(study_name: str):
 
 		# trial 이름을 일관성 있게 지정
 		args.optuna_trial_index = trial.number
-		args.trial_name = f"{study_name}_Trial_{trial.number}"  # 원하는 형식으로
+		args.trial_name = f"{study_name}__Trial_{trial.number}"  # 원하는 형식으로
 
 		# 이제 train_session에 넘겨서 학습
 		score = train_session(args)
