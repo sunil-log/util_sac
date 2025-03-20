@@ -162,6 +162,7 @@ def train_session(args):
 			mt.plot_metric(axes[0, 0], keys=["train_loss", "valid_loss", "test_loss"], y_log='log')
 			mt.plot_metric(axes[0, 1], keys=["train_accuracy", "test_accuracy"])
 			mt.plot_metric(axes[0, 2], keys=["f1_class_macro_train", "f1_class_macro_test"])
+			mt.plot_metric(axes[1, 0], keys=["lr"], y_log='log')
 			plt.tight_layout()
 			plt.savefig(tm.trial_dir / "train_test_loss.png")
 
