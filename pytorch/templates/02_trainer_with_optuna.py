@@ -37,6 +37,14 @@ param_space = {
 	"q_dim": {
 		"type": "categorical",
 		"choices": [2, 4, 8, 16, 32, 64, 128]
+	},
+	"lr_dict": {
+		"type": "categorical",
+		"choices": [
+			{10: 1e-4, 40: 1e-5},
+			{50: 1e-4, 80: 1e-5},
+			{99: 1e-4, 100: 1e-5},
+		]
 	}
 }
 
@@ -111,10 +119,6 @@ def train_session(args):
 	model = None
 	optimizer = None
 	criterion = None
-	lr_schedule = {
-		10: 1e-4,
-		100: 1e-5,
-	}
 
 
 	# 5) Trainer 생성
@@ -123,7 +127,7 @@ def train_session(args):
 		dataloaders=dataloaders,
 		optimizer=optimizer,
 		criterion=criterion,
-		lr_dict=lr_schedule,
+		lr_dict=args.lr_dict,
 		n_epoch=100,
 		args=args,
 	)
