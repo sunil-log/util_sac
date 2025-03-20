@@ -62,6 +62,10 @@ def load_metrics(base_path, keywords):
 
 def main():
 
+	from pathlib import Path
+	from util_sac.pytorch.trainer.load_metrics import load_metrics
+	from util_sac.pandas.print_df import print_partial_markdown
+
 	# read all train_test_metrics.csv files
 	base_path = Path('./trials')  # 현재 작업 디렉토리
 	keywords = ['__ID_2338__']
