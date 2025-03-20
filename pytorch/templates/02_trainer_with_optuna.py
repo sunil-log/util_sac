@@ -7,7 +7,6 @@ Created on  Mar 01 2025
 """
 
 
-from types import SimpleNamespace
 
 import torch
 import matplotlib.pyplot as plt
@@ -22,6 +21,7 @@ from util_sac.dict.save_args import save_args
 from util_sac.pandas.save_npz import save_df_as_npz
 
 import optuna
+from types import SimpleNamespace
 from util_sac.pytorch.optuna.sample_params import sample_params
 
 
