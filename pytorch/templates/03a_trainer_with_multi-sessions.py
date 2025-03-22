@@ -261,7 +261,6 @@ def main():
 	"""
 
 	# 1) study 생성 (이미 존재하면 로드)
-	# 1) study 생성 (이미 존재하면 로드)
 	study_name = f"{time.strftime('%H-%M-%S')}__study_name"
 	db_dir = f"./trials/{study_name}"
 	db_path = f"{db_dir}/study.db"
