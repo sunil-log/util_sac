@@ -23,10 +23,14 @@ from util_sac.pandas.print_df import print_partial_markdown
 from util_sac.pandas.save_npz import load_df_from_npz
 from util_sac.dict.save_args import load_args
 
+from util_sac.sys.search_files import search_items_df
+
+
+
 import pandas as pd
 
 
-def load_hyperparams(base_path, keywords):
+def load_hyperparams(base_path):
 	"""
 	주어진 keywords 리스트를 모두 포함하는 디렉토리를 찾아,
 	hyperparameters.json 파일만 읽어서 하나의 DataFrame으로 합친다.
@@ -40,26 +44,33 @@ def load_hyperparams(base_path, keywords):
 	- pd.DataFrame 혹은 None: 모든 json 데이터를 합친 DataFrame.
 	  조건에 맞는 디렉토리가 없으면 None을 반환한다.
 	"""
-	dfs = []
+	search_pattern = r".*hyperparameters\.json$"  # 정규표현식
+	result_df = search_items_df(base_path, search_pattern, search_type="files")
+	"""
+	|     | Path                                                                                                              | Parent                                                                                       | Name                 | Type   | Extension   |
+	|----:|:------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------|:---------------------|:-------|:------------|
+	|   0 | trials/ID_124024__study_name/2025-03-22_12-42-36__ID_124024__study_name__Trial_29__session_2/hyperparameters.json | trials/ID_124024__study_name/2025-03-22_12-42-36__ID_124024__study_name__Trial_29__session_2 | hyperparameters.json | File   | .json       |
+	|   1 | trials/ID_124024__study_name/2025-03-22_12-46-17__ID_124024__study_name__Trial_80__session_1/hyperparameters.json | trials/ID_124024__study_name/2025-03-22_12-46-17__ID_124024__study_name__Trial_80__session_1 | hyperparameters.json | File   | .json       |
+	|   2 | trials/ID_124024__study_name/2025-03-22_12-45-14__ID_124024__study_name__Trial_64__session_0/hyperparameters.json | trials/ID_124024__study_name/2025-03-22_12-45-14__ID_124024__study_name__Trial_64__session_0 | hyperparameters.json | File   | .json       |
+	"""
+	# print_partial_markdown(result_df)
 
-	for directory in base_path.iterdir():
-		if directory.is_dir() and all(kw in directory.name for kw in keywords):
-			json_path = directory / 'hyperparameters.json'
-			if json_path.exists():
-				# hyperparameters.json 로드
-				args = load_args(json_path)
-				# DataFrame 생성
-				temp_df = pd.DataFrame([args])
-				# trial_id 부여
-				temp_df['trial_time'] = directory.name.split('__')[0]
-				dfs.append(temp_df)
 
-	if not dfs:
-		print(f"No directory with keywords {keywords} found in {base_path}")
+	list_args = []
+	for i, row in result_df.iterrows():
+		json_path = row['Path']
+		args = load_args(json_path)
+		list_args.append(args)
+
+
+	if not list_args:
+		print(f"No 'hyperparameters.json' found in {base_path}")
 		return None
 
-	df = pd.concat(dfs, axis=0, ignore_index=True)
+	# DataFrame 생성
+	df = pd.DataFrame(list_args)
 	return df
+
 
 
 def load_metrics(base_path, keywords):
