@@ -35,7 +35,7 @@ import matplotlib.pyplot as plt
 
 
 n_epoch = 15
-lr_schedules = generate_lr_schedules(
+lr_dicts = generate_lr_schedules(
 	num_schedules=50,
 	total_epochs=n_epoch
 )
@@ -146,7 +146,7 @@ def train_session(args):
 		optimizer=optimizer,
 		criterion=criterion,
 		lr_dict=args.lr_dict,
-		n_epoch=100,
+		n_epoch=args.n_epoch,
 		args=args,
 	)
 
@@ -222,6 +222,7 @@ def multiple_train_sessions(args):
 
 		# modify args
 		args.trial_name = f"{trial_name}__session_{i}"
+		args.n_epoch = n_epoch
 		score = train_session(args)
 		list_score.append(score)
 
