@@ -26,6 +26,8 @@ from util_sac.sys.dir_manager import create_dir
 import time
 import optuna
 from types import SimpleNamespace
+from util_sac.pytorch.optuna.get_objective import get_objective
+
 
 import matplotlib.pyplot as plt
 
@@ -220,38 +222,6 @@ def multiple_train_sessions(args):
 
 
 
-def get_objective(study_info: dict):
-
-	"""
-	study_info 을 넣기 위한 wrapper 함수
-	"""
-
-	def objective(trial: optuna.trial.Trial) -> float:
-
-		"""
-		Optuna의 objective 함수
-		"""
-
-		# sample hyperparameters
-		args_dict = optuna_sample_params(trial, param_space)
-		args = SimpleNamespace(**args_dict)
-		args.lr_dict = lr_dicts[args.lr_dict_idx]
-
-		# 이제 train_session에 넘겨서 학습
-		args.study_name = study_info["study_name"]
-		args.optuna_trial_index = trial.number
-		args.trial_name = f"{study_info['study_name']}__Trial_{trial.number}"  # 원하는 형식으로
-		args.db_dir = study_info["db_dir"]
-
-		# run multiple train sessions
-		score = multiple_train_sessions(args)
-		return score
-
-	return objective
-
-
-
-
 def main():
 
 	"""
@@ -298,7 +268,12 @@ def main():
 	)
 
 	# get_objective(study_name)로부터 objective 함수를 얻어서 optimize
-	objective_func = get_objective(study_info)
+	objective_func = get_objective(
+		study_info=study_info,
+		param_space=param_space,
+		lr_dicts=lr_dicts,
+		train_sessions=multiple_train_sessions
+	)
 	study.optimize(objective_func, n_trials=100)
 
 	print("Best value:", study.best_value)
