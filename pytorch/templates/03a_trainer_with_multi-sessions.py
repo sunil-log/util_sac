@@ -207,6 +207,10 @@ def train_session(args):
 
 def multiple_train_sessions(args):
 
+	# fn results
+	fn_results = f"{args.db_dir}/scores.jsonl"
+	jm = jsonl_file_manager(fn_results)
+
 	# trial_name
 	trial_name = args.trial_name
 	list_score = []
@@ -217,8 +221,17 @@ def multiple_train_sessions(args):
 		score = train_session(args)
 		list_score.append(score)
 
+
+	# save session results
+	d = vars(args)
+	d.pop("trial_name")
+	for i, score in enumerate(list_score):
+		d[f"score_{i}"] = score
+	d["mean_score"] = np.mean(list_score)
+	jm.write_line(d)
+
 	# average score
-	return np.mean(list_score)
+	return d["mean_score"]
 
 
 
