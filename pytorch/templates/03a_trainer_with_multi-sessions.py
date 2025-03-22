@@ -35,6 +35,7 @@ import matplotlib.pyplot as plt
 
 
 n_epoch = 15
+n_trials = 100
 lr_dicts = generate_lr_schedules(
 	num_schedules=50,
 	total_epochs=n_epoch
@@ -292,7 +293,7 @@ def main():
 		lr_dicts=lr_dicts,
 		train_sessions=multiple_train_sessions      # or train_session
 	)
-	study.optimize(objective_func, n_trials=100)
+	study.optimize(objective_func, n_trials=n_trials)
 
 	print("Best value:", study.best_value)
 	print("Best params:", study.best_params)
