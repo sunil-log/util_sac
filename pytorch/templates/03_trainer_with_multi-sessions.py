@@ -26,7 +26,6 @@ from util_sac.sys.dir_manager import create_dir
 import time
 import optuna
 from types import SimpleNamespace
-from util_sac.pytorch.optuna.sample_params import optuna_sample_params
 
 import matplotlib.pyplot as plt
 
@@ -111,7 +110,12 @@ def train_session(args):
 
 	# 2) trial manager
 	sub_dir_list = ["weights", "reconstruction", "latent_space"]
-	tm = trial_manager(sub_dir_list, trial_name=args.trial_name, zip_src_loc="../")
+	tm = trial_manager(
+		sub_dir_list,
+		base_dir=args.db_dir,
+		trial_name=args.trial_name,
+		zip_src_loc="../"
+	)
 
 	# 3) load data
 	dataloader_train = None
@@ -154,11 +158,15 @@ def train_session(args):
 		f1_valid = calculate_f1(valid_data, name="valid")
 		f1_test = calculate_f1(test_data, name="test")
 
-		mt.update(epoch, **train_loss, **test_loss, **f1_train, **f1_test, **lr)
+		mt.update(
+			epoch,
+			**train_loss, **valid_loss, **test_loss,
+			**f1_train, **f1_valid, **f1_test,
+			**lr
+		)
 		mt.print_latest()
 
 		if epoch % 10 == 0:
-
 			# save model
 			# torch.save(model.state_dict(), f"{tm['weights']}/epoch_{epoch}.pth")
 

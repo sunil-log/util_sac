@@ -22,7 +22,6 @@ from util_sac.pandas.save_npz import save_df_as_npz
 
 import optuna
 from types import SimpleNamespace
-from util_sac.pytorch.optuna.sample_params import optuna_sample_params
 
 
 lr_dicts = [

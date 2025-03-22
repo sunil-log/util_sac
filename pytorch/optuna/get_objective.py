@@ -1,4 +1,13 @@
+
+# -*- coding: utf-8 -*-
+"""
+Created on  Mar 22 2025
+
+@author: sac
+"""
+
 import optuna
+from types import SimpleNamespace
 
 
 """
@@ -107,4 +116,40 @@ def optuna_sample_params(trial: optuna.trial.Trial, param_space: dict) -> dict:
 
 	return params
 
+
+
+
+def get_objective(
+		study_info: dict,
+		param_space: dict,
+		lr_dicts: list,
+		multiple_train_sessions: callable
+):
+
+	"""
+	study_info 을 넣기 위한 wrapper 함수
+	"""
+
+	def objective(trial: optuna.trial.Trial) -> float:
+
+		"""
+		Optuna의 objective 함수
+		"""
+
+		# sample hyperparameters
+		args_dict = optuna_sample_params(trial, param_space)
+		args = SimpleNamespace(**args_dict)
+		args.lr_dict = lr_dicts[args.lr_dict_idx]
+
+		# 이제 train_session에 넘겨서 학습
+		args.study_name = study_info["study_name"]
+		args.optuna_trial_index = trial.number
+		args.trial_name = f"{study_info['study_name']}__Trial_{trial.number}"  # 원하는 형식으로
+		args.db_dir = study_info["db_dir"]
+
+		# run multiple train sessions
+		score = multiple_train_sessions(args)
+		return score
+
+	return objective
 
