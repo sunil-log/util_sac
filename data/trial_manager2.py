@@ -54,14 +54,14 @@ class trial_manager:
 		torch.save(model.state_dict(), tm['weights'] / f"{tm.date_prefix}__model_{epoch}.pt")
 	"""
 
-	def __init__(self, sub_dir_list, trial_name="test", zip_src_loc="."):
+	def __init__(self, sub_dir_list, base_dir="./trials", trial_name="test", zip_src_loc="../"):
 
 		# validate trial name
 		validate_trial_name(trial_name)
 
 		# create trial directory
 		self.date_prefix = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-		self.trial_dir = self.__create_trial_dir(trial_name)
+		self.trial_dir = self.__create_trial_dir(base_dir, trial_name)
 		self.sub_dir_dict = self.__create_sub_dirs(sub_dir_list)
 		self.source_path = self.trial_dir / f"{self.date_prefix}__{trial_name}.zip"
 		"""
@@ -80,8 +80,8 @@ class trial_manager:
 	def get_trial_dir(self):
 		return self.trial_dir
 
-	def __create_trial_dir(self, trial_name):
-		base_dir = Path("./trials")
+	def __create_trial_dir(self, base_dir, trial_name):
+		base_dir = Path(base_dir)
 		base_dir.mkdir(exist_ok=True)
 
 		dir_name = f"{self.date_prefix}__{trial_name}"

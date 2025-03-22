@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
 
 
-def sample_params(trial: optuna.trial.Trial, param_space: dict) -> dict:
+def optuna_sample_params(trial: optuna.trial.Trial, param_space: dict) -> dict:
 	"""
 	param_space에 정의된 항목을 순회하며, trial.suggest_...()를 자동으로 호출해
 	하이퍼파라미터 dict를 생성하여 리턴한다.
