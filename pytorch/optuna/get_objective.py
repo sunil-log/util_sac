@@ -123,7 +123,7 @@ def get_objective(
 		study_info: dict,
 		param_space: dict,
 		lr_dicts: list,
-		multiple_train_sessions: callable
+		train_sessions: callable
 ):
 
 	"""
@@ -148,7 +148,7 @@ def get_objective(
 		args.db_dir = study_info["db_dir"]
 
 		# run multiple train sessions
-		score = multiple_train_sessions(args)
+		score = train_sessions(args)
 		return score
 
 	return objective
