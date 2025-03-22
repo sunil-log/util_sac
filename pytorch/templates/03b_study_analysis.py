@@ -27,10 +27,13 @@ from util_sac.dict.jsonl_file_manager import jsonl_file_manager
 def main():
 
 	# Load the scores.jsonl file as a DataFrame
-	bast_path = './trials/ID_124024__study_name'
+	bast_path = './trials/ID_133016__study_name'
 	fm = jsonl_file_manager(f"{bast_path}/scores.jsonl")
 	df = fm.read_as_df()
+	df = df.sort_values(by=['mean_score'], ascending=False)
+
 	print_partial_markdown(df)
+	exit()
 
 	# Load the hyperparameters.jsonl file as a DataFrame
 	df = load_hyperparams(bast_path)
