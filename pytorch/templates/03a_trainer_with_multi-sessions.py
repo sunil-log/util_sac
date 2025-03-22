@@ -285,7 +285,7 @@ def main():
 		study_info=study_info,
 		param_space=param_space,
 		lr_dicts=lr_dicts,
-		train_sessions=multiple_train_sessions
+		train_sessions=multiple_train_sessions      # or train_session
 	)
 	study.optimize(objective_func, n_trials=100)
 
