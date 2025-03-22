@@ -82,8 +82,8 @@ class NewTrainer(BaseTrainer):
 
 		# data
 		d = {
-			"x": x,
-			"label": label
+			"x": None,
+			"label": None
 		}
 		d = move_dict_tensors_to_device(d, self.device)
 		# print_array_info(data)
@@ -171,6 +171,7 @@ def train_session(args):
 		if epoch % 10 == 0:
 			# save model
 			# torch.save(model.state_dict(), f"{tm['weights']}/epoch_{epoch}.pth")
+			pass
 
 
 	# plot the train and test metrics

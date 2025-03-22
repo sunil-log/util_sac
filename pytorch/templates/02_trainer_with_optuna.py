@@ -19,9 +19,13 @@ from util_sac.pytorch.load_data.move_device import move_dict_tensors_to_device
 from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1
 from util_sac.dict.save_args import save_args
 from util_sac.pandas.save_npz import save_df_as_npz
+from util_sac.sys.dir_manager import create_dir
 
+import time
 import optuna
 from types import SimpleNamespace
+from util_sac.pytorch.optuna.get_objective import get_objective
+
 
 
 lr_dicts = [
@@ -75,8 +79,8 @@ class NewTrainer(BaseTrainer):
 
 		# data
 		d = {
-			"x": x,
-			"label": label
+			"x": None,
+			"label": None
 		}
 		d = move_dict_tensors_to_device(d, self.device)
 		# print_array_info(data)
@@ -187,24 +191,6 @@ def train_session(args):
 		return best_f1
 
 
-def get_objective(study_name: str):
-	def objective(trial: optuna.trial.Trial) -> float:
-		# 여기서, study_name이 클로저 형태로 바깥에서 넘어온다.
-		# (예: trial_name 설정 시 study_name과 trial.number를 묶어서 사용)
-
-		args_dict = optuna_sample_params(trial, param_space)
-		args = SimpleNamespace(**args_dict)
-		args.lr_dict = lr_dicts[args.lr_dict_idx]
-
-		# trial 이름을 일관성 있게 지정
-		args.optuna_trial_index = trial.number
-		args.trial_name = f"{study_name}__Trial_{trial.number}"  # 원하는 형식으로
-
-		# 이제 train_session에 넘겨서 학습
-		score = train_session(args)
-		return score
-
-	return objective
 
 
 def main():
@@ -225,22 +211,38 @@ def main():
 	args = SimpleNamespace(**args_dict)
 	score = train_session(args)
 	print("Single Trial Score:", score)
-	exit()
+
 
 	"""
 	2. Optuna Optimization 
 	"""
 	# 1) study 생성 (이미 존재하면 로드)
-	study_name = "my_study2"
+	study_name = f"ID_{time.strftime('%H%M%S')}__study_name"
+	db_dir = f"./trials/{study_name}"
+	db_path = f"{db_dir}/study.db"
+	study_info = {
+		"study_name": study_name,
+		"db_dir": db_dir,
+		"db_path": db_path,
+	}
+	create_dir(db_dir)
+
+
+	# 2) study_name을 이용해 study 생성
 	study = optuna.create_study(
 		study_name=study_name,
-		storage=f"sqlite:///{study_name}.db",
+		storage=f"sqlite:///{db_path}",
 		load_if_exists=True,
 		direction="maximize"
 	)
 
 	# get_objective(study_name)로부터 objective 함수를 얻어서 optimize
-	objective_func = get_objective(study_name)
+	objective_func = get_objective(
+		study_info=study_info,
+		param_space=param_space,
+		lr_dicts=lr_dicts,
+		train_sessions=train_session
+	)
 	study.optimize(objective_func, n_trials=100)
 
 	print("Best value:", study.best_value)
