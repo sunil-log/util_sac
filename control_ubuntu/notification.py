@@ -15,7 +15,7 @@ def convert_dict_to_str(my_dict):
 	딕셔너리를 문자열로 변환하는 함수입니다.
 
 	Args:
-	my_dict (dict_module): 변환할 딕셔너리입니다.
+	my_dict (dict): 변환할 딕셔너리입니다.
 
 	Returns:
 	str: 딕셔너리를 문자열로 변환한 결과입니다.
@@ -39,7 +39,7 @@ def linux_alert(title, message):
 	# subprocess.Popen(['/usr/bin/paplay', sound_file_path])
 	# 메시지 박스 띄우기
 
-	# if type of message is dict_module, convert it to string
+	# if type of message is dict, convert it to string
 	if isinstance(message, dict):
 		message = convert_dict_to_str(message)
 
@@ -60,7 +60,7 @@ def linux_notification(title, message):
 		sudo apt install libnotify-bin
 	"""
 
-	# if type of message is dict_module, convert it to string
+	# if type of message is dict, convert it to string
 	if isinstance(message, dict):
 		message = convert_dict_to_str(message)
 

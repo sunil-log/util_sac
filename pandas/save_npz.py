@@ -34,9 +34,9 @@ def load_df_from_npz(filename):
 		변환된 DataFrame
 	"""
 	data = np.load(filename)
-	# 파일 내 모든 배열을 사전(dict_module)으로 획득
+	# 파일 내 모든 배열을 사전(dict)으로 획득
 	arrays = {key: data[key] for key in data.files}
-	# dict_module -> DataFrame 변환
+	# dict -> DataFrame 변환
 	return pd.DataFrame(arrays)
 
 

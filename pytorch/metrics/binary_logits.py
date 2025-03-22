@@ -117,7 +117,7 @@ def binary_metrics(train_data, valid_data, test_data):
 
 	"""
 	train_data, valid_data, test_data 를 받는다.
-	각각 dict_module 로 "logit" 과 "label" 이 포함되어 있다.
+	각각 dict 로 "logit" 과 "label" 이 포함되어 있다.
 
 	Valid set 을 이용해서 threshold 를 구한다.
 	train, valid, test 의 prob,

@@ -52,7 +52,7 @@ def train_session(args):
 
 
 def objective(trial: optuna.trial.Trial):
-	# 2) sample_params 함수를 통해 dict_module 획득
+	# 2) sample_params 함수를 통해 dict 획득
 	args_dict = sample_params(trial, param_space)
 
 	# 3) SimpleNamespace로 감싸서 사용 (편의를 위해)
@@ -87,7 +87,7 @@ def generate_lr_schedules(num_schedules: int, total_epochs: int):
 		total_epochs (int): 전체 에폭 수
 
 	Returns:
-		List[dict_module]: 두 번에 걸쳐 학습률이 하락하는 스케줄 딕셔너리의 리스트
+		List[dict]: 두 번에 걸쳐 학습률이 하락하는 스케줄 딕셔너리의 리스트
 	"""
 	schedules = []
 	for _ in range(num_schedules):

@@ -5,7 +5,7 @@ from util_sac.data.batch_data_collector import batch_loss_collector, batch_data_
 from util_sac.pytorch.trainer.update_lr import update_lr_with_dict
 
 """
-trainer.py 대비 dataloader 를 dict_module 로 모아서 받는다.
+trainer.py 대비 dataloader 를 dict 로 모아서 받는다.
 
 one_step 만 implement 하면 된다.
 	1. batch 를 받아서 parameter 를 정리하고,
@@ -171,7 +171,7 @@ class BaseTrainer:
 
 		"""
 		:param model: PyTorch model
-		:param dataloaders: dict_module 형태의 dataloaders (예: {"train": ..., "val": ...})
+		:param dataloaders: dict 형태의 dataloaders (예: {"train": ..., "val": ...})
 		:param optimizer: PyTorch optimizer
 		:param criterion: loss function
 		:param n_epoch: 학습 epoch 수

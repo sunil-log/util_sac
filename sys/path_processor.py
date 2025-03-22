@@ -46,7 +46,7 @@ class PathProcessor:
 		_validate_paths(): 제공된 데이터 및 불필요한 경로를 검증합니다.
 		_remove_unnecessary_path(file_path: Path) -> Path: 파일 경로에서 불필요한 경로를 제거합니다.
 		_create_save_path(processed_path: Path) -> Path: 처리된 데이터를 저장할 경로를 생성합니다.
-		_save_data(save_path: Path, data: Union[list, tuple, set, dict_module, np.array]) -> None: 처리된 데이터를 저장합니다.
+		_save_data(save_path: Path, data: Union[list, tuple, set, dict, np.array]) -> None: 처리된 데이터를 저장합니다.
 		_save_data_description(save_path: Path) -> None: 처리된 데이터에 대한 설명 파일을 저장합니다.
 
 	사용 방법:

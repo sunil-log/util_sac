@@ -15,7 +15,7 @@ def save_args(args, filename):
 		json.dump(vars(args), f, indent=4)
 
 def load_args(filename):
-	"""JSON 파일을 읽어서 dict_module 형태로 불러온다."""
+	"""JSON 파일을 읽어서 dict 형태로 불러온다."""
 	with open(filename, "r") as f:
 		args_dict = json.load(f)
 	return args_dict

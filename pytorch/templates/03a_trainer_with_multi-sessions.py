@@ -17,10 +17,10 @@ from util_sac.pytorch.trainer.trainer import BaseTrainer
 from util_sac.pytorch.trainer.update_lr import current_lr
 from util_sac.pytorch.load_data.move_device import move_dict_tensors_to_device
 from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1
-from util_sac.dict_module.save_args import save_args
+from util_sac.dict.save_args import save_args
 from util_sac.pandas.save_npz import save_df_as_npz
 from util_sac.sys.dir_manager import create_dir
-from util_sac.dict_module.jsonl_file_manager import jsonl_file_manager
+from util_sac.dict.jsonl_file_manager import jsonl_file_manager
 from util_sac.pytorch.optuna.get_objective import generate_lr_schedules
 
 

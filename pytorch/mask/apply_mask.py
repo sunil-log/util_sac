@@ -10,7 +10,7 @@ def apply_mask_1d(tensor_dict: dict, mask: torch.Tensor, device: torch.device) -
 
 	1) mask가 numpy.ndarray라면 torch.Tensor로 변환
 	2) mask가 0/1 (int/float)이면 bool로 변환 (mask != 0)
-	3) dict_module 안의 value도 numpy -> tensor -> device
+	3) dict 안의 value도 numpy -> tensor -> device
 	4) 인덱싱 후 반환 (shape: (num_valid, ...))
 	"""
 	# mask를 device로 옮기기 전 numpy -> tensor 변환
@@ -47,7 +47,7 @@ def apply_mask_2d(tensor_dict: dict, mask: torch.Tensor, device: torch.device) -
 
 	1) mask가 numpy.ndarray라면 torch.Tensor로 변환
 	2) mask가 0/1 (int/float)이면 bool로 변환 (mask != 0)
-	3) dict_module 안의 value도 numpy -> tensor -> device
+	3) dict 안의 value도 numpy -> tensor -> device
 	4) (B,T) -> (B*T,)로 펼쳐서 인덱싱 후 반환
 	   => 결과 shape: (num_valid, ...)
 	"""
@@ -97,7 +97,7 @@ def apply_mask_dict(tensor_dict: dict, mask, device: torch.device) -> dict:
 			mask 가 (subject, epoch) = valid epoch 인 경우 사용
 
 	Args:
-		tensor_dict (dict_module): {key: torch.Tensor or np.ndarray} 형태
+		tensor_dict (dict): {key: torch.Tensor or np.ndarray} 형태
 			- 1D 마스크인 경우: v.shape[0] = B
 			- 2D 마스크인 경우: v.shape[:2] = (B, T)
 		mask (torch.Tensor or np.ndarray):
@@ -107,7 +107,7 @@ def apply_mask_dict(tensor_dict: dict, mask, device: torch.device) -> dict:
 		device (torch.device):
 			- 연산 및 결과 텐서가 올라갈 디바이스 (cuda, cpu 등)
 	Returns:
-		dict_module: mask를 적용해 필터링된 dict_module
+		dict: mask를 적용해 필터링된 dict
 
 	동작 요약:
 	  - 1D 마스크 => apply_mask_1d 호출

@@ -40,7 +40,7 @@ class trial_manager:
 
 	Attributes:
 		trial_dir (Path): 생성된 실험 디렉토리 경로
-		sub_dir_dict (dict_module): 생성된 하위 디렉토리 경로 딕셔너리
+		sub_dir_dict (dict): 생성된 하위 디렉토리 경로 딕셔너리
 
 	Methods:
 		__getitem__(key): 인덱스 또는 키를 사용하여 하위 디렉토리 경로에 접근합니다.

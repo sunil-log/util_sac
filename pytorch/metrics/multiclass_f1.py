@@ -17,7 +17,7 @@ def calculate_f1(data, name="test"):
 	Multiclass F1Score를 산출한 뒤 딕셔너리 형태로 반환한다.
 
 	Args:
-	    data (dict_module):
+	    data (dict):
 	    {
 			"logits": (batch_size, num_classes) 형태의 PyTorch Tensor,
 			"y":      (batch_size,)             형태의 PyTorch Tensor
@@ -26,7 +26,7 @@ def calculate_f1(data, name="test"):
 	        결과 딕셔너리에 부가적으로 붙일 suffix이다. 기본값은 "test"이다.
 
 	Returns:
-	    dict_module:
+	    dict:
 	        {
 	            "f1_class_0_{name}": float 값,
 	            "f1_class_1_{name}": float 값,

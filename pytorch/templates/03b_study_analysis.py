@@ -20,7 +20,7 @@ from util_sac.image_processing.reduce_palette import reduce_palette
 
 
 from util_sac.pytorch.trainer.load_metrics import load_hyperparams
-from util_sac.dict_module.jsonl_file_manager import jsonl_file_manager
+from util_sac.dict.jsonl_file_manager import jsonl_file_manager
 
 
 
