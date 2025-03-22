@@ -19,7 +19,7 @@ def calculate_roc(data, auc_only=True, name="test"):
 	ROC 커브 (FPR, TPR)와 AUC를 계산하여 반환한다.
 
 	Args:
-		data (dict):
+		data (dict_module):
 			{
 				"logits": (batch_size, 2) 형태의 PyTorch Tensor,
 				"y":	  (batch_size,)	 형태의 PyTorch Tensor
@@ -28,7 +28,7 @@ def calculate_roc(data, auc_only=True, name="test"):
 			결과 딕셔너리에 붙일 suffix이다. 기본값은 "test"이다.
 
 	Returns:
-		dict:
+		dict_module:
 			{
 				f"fpr_{name}":		torch.Tensor (FPR 값들),
 				f"tpr_{name}":		torch.Tensor (TPR 값들),
@@ -76,7 +76,7 @@ def calculate_pr(data, auc_only=True, name="test"):
 	Precision-Recall (PR) 커브와 PR-AUC를 계산하여 반환한다.
 
 	Args:
-		data (dict):
+		data (dict_module):
 			{
 				"logits": (batch_size, 2) 형태의 PyTorch Tensor,
 				"y":	  (batch_size,)	 형태의 PyTorch Tensor
@@ -85,7 +85,7 @@ def calculate_pr(data, auc_only=True, name="test"):
 			결과 딕셔너리에 붙일 suffix이다. 기본값은 "test"이다.
 
 	Returns:
-		dict:
+		dict_module:
 			{
 				f"precision_{name}":  torch.Tensor (Precision 값들),
 				f"recall_{name}":	 torch.Tensor (Recall 값들),

@@ -21,7 +21,7 @@ import pandas as pd
 
 from util_sac.pandas.print_df import print_partial_markdown
 from util_sac.pandas.save_npz import load_df_from_npz
-from util_sac.dict.save_args import load_args
+from util_sac.dict_module.save_args import load_args
 
 from util_sac.sys.search_files import search_items_df
 

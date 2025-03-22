@@ -19,9 +19,9 @@ def make_k_fold_splits(
 
 	반환값:
 		{
-			'train': dict,
-			'valid': dict,
-			'test': dict
+			'train': dict_module,
+			'valid': dict_module,
+			'test': dict_module
 		}
 	형태의 Dictionary. 각각의 key/value도 원본 data 구조를 유지하며
 	Fold에 맞게 axis=0을 슬라이싱하여 분배한다.

@@ -1,6 +1,6 @@
 """
 이 모듈은 Line-based JSON 파일(.jsonl)을 효율적으로 관리하기 위해 설계되었습니다.
-각 줄에 하나의 JSON 형태 데이터를 저장하고, 이를 읽어오는 과정에서 dict 타입의 리스트를 얻을 수 있습니다.
+각 줄에 하나의 JSON 형태 데이터를 저장하고, 이를 읽어오는 과정에서 dict_module 타입의 리스트를 얻을 수 있습니다.
 또한 이 데이터를 pandas의 DataFrame 형태로 변환할 수도 있습니다.
 
 용례:
@@ -10,11 +10,11 @@
 	# 파일 매니저 인스턴스 생성 (str 또는 Path 사용 가능)
 	manager = JsonlFileManager(filepath=Path("data.jsonl"))
 
-	# dict 데이터를 한 줄씩 저장
+	# dict_module 데이터를 한 줄씩 저장
 	manager.write_line({"id": 1, "text": "Hello World"})
 	manager.write_line({"id": 2, "text": "Another line"})
 
-	# 파일에서 dict 목록 읽어오기
+	# 파일에서 dict_module 목록 읽어오기
 	data_list = manager.read()
 	print(data_list)
 	# [{'id': 1, 'text': 'Hello World'}, {'id': 2, 'text': 'Another line'}]
@@ -44,7 +44,7 @@ class jsonl_file_manager:
 	  (str 또는 Path 객체 모두 가능)
 	- write_line(data): dict를 받아 JSON 형식으로 한 줄씩 파일에 저장합니다.
 	- read(): 파일의 모든 줄을 읽고, 각 줄을 dict로 변환한 뒤 list로 반환합니다.
-	- read_as_df(): read()로 얻은 dict list를 DataFrame으로 변환하여 반환합니다.
+	- read_as_df(): read()로 얻은 dict_module list를 DataFrame으로 변환하여 반환합니다.
 	"""
 	def __init__(self, filepath: Union[str, Path]):
 		"""
@@ -54,7 +54,7 @@ class jsonl_file_manager:
 
 	def write_line(self, data):
 		"""
-		data(dict): 파일에 JSON 형식으로 한 줄 저장할 데이터
+		data(dict_module): 파일에 JSON 형식으로 한 줄 저장할 데이터
 		"""
 		converted_data = {}
 		for k, v in data.items():
@@ -73,7 +73,7 @@ class jsonl_file_manager:
 		변환이 불가능한 줄은 무시합니다.
 
 		Returns:
-			list of dict: 파일에서 읽어온 모든 데이터를 담고 있는 리스트
+			list of dict_module: 파일에서 읽어온 모든 데이터를 담고 있는 리스트
 		"""
 		data_list = []
 		with open(self.filepath, 'r', encoding='utf-8') as f:
@@ -90,7 +90,7 @@ class jsonl_file_manager:
 
 	def read_as_df(self):
 		"""
-		read()로 읽은 dict list를 기반으로 DataFrame을 생성하여 반환합니다.
+		read()로 읽은 dict_module list를 기반으로 DataFrame을 생성하여 반환합니다.
 
 		Returns:
 			pandas.DataFrame: 파일에서 읽어온 데이터를 담고 있는 DataFrame

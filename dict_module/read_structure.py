@@ -3,20 +3,20 @@ from rich.tree import Tree
 from rich.console import Console
 
 """
-이 모듈은 JSON 데이터를 Python dict 형식으로 받아,
+이 모듈은 JSON 데이터를 Python dict_module 형식으로 받아,
 rich 라이브러리의 Tree 객체를 이용해 해당 데이터 구조를 시각적으로 표현하고자 할 때
 유용한 함수를 제공합니다.
 
 주요 함수:
-- build_tree(data, tree): 주어진 data(dict, list 등)를 재귀적으로 순회하며,
+- build_tree(data, tree): 주어진 data(dict_module, list 등)를 재귀적으로 순회하며,
   Rich의 Tree 객체에 노드를 추가합니다.
-- create_tree(data, root_label): 주어진 dict 데이터를 바탕으로 루트 노드를 생성한 뒤,
+- create_tree(data, root_label): 주어진 dict_module 데이터를 바탕으로 루트 노드를 생성한 뒤,
   build_tree 함수를 이용해 전체 구조를 구성한 Tree 객체를 반환합니다.
 - print_tree(data, root_label): create_tree 함수를 통해 생성한 Tree 객체를
   콘솔에 출력합니다.
 
 사용 예시:
-1) JSON 파일을 읽어 dict 형태로 로드합니다.
+1) JSON 파일을 읽어 dict_module 형태로 로드합니다.
 2) print_tree 함수를 호출해 구조를 확인합니다.
    (필요에 따라 create_tree를 직접 호출한 뒤, console.print를 사용할 수도 있습니다.)
 
@@ -43,7 +43,7 @@ def build_tree(data, tree: Tree) -> None:
 	주어진 data의 구조를 rich의 Tree 객체에 재귀적으로 추가합니다.
 
 	인자:
-		data: 탐색할 데이터 (dict, list, 또는 기타 타입)
+		data: 탐색할 데이터 (dict_module, list, 또는 기타 타입)
 		tree (Tree): 현재 노드
 	"""
 	if isinstance(data, dict):
@@ -67,10 +67,10 @@ def build_tree(data, tree: Tree) -> None:
 
 def create_tree(data: dict, root_label: str = "[bold green]JSON 구조[/bold green]") -> Tree:
 	"""
-	주어진 dict 데이터를 기반으로 rich의 Tree 객체를 생성하여 반환합니다.
+	주어진 dict_module 데이터를 기반으로 rich의 Tree 객체를 생성하여 반환합니다.
 
 	인자:
-		data (dict): JSON 데이터로 변환된 dict
+		data (dict_module): JSON 데이터로 변환된 dict_module
 		root_label (str): 트리의 루트 노드에 표시할 레이블 (기본값: "[bold green]JSON 구조[/bold green]")
 
 	반환:
@@ -83,10 +83,10 @@ def create_tree(data: dict, root_label: str = "[bold green]JSON 구조[/bold gre
 
 def print_tree(data: dict, root_label: str = "[bold green]JSON 구조[/bold green]") -> None:
 	"""
-	주어진 dict 데이터를 기반으로 rich의 Tree 객체를 생성하고 출력합니다.
+	주어진 dict_module 데이터를 기반으로 rich의 Tree 객체를 생성하고 출력합니다.
 
 	인자:
-		data (dict): JSON 데이터로 변환된 dict
+		data (dict_module): JSON 데이터로 변환된 dict_module
 		root_label (str): 트리의 루트 노드에 표시할 레이블 (기본값: "[bold green]JSON 구조[/bold green]")
 	"""
 	tree = create_tree(data, root_label)

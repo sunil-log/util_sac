@@ -7,12 +7,12 @@ def dict_to_tensors(d, float_dtype=torch.float32, int_dtype=torch.int64):
 	float, int 모두 기본적으로 float_dtype, int_dtype 로 변환한다.
 
 	Args:
-		d (dict): 여러 형태(tensor, numpy array, list, 숫자 등)의 데이터를 value로 가지는 dictionary.
+		d (dict_module): 여러 형태(tensor, numpy array, list, 숫자 등)의 데이터를 value로 가지는 dictionary.
 		float_dtype (torch.dtype): float 형 변환 시 사용할 dtype (기본값: torch.float32).
 		int_dtype (torch.dtype): int 형 변환 시 사용할 dtype (기본값: torch.int64).
 
 	Returns:
-		dict: value들이 모두 torch Tensor로 변환된 dictionary.
+		dict_module: value들이 모두 torch Tensor로 변환된 dictionary.
 	"""
 	new_d = {}
 	for k, v in d.items():
@@ -52,11 +52,11 @@ def move_dict_tensors_to_device(d, device):
 	모두 지정된 device로 옮긴다.
 
 	Args:
-		d (dict): value가 torch Tensor인 dictionary.
+		d (dict_module): value가 torch Tensor인 dictionary.
 		device (torch.device): 데이터를 옮길 대상 device.
 
 	Returns:
-		dict: value들이 지정된 device로 옮겨진 dictionary.
+		dict_module: value들이 지정된 device로 옮겨진 dictionary.
 	"""
 	new_d = {}
 	for k, v in d.items():
