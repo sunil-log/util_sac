@@ -21,7 +21,7 @@ from util_sac.dict.save_args import save_args
 from util_sac.pandas.save_npz import save_df_as_npz
 from util_sac.sys.dir_manager import create_dir
 from util_sac.dict.jsonl_file_manager import jsonl_file_manager
-
+from util_sac.pytorch.optuna.get_objective import generate_lr_schedules
 
 
 
@@ -33,11 +33,13 @@ from util_sac.pytorch.optuna.get_objective import get_objective
 
 import matplotlib.pyplot as plt
 
-lr_dicts = [
-    {10: 1e-4, 40: 1e-5},
-    {50: 1e-4, 80: 1e-5},
-    {99: 1e-4, 100: 1e-5}
-]
+
+n_epoch = 15
+lr_schedules = generate_lr_schedules(
+	num_schedules=50,
+	total_epochs=n_epoch
+)
+
 
 
 param_space = {
