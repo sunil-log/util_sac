@@ -172,6 +172,9 @@ def get_objective(
 		args = SimpleNamespace(**args_dict)
 		args.lr_dict = lr_dicts[args.lr_dict_idx]
 
+		# Optuna Trial DB에 user attribute로 저장
+		trial.set_user_attr("lr_dict", args.lr_dict)
+
 		# 이제 train_session에 넘겨서 학습
 		args.study_name = study_info["study_name"]
 		args.optuna_trial_index = trial.number
