@@ -2,12 +2,12 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from matplotlib import pyplot as plt
-from util_sac.data.trial_manager2 import trial_manager
+from util_sac.pytorch.data.trial_manager2 import trial_manager
 import random
 from sklearn.metrics import accuracy_score, f1_score
 
-from util_sac.data.epoch_metric_tracker import metric_tracker
-from util_sac.data.batch_metric_tracker import batch_loss_tracker
+from util_sac.pytorch.data.epoch_metric_tracker import metric_tracker
+from util_sac.pytorch.data import batch_loss_tracker
 
 from torch.utils.data import TensorDataset, DataLoader
 
