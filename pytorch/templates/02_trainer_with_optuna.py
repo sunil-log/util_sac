@@ -20,6 +20,8 @@ from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1
 from util_sac.dict.json_manager import save_json
 from util_sac.pandas.save_npz import save_df_as_npz
 from util_sac.sys.dir_manager import create_dir
+from util_sac.pytorch.optuna.get_objective import generate_lr_schedules
+
 
 import time
 import optuna
@@ -28,11 +30,12 @@ from util_sac.pytorch.optuna.get_objective import get_objective
 
 
 
-lr_dicts = [
-    {10: 1e-4, 40: 1e-5},
-    {50: 1e-4, 80: 1e-5},
-    {99: 1e-4, 100: 1e-5}
-]
+n_epoch = 15
+n_trials = 100
+lr_dicts = generate_lr_schedules(
+	num_schedules=50,
+	total_epochs=n_epoch
+)
 
 
 param_space = {
