@@ -185,6 +185,8 @@ def main():
 		"n_head": 8,
 		"q_dim": 16,
 		"lr_dict_idx": 0,
+		"fold": 0,
+		"n_folds": 5,
 	}
 	args = SimpleNamespace(**args_dict)
 	score = train_session(args)
