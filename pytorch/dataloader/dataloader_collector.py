@@ -6,11 +6,12 @@ Created on  Oct 10 2024
 @author: sac
 """
 
-
+import os
 import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 from util_sac.pytorch.data.print_array import print_array_info
+from util_sac.dict.json_manager import save_json, load_json
 
 
 class TensorDataset(Dataset):
@@ -34,68 +35,50 @@ class TensorDataset(Dataset):
 		return {key: value[idx] for key, value in self.tensor_data.items()}
 
 
-class dataloader_collector:
+class DataCollector:
 	"""
-	dataloader_collector 클래스이다. 이 클래스는 구조화된 데이터를 수집하고,
-	수집된 데이터를 numpy array, PyTorch Tensor, 혹은 PyTorch DataLoader로
-	변환하기 위한 기능을 제공한다. 각 데이터 필드는 사전에 정의된 structure에 따라
-	특정 Data Type으로만 수집될 수 있다.
+	DataCollector 클래스이다. 이 클래스는 구조화된 데이터를 수집하고,
+	수집된 데이터를 numpy array로 변환하거나 .npz 파일 형태로 저장하기 위한 기능을 제공한다.
+
 
 	디자인 원리:
-	    - 본 클래스는 record(행) 단위로 데이터를 추가(add_sample)하도록 설계한다.
-	      이는 한 번에 key 방향으로 데이터를 합치는 방식에 비해 다소 비효율적으로 보일 수 있다.
-	    - 그러나 비정형 데이터를 다룰 때는 보통 같은 ID를 가진 데이터가 서로 다른 key를 통해
-	      묶이는 경우가 잦다. 이때, key 방향으로 concat을 시도하면 ID가 동일한지 확인하는 로직이
-	      필요하게 된다.
-	    - 따라서 처음부터 ID 방향으로 item(샘플)을 추가함으로써, 중복이나 누락 같은 실수를
-	      줄일 수 있으며, 수집된 데이터를 통합 관리하기가 용이해진다.
+		- 본 클래스는 record(행) 단위로 데이터를 추가(add_sample)하도록 설계한다.
+		  이는 한 번에 key 방향으로 데이터를 합치는 방식에 비해 다소 비효율적으로 보일 수 있다.
+		- 그러나 비정형 데이터를 다룰 때는 보통 같은 ID를 가진 데이터가 서로 다른 key를 통해
+		  묶이는 경우가 잦다. 이때, key 방향으로 concat을 시도하면 ID가 동일한지 확인하는 로직이
+		  필요하게 된다.
+		- 따라서 처음부터 ID 방향으로 item(샘플)을 추가함으로써, 중복이나 누락 같은 실수를
+		  줄일 수 있으며, 수집된 데이터를 통합 관리하기가 용이해진다.
 
-	사용 방법:
-	    1) 객체 생성 시, structure라는 dictionary를 입력받는다. 예) {'REM_emg': 'float32', 'stage_label': 'int64'}
-	       - ALLOWED_TYPES에 정의된 타입만 사용할 수 있다.
-	    2) add_sample(sample) 메서드를 통해 데이터를 추가한다.
-	       - sample은 structure에서 정의된 key와 일치하는 field들을 포함해야 하며,
-	         각 field에 해당하는 값들이 리스트 형태로 내부에 순차적으로 저장된다.
-	    3) to_numpy() 메서드를 호출하면, 수집된 데이터를 numpy array로 변환한 dictionary를 반환한다.
-	    4) to_tensor() 메서드를 호출하면, 수집된 데이터를 PyTorch Tensor로 변환한 dictionary를 반환한다.
-	    5) to_dataloader(batch_size, shuffle) 메서드를 호출하면, 내부 데이터를 PyTorch DataLoader로 변환한다.
-	       - batch_size와 shuffle 파라미터로 미니배치 단위 및 데이터 셔플 여부를 설정할 수 있다.
+	구조:
+		1) structure (dict): key는 데이터 필드 이름, value는 'float32', 'float64', 'int32', 'int64', 'bool' 중 하나이다.
+		2) data (dict): structure에 정의된 key를 기준으로, 각 key에 해당하는 데이터가 리스트로 쌓인다.
 
-	예시:
-	    structure = {
-	        'REM_emg': 'float32',
-	        'stage_label': 'int64',
-	        'is_sleep': 'bool'
-	    }
-	    collector = dataloader_collector(structure)
+	주요 메서드:
+		- add_sample(sample): 샘플(행) 단위로 데이터를 추가한다.
+		- to_numpy(): 수집된 데이터를 numpy array로 변환한다.
+		- save_npz(target_dir): to_numpy() 결과를 data.npz로 저장하고, structure를 data_structure.json으로 저장한다.
 
-	    # float 값뿐 아니라, numpy array 형태의 float 데이터도 추가 가능하다.
-	    collector.add_sample({
-	        'REM_emg': np.array([0.123, 0.234, 0.345], dtype=np.float32),
-	        'stage_label': 2,
-	        'is_sleep': True
-	    })
-	    collector.add_sample({
-	        'REM_emg': np.array([0.456, 0.567, 0.678], dtype=np.float32),
-	        'stage_label': 3,
-	        'is_sleep': False
-	    })
+	사용 예시:
+		structure = {
+			'REM_emg': 'float32',
+			'stage_label': 'int64',
+			'is_sleep': 'bool'
+		}
+		collector = DataCollector(structure)
 
-	    # numpy array로 변환
-	    numpy_data = collector.to_numpy()
+		# 데이터 추가
+		collector.add_sample({
+			'REM_emg': np.array([0.123, 0.234, 0.345], dtype=np.float32),
+			'stage_label': 2,
+			'is_sleep': True
+		})
 
-	    # PyTorch Tensor로 변환
-	    tensor_data = collector.to_tensor()
+		# numpy array로 변환
+		numpy_data = collector.to_numpy()
 
-	    # PyTorch DataLoader로 변환
-	    dataloader = collector.to_dataloader(batch_size=2, shuffle=True)
-
-	주의 사항:
-	    - add_sample()로 전달되는 dictionary의 key는 structure에서 정의된 key와 완전히 일치해야 한다.
-	    - 잘못된 Data Type의 값을 전달할 경우, 내부적으로 numpy나 PyTorch 변환 시 에러가 발생할 수 있다.
-	    - to_dataloader() 내부에서는 TensorDataset(tensor_data) 방식을 사용한다.
-	      추후 멀티모달 데이터를 처리해야 하는 경우, Dataset 클래스를 확장하거나
-	      별도의 Dataset 클래스를 정의하여 필요한 형태로 변형하는 것이 좋다.
+		# .npz 파일 저장
+		collector.save_npz('some_directory')
 	"""
 	ALLOWED_TYPES = {
 		'float32': (np.float32, torch.float32),
@@ -107,10 +90,9 @@ class dataloader_collector:
 
 	def __init__(self, structure):
 		"""
-		Initialize the DataCollector with a specified structure.
+		객체를 초기화한다.
 
-		:param structure: A dictionary where keys are data field names and values are their types.
-						  Allowed types: 'float32', 'float64', 'int32', 'int64', 'bool'
+		:param structure: key가 데이터 필드 이름, value가 허용된 데이터 타입 중 하나('float32', 'float64', 'int32', 'int64', 'bool')인 dict
 		"""
 		self.structure = {}
 		for key, dtype in structure.items():
@@ -121,39 +103,121 @@ class dataloader_collector:
 
 		self.data = {key: [] for key in self.structure.keys()}
 		"""
+		예) 
 		self.structure = {'REM_emg': 'float32', ...}
 		self.data = {'REM_emg': [], ...}
 		"""
 
-
 	def add_sample(self, sample):
-		"""Add a sample to the collector."""
+		"""
+		샘플(행)을 추가한다.
+
+		:param sample: structure에 정의된 key를 모두 포함하는 dict
+		"""
 		for key, value in sample.items():
 			if key not in self.structure:
 				raise KeyError(f"Unexpected key: {key}")
 			self.data[key].append(value)
 
 	def to_numpy(self):
-		"""Convert collected data to numpy arrays."""
+		"""
+		수집된 데이터를 numpy array로 변환한다.
+
+		:return: {key: numpy_array} 형태의 dict
+		"""
 		numpy_data = {}
 		for key, value_list in self.data.items():
 			numpy_type = self.ALLOWED_TYPES[self.structure[key]][0]
 			numpy_data[key] = np.array(value_list, dtype=numpy_type)
 		return numpy_data
 
-	def to_tensor(self):
-		"""Convert collected data to PyTorch tensors."""
+	def save_npz(self, target_dir):
+		"""
+		수집된 데이터를 to_numpy()로 변환한 뒤, data.npz 형태로 저장하고,
+		structure는 data_structure.json 파일로 저장한다.
+
+		:param target_dir: 파일이 저장될 디렉터리 경로
+		"""
+		os.makedirs(target_dir, exist_ok=True)
+
+		# numpy array로 변환
 		numpy_data = self.to_numpy()
+		print_array_info(numpy_data)
+
+		# 파일 경로 설정
+		npz_path = os.path.join(target_dir, "data.npz")
+		json_path = os.path.join(target_dir, "data_structure.json")
+
+		# data.npz 저장
+		np.savez(npz_path, **numpy_data)
+
+		# data_structure.json 저장
+		save_json(self.structure, json_path)
+
+
+class TensorDataLoaderMaker:
+	"""
+	TensorDataLoaderMaker 클래스이다. 이 클래스는 이미 저장된 .npz 파일과
+	structure.json 파일(또는 메모리에 이미 로드된 numpy data, structure)을 바탕으로
+	to_tensor(), to_dataloader() 기능을 제공한다.
+
+	사용 방법:
+		1) data_npz와 structure_json 경로(또는 이미 로드된 data, structure)를 전달하여 객체를 생성한다.
+		2) to_tensor()를 호출하여 PyTorch Tensor 형태의 데이터를 얻는다.
+		3) to_dataloader(batch_size, shuffle)를 호출하여 PyTorch DataLoader를 얻는다.
+
+	예시:
+		maker = TensorDataLoaderMaker(data_npz='some_directory/data.npz',
+									  structure_json='some_directory/data_structure.json')
+
+		tensor_data = maker.to_tensor()
+		dataloader = maker.to_dataloader(batch_size=16, shuffle=True)
+	"""
+
+	def __init__(self, data_npz=None, structure_json=None,
+	             loaded_numpy_data=None, loaded_structure=None):
+		"""
+		:param data_npz: .npz 파일 경로 (예: 'some_directory/data.npz')
+		:param structure_json: 구조 정의가 저장된 json 파일 경로 (예: 'some_directory/data_structure.json')
+		:param loaded_numpy_data: 이미 메모리에 로드된 numpy data(dict 형태) - data_npz 없이 사용 가능
+		:param loaded_structure: 이미 메모리에 로드된 structure(dict 형태) - structure_json 없이 사용 가능
+		"""
+		if data_npz and structure_json:
+			# 파일 로드
+			self.data = dict(np.load(data_npz))
+			load_json(structure_json)
+		elif loaded_numpy_data is not None and loaded_structure is not None:
+			# 이미 로드된 numpy data와 structure 사용
+			self.data = loaded_numpy_data
+			self.structure = loaded_structure
+		else:
+			raise ValueError("data_npz와 structure_json 경로를 모두 주거나, "
+			                 "loaded_numpy_data와 loaded_structure를 모두 제공해야 한다.")
+
+	def to_tensor(self):
+		"""
+		내부 data(numpy array 형태)를 PyTorch Tensor로 변환한다.
+
+		:return: {key: tensor} 형태의 dict
+		"""
 		tensor_data = {}
-		for key, value in numpy_data.items():
-			tensor_data[key] = torch.tensor(value)
+		for key, np_array in self.data.items():
+			tensor_data[key] = torch.tensor(np_array)
 		return tensor_data
 
-
 	def to_dataloader(self, batch_size, shuffle):
-		"""Convert collected data to a PyTorch DataLoader."""
+		"""
+		내부 data를 Tensor로 변환한 뒤, PyTorch DataLoader로 감싼다.
+
+		:param batch_size: Batch 크기
+		:param shuffle: Shuffle 여부
+		:return: torch.utils.data.DataLoader
+		"""
 		tensor_data = self.to_tensor()
-		dataset = TensorDataset(tensor_data)
+		# tensor_data가 dict이므로, 각 key에 해당하는 value(tensor)만 추출하여
+		# (tensor1, tensor2, ...) 형태의 튜플로 구성한다.
+		tensors_tuple = tuple(tensor_data.values())
+		dataset = TensorDataset(*tensors_tuple)
 		return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
 
 
