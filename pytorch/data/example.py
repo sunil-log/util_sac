@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from matplotlib import pyplot as plt
-from util_sac.pytorch.data.trial_manager2 import trial_manager
+from util_sac.pytorch.data.trial_manager import trial_manager
 import random
 from sklearn.metrics import accuracy_score, f1_score
 
