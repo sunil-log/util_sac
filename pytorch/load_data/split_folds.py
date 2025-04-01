@@ -9,7 +9,7 @@ def make_k_fold_splits(
 	n_fold: int = 5,
 	i_fold: int = 0,
 	seed: int = 42,
-	display_folds: bool = True  # fold 정보를 표시할지 여부
+	display_folds: bool = True  # dataloader 정보를 표시할지 여부
 ) -> dict:
 	"""
 	data: Dictionary 형태. key별 value가 (num_samples, ...) 형상을 가정한다.
@@ -43,7 +43,7 @@ def make_k_fold_splits(
 	# (4) n_fold로 분할
 	folds = np.array_split(indices, n_fold)
 
-	# (5) Test와 Valid, Train에 해당하는 fold index 지정
+	# (5) Test와 Valid, Train에 해당하는 dataloader index 지정
 	test_fold_idx = i_fold
 	valid_fold_idx = (i_fold + 1) % n_fold
 
@@ -58,7 +58,7 @@ def make_k_fold_splits(
 	train_idx = np.array(train_idx)
 
 
-	# display_folds: fold 정보 표시 여부
+	# display_folds: dataloader 정보 표시 여부
 	if display_folds:
 		print(f"==== Fold Information ====")
 		print(f"> Total samples: {num_samples}")

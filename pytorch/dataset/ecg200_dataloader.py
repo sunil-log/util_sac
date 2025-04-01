@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 from util_sac.pytorch.load_data.move_device import dict_to_tensors
 
-from util_sac.pytorch.data import print_array_info
+from util_sac.pytorch.data import print_array
 from util_sac.pandas.print_df import print_partial_markdown
 
 import matplotlib.pyplot as plt

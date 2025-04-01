@@ -10,7 +10,7 @@ Created on  Oct 10 2024
 import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
-from util_sac.pytorch.data.print_array_info import print_array_info
+from util_sac.pytorch.data.print_array import print_array_info
 
 
 class TensorDataset(Dataset):

@@ -14,7 +14,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 from util_sac.pandas.print_df import print_partial_markdown
-from util_sac.pytorch.data import print_array_info
+from util_sac.pytorch.data import print_array
 from util_sac.image_processing.reduce_palette import reduce_palette_from_matplotlib_image
 
 from scipy.special import softmax
