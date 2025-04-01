@@ -26,7 +26,6 @@ from util_sac.pytorch.optuna.get_objective import generate_lr_schedules
 import time
 import optuna
 from types import SimpleNamespace
-from util_sac.pytorch.optuna.get_objective import get_objective
 
 
 
