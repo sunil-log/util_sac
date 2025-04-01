@@ -1,4 +1,3 @@
-```python
 import pandas as pd
 import numpy as np
 from typing import Dict
@@ -98,4 +97,3 @@ def pandas_2d_to_numpy_dict(df: pd.DataFrame, id_col: str = "ID") -> Dict[str, n
 			arr_dict[col] = pivoted.to_numpy()
 
 	return arr_dict
-```
