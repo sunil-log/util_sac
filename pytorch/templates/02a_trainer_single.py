@@ -38,29 +38,6 @@ lr_dicts = generate_lr_schedules(
 )
 
 
-param_space = {
-	"input_dim": {
-		"type": "categorical",
-		"choices": [2, 4, 8, 16, 32, 64, 128]
-	},
-	"n_head": {
-		"type": "categorical",
-		"choices": [2, 4, 8, 16, 32, 64, 128]
-	},
-	"q_dim": {
-		"type": "categorical",
-		"choices": [2, 4, 8, 16, 32, 64, 128]
-	},
-	"lr_dict_idx": {
-		"type": "int",
-		"low": 0,
-		"high": len(lr_dicts) - 1,
-		"step": 1,
-		"log": False
-	}
-}
-
-
 
 class NewTrainer(BaseTrainer):
 
@@ -202,54 +179,17 @@ def main():
 	main
 	"""
 
-	"""
-	1. Single Trial
-	"""
 	args_dict = {
 		"trial_name": "Building",
 		"input_dim": 32,
 		"n_head": 8,
 		"q_dim": 16,
+		"lr_dict_idx": 0,
 	}
 	args = SimpleNamespace(**args_dict)
 	score = train_session(args)
 	print("Single Trial Score:", score)
 
-
-	"""
-	2. Optuna Optimization 
-	"""
-	# 1) study 생성 (이미 존재하면 로드)
-	study_name = f"ID_{time.strftime('%H%M%S')}__study_name"
-	db_dir = f"./trials/{study_name}"
-	db_path = f"{db_dir}/study.db"
-	study_info = {
-		"study_name": study_name,
-		"db_dir": db_dir,
-		"db_path": db_path,
-	}
-	create_dir(db_dir)
-
-
-	# 2) study_name을 이용해 study 생성
-	study = optuna.create_study(
-		study_name=study_name,
-		storage=f"sqlite:///{db_path}",
-		load_if_exists=True,
-		direction="maximize"
-	)
-
-	# get_objective(study_name)로부터 objective 함수를 얻어서 optimize
-	objective_func = get_objective(
-		study_info=study_info,
-		param_space=param_space,
-		lr_dicts=lr_dicts,
-		train_sessions=train_session
-	)
-	study.optimize(objective_func, n_trials=100)
-
-	print("Best value:", study.best_value)
-	print("Best params:", study.best_params)
 
 
 

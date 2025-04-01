@@ -203,20 +203,6 @@ def main():
 	"""
 
 	"""
-	1. Single Trial
-	"""
-	args_dict = {
-		"trial_name": "Building",
-		"input_dim": 32,
-		"n_head": 8,
-		"q_dim": 16,
-	}
-	args = SimpleNamespace(**args_dict)
-	score = train_session(args)
-	print("Single Trial Score:", score)
-
-
-	"""
 	2. Optuna Optimization 
 	"""
 	# 1) study 생성 (이미 존재하면 로드)
