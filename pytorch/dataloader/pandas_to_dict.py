@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 from typing import Dict
 
+from util_sac.pandas.print_df import print_partial_markdown
+from util_sac.pytorch.data.print_array import print_array_info
+
 """
 이 모듈은 pandas DataFrame을 편리하게 Numpy array로 변환하기 위한 함수를 제공한다.
 
@@ -56,9 +59,6 @@ def pandas_1d_to_numpy_dict(df: pd.DataFrame) -> dict:
 	df = df.copy()
 	return {col: df[col].to_numpy() for col in df.columns}
 
-import pandas as pd
-import numpy as np
-from typing import Dict
 
 
 def pandas_2d_to_numpy_dict(
@@ -66,3 +66,14 @@ def pandas_2d_to_numpy_dict(
 	id_col: str = "ID",
 ) -> Dict[str, np.ndarray]:
 
+	# 복사본 생성(원본 보호)
+	df = df.copy()
+
+	# ID 기준으로 그룹화
+	for name, group in df.groupby(id_col):
+		print(name)
+		print_partial_markdown(group)
+		print()
+
+
+	exit()

@@ -35,7 +35,68 @@ class TensorDataset(Dataset):
 
 
 class dataloader_collector:
+	"""
+	dataloader_collector 클래스이다. 이 클래스는 구조화된 데이터를 수집하고,
+	수집된 데이터를 numpy array, PyTorch Tensor, 혹은 PyTorch DataLoader로
+	변환하기 위한 기능을 제공한다. 각 데이터 필드는 사전에 정의된 structure에 따라
+	특정 Data Type으로만 수집될 수 있다.
 
+	디자인 원리:
+	    - 본 클래스는 record(행) 단위로 데이터를 추가(add_sample)하도록 설계한다.
+	      이는 한 번에 key 방향으로 데이터를 합치는 방식에 비해 다소 비효율적으로 보일 수 있다.
+	    - 그러나 비정형 데이터를 다룰 때는 보통 같은 ID를 가진 데이터가 서로 다른 key를 통해
+	      묶이는 경우가 잦다. 이때, key 방향으로 concat을 시도하면 ID가 동일한지 확인하는 로직이
+	      필요하게 된다.
+	    - 따라서 처음부터 ID 방향으로 item(샘플)을 추가함으로써, 중복이나 누락 같은 실수를
+	      줄일 수 있으며, 수집된 데이터를 통합 관리하기가 용이해진다.
+
+	사용 방법:
+	    1) 객체 생성 시, structure라는 dictionary를 입력받는다. 예) {'REM_emg': 'float32', 'stage_label': 'int64'}
+	       - ALLOWED_TYPES에 정의된 타입만 사용할 수 있다.
+	    2) add_sample(sample) 메서드를 통해 데이터를 추가한다.
+	       - sample은 structure에서 정의된 key와 일치하는 field들을 포함해야 하며,
+	         각 field에 해당하는 값들이 리스트 형태로 내부에 순차적으로 저장된다.
+	    3) to_numpy() 메서드를 호출하면, 수집된 데이터를 numpy array로 변환한 dictionary를 반환한다.
+	    4) to_tensor() 메서드를 호출하면, 수집된 데이터를 PyTorch Tensor로 변환한 dictionary를 반환한다.
+	    5) to_dataloader(batch_size, shuffle) 메서드를 호출하면, 내부 데이터를 PyTorch DataLoader로 변환한다.
+	       - batch_size와 shuffle 파라미터로 미니배치 단위 및 데이터 셔플 여부를 설정할 수 있다.
+
+	예시:
+	    structure = {
+	        'REM_emg': 'float32',
+	        'stage_label': 'int64',
+	        'is_sleep': 'bool'
+	    }
+	    collector = dataloader_collector(structure)
+
+	    # float 값뿐 아니라, numpy array 형태의 float 데이터도 추가 가능하다.
+	    collector.add_sample({
+	        'REM_emg': np.array([0.123, 0.234, 0.345], dtype=np.float32),
+	        'stage_label': 2,
+	        'is_sleep': True
+	    })
+	    collector.add_sample({
+	        'REM_emg': np.array([0.456, 0.567, 0.678], dtype=np.float32),
+	        'stage_label': 3,
+	        'is_sleep': False
+	    })
+
+	    # numpy array로 변환
+	    numpy_data = collector.to_numpy()
+
+	    # PyTorch Tensor로 변환
+	    tensor_data = collector.to_tensor()
+
+	    # PyTorch DataLoader로 변환
+	    dataloader = collector.to_dataloader(batch_size=2, shuffle=True)
+
+	주의 사항:
+	    - add_sample()로 전달되는 dictionary의 key는 structure에서 정의된 key와 완전히 일치해야 한다.
+	    - 잘못된 Data Type의 값을 전달할 경우, 내부적으로 numpy나 PyTorch 변환 시 에러가 발생할 수 있다.
+	    - to_dataloader() 내부에서는 TensorDataset(tensor_data) 방식을 사용한다.
+	      추후 멀티모달 데이터를 처리해야 하는 경우, Dataset 클래스를 확장하거나
+	      별도의 Dataset 클래스를 정의하여 필요한 형태로 변형하는 것이 좋다.
+	"""
 	ALLOWED_TYPES = {
 		'float32': (np.float32, torch.float32),
 		'float64': (np.float64, torch.float64),
