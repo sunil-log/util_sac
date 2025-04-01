@@ -2,6 +2,23 @@ import pandas as pd
 import numpy as np
 from typing import Dict
 
+"""
+이 모듈은 pandas DataFrame을 편리하게 Numpy array로 변환하기 위한 함수를 제공한다.
+
+다음 함수를 포함한다:
+- pandas_1d_to_numpy_dict: 입력된 DataFrame의 각 컬럼을 key로 하고, 1차원 형태의 Numpy array를 value로 하는 dict를 반환한다.
+- pandas_2d_to_numpy_dict: ID 및 trial_index 기준으로 그룹화한 뒤, (ID x trial_index) 형태의 2차원 Numpy array를 value로 하는 dict를 생성한다.
+
+사용 목적
+---------
+- pandas DataFrame에서 PyTorch 등 Numerical Computing 환경으로 데이터를 이관할 때 사용된다.
+- 기존 DataFrame을 유지한 채로 Numpy array 형태만 별도로 얻어, 이후 수치 연산 및 모델 학습에 활용하기 위함이다.
+
+사용 예시
+---------
+1. Preprocessing을 pandas로 수행한 뒤, PyTorch 모델 학습을 위해 Numpy array 형태로 변환할 때.
+2. Hierarchical 데이터를 (ID x trial_index) 구조로 유지하면서, 2차원 Numpy 형태로 가공해 배치 처리를 용이하게 하고자 할 때.
+"""
 
 def pandas_1d_to_numpy_dict(df: pd.DataFrame) -> dict:
 	"""
@@ -39,61 +56,13 @@ def pandas_1d_to_numpy_dict(df: pd.DataFrame) -> dict:
 	df = df.copy()
 	return {col: df[col].to_numpy() for col in df.columns}
 
+import pandas as pd
+import numpy as np
+from typing import Dict
 
-def pandas_2d_to_numpy_dict(df: pd.DataFrame, id_col: str = "ID") -> Dict[str, np.ndarray]:
-	"""
-	DataFrame을 받아, 지정된 ID 컬럼(id_col)을 기준으로 groupby 후,
-	각 그룹 내 행 순서를 나타내는 cumcount()를 trial_index로 삼아
-	나머지 모든 컬럼을 pivot하여 (ID x trial_index) 형태의 2차원 Numpy array로 만든다.
 
-	Parameters
-	----------
-	df : pd.DataFrame
-		2차원 배열 형태로 변환할 원본 DataFrame이다.
-	id_col : str, default="ID"
-		그룹화에 사용할 식별자 역할의 컬럼명이다.
+def pandas_2d_to_numpy_dict(
+	df: pd.DataFrame,
+	id_col: str = "ID",
+) -> Dict[str, np.ndarray]:
 
-	Returns
-	-------
-	dict
-		- key: df의 각 컬럼명(str)
-		- value: (ID x trial_index) 형태로 pivot된 2차원 np.ndarray
-
-	DataFrame Format
-	----------------
-	- id_col로 지정된 컬럼을 포함해야 한다.
-	- id_col 컬럼 외의 모든 컬럼은 pivot 대상이 된다.
-
-	Usage Example
-	-------------
-	>>> import pandas as pd
-	>>> df_example = pd.DataFrame({
-	...	 "ID": [1, 1, 2, 2],
-	...	 "colA": [10, 20, 30, 40],
-	...	 "colB": [100, 200, 300, 400]
-	... })
-	>>> arr_dict = pandas_2d_to_numpy_dict(df_example, id_col="ID")
-	>>> print(arr_dict["colA"])
-	[[10 20]
-	 [30 40]]
-	>>> print(arr_dict["colB"])
-	[[100 200]
-	 [300 400]]
-
-	"""
-	# 복사본 생성(원본 보호)
-	df = df.copy()
-
-	# 그룹별 누적 개수 계산 -> trial_index
-	df["trial_index"] = df.groupby(id_col).cumcount()
-
-	# 결과 저장용 dict
-	arr_dict = {}
-
-	# ID 컬럼, trial_index 컬럼을 제외한 나머지 컬럼들 pivot
-	for col in df.columns:
-		if col not in [id_col, "trial_index"]:
-			pivoted = df.pivot(index=id_col, columns="trial_index", values=col)
-			arr_dict[col] = pivoted.to_numpy()
-
-	return arr_dict
