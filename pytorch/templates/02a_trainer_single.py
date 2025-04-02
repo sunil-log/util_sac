@@ -9,6 +9,9 @@ Created on  Mar 01 2025
 
 
 import torch
+import torch.nn as nn
+import torch.optim as optim
+
 import matplotlib.pyplot as plt
 
 from util_sac.pytorch.data.trial_manager import trial_manager
@@ -99,8 +102,8 @@ def train_session(args):
 
 	# 4) Model 생성
 	model = None
-	optimizer = None
-	criterion = None
+	optimizer = optim.Adam(model.parameters(), lr=1e-3)
+	criterion = nn.CrossEntropyLoss()
 
 
 	# 5) Trainer 생성
