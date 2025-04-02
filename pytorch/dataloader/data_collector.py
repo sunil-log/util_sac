@@ -9,30 +9,11 @@ Created on  Oct 10 2024
 import os
 import numpy as np
 import torch
-from torch.utils.data import Dataset, DataLoader
 from util_sac.pytorch.data.print_array import print_array_info
 from util_sac.dict.json_manager import save_json, load_json
 
 
-class TensorDataset(Dataset):
-	def __init__(self, tensor_data):
-		self.tensor_data = tensor_data
-		self.length = len(next(iter(tensor_data.values())))
-		"""
-		self.length = 4
-		self.tensor_data = 
-			Key        Type            Shape                    Memory Dtype     
-			----------------------------------------------------------------------
-			REM_emg    PyTorch Tensor  (4, 300, 1, 1, 10)      46.88 KB torch.float32
-			REM_mask   PyTorch Tensor  (4, 300, 1, 1, 10)      46.88 KB torch.float32
-			...
-		"""
 
-	def __len__(self):
-		return self.length
-
-	def __getitem__(self, idx):
-		return {key: value[idx] for key, value in self.tensor_data.items()}
 
 
 class DataCollector:
@@ -158,44 +139,7 @@ class DataCollector:
 
 def main():
 
-	# get only first 3
-	df_fn = df_fn.head(50)
-	# print_partial_markdown(df_fn)
-
-	# prepare subject
-	structure = {"REM_emg": "float32",
-		 "REM_mask": "float32",
-		 "NREM_emg": "float32",
-		 "NREM_mask": "float32",
-		 "class_rbd": "int64",
-		 "class_pd": "int64",
-		 "hospital": "int64"}
-	collector = DataCollector(structure)
-
-	for idx, row in df_fn.iterrows():
-		print(f"Loading {idx + 1}/{len(df_fn)}: {row['File Path']}", flush=True)
-
-		# load z data
-		z = load_reduced_data(row["File Path"], n_REM, n_NREM)
-		collector.add_sample(z)
-		"""
-		print_array_info(z)
-
-		Key        Type            Shape                    Memory Dtype     
-		----------------------------------------------------------------------
-		REM_emg    NumPy Array     (300, 1, 1, 10)         11.72 KB float32
-		REM_mask   NumPy Array     (300, 1, 1, 10)         11.72 KB float32
-		NREM_emg   NumPy Array     (700, 1, 1, 10)         27.34 KB float32
-		NREM_mask  NumPy Array     (700, 1, 1, 10)         27.34 KB float32
-		class_rbd  Other           <class 'numpy.int32'>        N/A N/A       
-		class_pd   Other           <class 'numpy.int32'>        N/A N/A       
-		hospital   NumPy Array     (5,)                     0.04 KB int64
-		"""
-
-	collector.save_npz('./data')
-
-
-
+	pass
 
 if __name__ == "__main__":
 	main()
