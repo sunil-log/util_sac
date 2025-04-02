@@ -25,9 +25,6 @@ def generate_folds(
 	num_samples = data[first_key].shape[0]
 	indices = np.arange(num_samples)
 
-	# scikit-learn이 없는 경우 예외 처리
-	if stratify_key is not None and not HAVE_SKLEARN:
-		raise ImportError("scikit-learn이 설치되어 있지 않아 stratify 사용이 불가능하다.")
 
 
 	# stratify_key가 주어졌을 때
