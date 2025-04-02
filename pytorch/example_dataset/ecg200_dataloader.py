@@ -10,10 +10,7 @@ from torch.utils.data import DataLoader, Dataset
 
 import numpy as np
 import pandas as pd
-from util_sac.pytorch.load_data.move_device import dict_to_tensors
-
-from util_sac.pytorch.data import print_array
-from util_sac.pandas.print_df import print_partial_markdown
+from util_sac.pytorch.dataloader.to_tensor_device import dict_to_tensors
 
 import matplotlib.pyplot as plt
 from util_sac.image_processing.reduce_palette import reduce_palette
