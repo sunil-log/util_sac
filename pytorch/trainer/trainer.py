@@ -1,8 +1,9 @@
 import torch
 from pathlib import Path
 import pandas as pd
-from util_sac.pytorch.data import batch_loss_collector, batch_data_collector
+from util_sac.pytorch.data.batch_data_collector import batch_loss_collector, batch_data_collector
 from util_sac.pytorch.trainer.update_lr import update_lr_with_dict
+
 
 """
 trainer.py 대비 dataloader 를 dict 로 모아서 받는다.
