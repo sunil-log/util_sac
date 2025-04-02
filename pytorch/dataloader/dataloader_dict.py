@@ -35,9 +35,22 @@ def create_dataloaders(data, batch_size=32, shuffle=True):
 	:return: DataLoader 객체
 	"""
 
-	train_loader = DataLoader(data['train'], batch_size=batch_size, shuffle=shuffle)
-	valid_loader = DataLoader(data['valid'], batch_size=batch_size, shuffle=False)
-	test_loader = DataLoader(data['test'], batch_size=batch_size, shuffle=False)
+
+	train_loader = DataLoader(
+		TensorDataset(data['train']),
+		batch_size=batch_size,
+		shuffle=shuffle
+	)
+	valid_loader = DataLoader(
+		TensorDataset(data['valid']),
+		batch_size=batch_size,
+		shuffle=False
+	)
+	test_loader = DataLoader(
+		TensorDataset(data['test']),
+		batch_size=batch_size,
+		shuffle=False
+	)
 
 	return {
 		'train': train_loader,
