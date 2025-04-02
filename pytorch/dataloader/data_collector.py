@@ -123,6 +123,7 @@ class DataCollector:
 
 		# numpy array로 변환
 		numpy_data = self.to_numpy()
+		print(f"saving data to {target_dir}")
 		print_array_info(numpy_data)
 
 		# 파일 경로 설정
