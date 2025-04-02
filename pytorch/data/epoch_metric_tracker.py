@@ -103,7 +103,7 @@ class metric_tracker:
 		print(print_str, flush=True)
 
 
-	def plot_metric(self, ax, keys, y_log=False):
+	def plot_metric(self, ax, keys, y_log=False, y_range=None):
 		"""
 		Plot multiple metrics on the given axes.
 
@@ -111,6 +111,8 @@ class metric_tracker:
 			ax (matplotlib.axes.Axes): The axes to plot on.
 			keys (list): List of metric names to plot.
 			y_log (bool): Whether to use log scale for y-axis. Default is False.
+			y_range (tuple or list, optional): y-axis 범위를 지정한다. 예: (0, 1).
+
 
 		Example:
 			fig, ax = plt.subplots()
@@ -145,6 +147,10 @@ class metric_tracker:
 
 		if y_log:
 			ax.set_yscale('log')
+
+		# y-axis 범위 설정
+		if y_range is not None:
+			ax.set_ylim(y_range)
 
 	def generate_df(self):
 		metrics = self.get_metrics()
