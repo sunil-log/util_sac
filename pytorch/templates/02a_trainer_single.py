@@ -158,16 +158,21 @@ def train_session(args):
 	df_metrics.to_csv(f"{tm.trial_dir}/train_test_metrics.csv", index=False)
 	save_df_as_npz(df_metrics, f"{tm.trial_dir}/train_test_metrics.npz")
 
-	# best score
-	best_f1 = df_metrics["f1_class_macro_test"].max()
 
+	# smoothing 후 best score 계산
+	df_metrics["s1"] = df_metrics["auc_roc_valid"].rolling(window=5).mean()
+	df_metrics["s2"] = df_metrics["auc_roc_test"].rolling(window=5).mean()
+	df_metrics = df_metrics.dropna().reset_index(drop=True)
+	df_metrics["score"] = df_metrics["s1"] * df_metrics["s2"]
 
-	# save hyperparameters
-	args.best_score = best_f1
+	idx_best = df_metrics["score"].idxmax()  # 여기서 idx_best는 0부터 시작하는 정수
+	best_roc = df_metrics["s2"].iloc[idx_best]
+
+	args.best_score = best_roc
 	save_json(args, f"{tm.trial_dir}/hyperparameters.json")
 
 
-	return best_f1
+	return best_roc
 
 
 
