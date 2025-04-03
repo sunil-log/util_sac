@@ -51,6 +51,9 @@ class ResidualTwoLayerProjector(nn.Module):
 	2-Layer Perceptron (Linear + ReLU) 구조 위에 Residual Connection, BatchNorm, Dropout을 적용하는 예시이다.
 	입력 Feature Dimension과 출력 Feature Dimension이 다른 경우를 대비하여 Projection Layer를 사용한다.
 
+	내부적으로 입력 텐서의 마지막 차원만을 Feature Dimension으로 보고 나머지 차원은 Batch Dimension으로 처리한다.
+	예를 들어, 입력이 (a, b, c, d) 형태라면 (a, b, c)는 Batch 차원으로 간주되고, 마지막 차원인 d가 Feature 차원이다.
+
 	Args:
 	    in_dim (int): 입력 Feature의 Dimension이다.
 	    hidden_dim (int): 첫 번째 Linear Layer의 출력 Dimension이다.
@@ -58,7 +61,8 @@ class ResidualTwoLayerProjector(nn.Module):
 	    p_dropout (float, optional): Dropout 확률이다. 기본값은 0.5이다.
 
 	Forward:
-	    x (Tensor): (BatchSize, in_dim) 형태의 입력 Tensor이다.
+	    x (Tensor): (BatchSize, in_dim) 형태의 입력 Tensor이다. (BatchSize는 1개 이상의 Batch 차원으로 구성될 수 있다.)
+	                 예: (a, b, c, d) 형태라면, (a, b, c)가 Batch 차원이고 마지막 d가 Feature 차원이다.
 
 	Returns:
 	    Tensor: (BatchSize, out_dim) 형태의 출력 Tensor이다. Residual Connection 적용 결과가 더해진다.
@@ -93,19 +97,23 @@ class ResidualTwoLayerProjector(nn.Module):
 class StackedProjector(nn.Module):
 	"""
 	여러 개의 ResidualTwoLayerProjector를 직렬로 연결하여 Feature 변환을 연속적으로 수행한다.
+	내부적으로 입력 텐서의 마지막 차원만을 Feature Dimension으로 보고 나머지 차원은 Batch Dimension으로 처리한다.
+	예를 들어, 입력이 (a, b, c, d) 형태라면 (a, b, c)는 Batch 차원으로 간주되고, 마지막 차원인 d가 Feature 차원이다.
 
 	Args:
-		in_dim (int): 첫 번째 ResidualTwoLayerProjector의 입력 Feature Dimension이다.
-		hidden_dim (int): 각 ResidualTwoLayerProjector에서의 첫 번째 Linear Layer 출력 Dimension이다.
-		out_dim (int): 모델의 최종 출력 Dimension이며 모든 ResidualTwoLayerProjector의 두 번째 Linear Layer가 가진 출력 Dimension이다.
-		p_dropout (float, optional): 각 ResidualTwoLayerProjector 내 Dropout 확률이다. 기본값은 0.5이다.
-		num_stacks (int, optional): 직렬로 연결할 ResidualTwoLayerProjector의 개수이다. 기본값은 3이다.
+	    in_dim (int): 첫 번째 ResidualTwoLayerProjector의 입력 Feature Dimension이다.
+	    hidden_dim (int): 각 ResidualTwoLayerProjector에서의 첫 번째 Linear Layer 출력 Dimension이다.
+	    out_dim (int): 모델의 최종 출력 Dimension이며 모든 ResidualTwoLayerProjector의 두 번째 Linear Layer가 가진 출력 Dimension이다.
+	    p_dropout (float, optional): 각 ResidualTwoLayerProjector 내 Dropout 확률이다. 기본값은 0.5이다.
+	    num_stacks (int, optional): 직렬로 연결할 ResidualTwoLayerProjector의 개수이다. 기본값은 3이다.
 
 	Forward:
-		x (Tensor): (BatchSize, in_dim) 형태의 입력 Tensor이다.
+	    x (Tensor): (BatchSize, in_dim) 형태의 입력 Tensor이다. (BatchSize는 1개 이상의 Batch 차원으로 구성될 수 있다.)
+	                 예: (a, b, c, d) 형태라면, (a, b, c)가 Batch 차원이고 마지막 d가 Feature 차원이다.
 
 	Returns:
-		Tensor: (BatchSize, out_dim) 형태의 출력 Tensor이다.
+	    Tensor: (BatchSize, out_dim) 형태의 출력 Tensor이다.
+	            ResidualTwoLayerProjector가 순차적으로 적용된 결과를 반환한다.
 	"""
 	def __init__(self, in_dim, hidden_dim, out_dim, num_stacks=3, p_dropout=0.5):
 		super().__init__()
