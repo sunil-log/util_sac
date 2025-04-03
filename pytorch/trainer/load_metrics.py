@@ -21,7 +21,7 @@ import pandas as pd
 
 from util_sac.pandas.print_df import print_partial_markdown
 from util_sac.pandas.save_npz import load_df_from_npz
-from util_sac.dict.json_manager import load_args
+from util_sac.dict.json_manager import load_json
 
 from util_sac.sys.search_files import search_items_df
 
@@ -59,7 +59,7 @@ def load_hyperparams(base_path):
 	list_args = []
 	for i, row in result_df.iterrows():
 		json_path = row['Path']
-		args = load_args(json_path)
+		args = load_json(json_path)
 		list_args.append(args)
 
 
@@ -94,7 +94,7 @@ def load_metrics(base_path, keywords):
 				# load npz
 				df = load_df_from_npz(npz_path)
 				# load args and assign to df
-				args = load_args(json_path)
+				args = load_json(json_path)
 				df = df.assign(**args)
 				# append date
 				df['trial_id'] = directory.name.split('__')[0]
