@@ -14,10 +14,10 @@ RUN pip install torchvision \
 				openai \
 				umap-learn \
 				shap \
-				optuna \
 				tables \
 				PyMySQL \
-				lightning
+				torchmetrics \
+				optuna
 
 
 # 컨테이너 실행시 자동으로 실행될 명령어
