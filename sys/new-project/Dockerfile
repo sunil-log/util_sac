@@ -16,6 +16,7 @@ RUN pip install torchvision \
 				shap \
 				tables \
 				PyMySQL \
+				hydra-core \
 				torchmetrics \
 				optuna
 
