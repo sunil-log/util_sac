@@ -9,14 +9,12 @@ RUN pip install torchvision \
 				Pillow \
 				scikit-learn \
 				statsmodels \
-				moabb \
-				braindecode \
 				openai \
 				umap-learn \
 				shap \
 				tables \
 				PyMySQL \
-				hydra-core \
+				pyyaml \
 				torchmetrics \
 				optuna
 
