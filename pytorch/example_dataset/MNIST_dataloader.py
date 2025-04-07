@@ -1,7 +1,8 @@
 
-
+import torch
 import torchvision
 from torch.utils.data import DataLoader, Dataset
+
 
 """
 MNIST class 는 dataloader 에 넣을 때 transform 을 한번에 적용하는 것이 아니라,
@@ -30,45 +31,59 @@ def load_dataloader(batch_size=64, train=True, flatten=True, cnn=True, shuffle=T
 	return dataloader
 
 
-def prepare_data(train=True, flatten=True, cnn=True):
-	"""
-	MNIST 데이터셋을 로드하고 전처리하여 DataLoader 객체로 반환합니다.
-	정규화 과정에서 모든 픽셀 값을 255로 나누어 0-1 범위로 변환합니다.
 
-	이 함수는 다음과 같은 작업을 수행합니다:
-	1. MNIST 데이터셋을 다운로드합니다 (필요한 경우).
-	2. 이미지 픽셀 값을 0-255에서 0-1 범위로 정규화합니다.
-	3. 선택적으로 이미지를 1차원으로 평탄화하거나 CNN용 차원을 추가합니다.
-	4. DataLoader 객체를 생성하여 반환합니다.
+def prepare_data_combine_train_test(flatten=True, cnn=True):
+	"""
+	MNIST의 train과 test 데이터를 모두 로드한 후 합쳐서 반환한다.
+	모든 이미지 픽셀을 0-255에서 0-1 범위로 정규화한다.
+
+	수행 작업:
+	1. MNIST train, test 데이터를 모두 다운로드하고 로드한다.
+	2. 두 데이터를 합친 뒤 이미지 픽셀 값을 0-1 범위로 변환한다.
+	3. 사용자가 원하면 이미지를 1차원으로 평탄화하거나(CNN이 아니라면) 채널 차원을 추가한다(CNN일 경우).
+	4. 합쳐진 이미지와 라벨을 dict 형태로 반환한다.
 
 	매개변수:
-	batch_size (int): 배치 크기 (기본값: 64)
-	train (bool): 학습 데이터셋 사용 여부 (기본값: True)
-	flatten (bool): 이미지를 1차원으로 평탄화할지 여부 (기본값: True)
-	cnn (bool): CNN용 차원을 추가할지 여부 (기본값: True)
+	flatten (bool): 이미지를 1차원으로 평탄화할지 여부이다 (기본값: True).
+	cnn (bool): CNN용 차원을 추가할지 여부이다 (기본값: True).
 
 	반환값:
-	DataLoader: 전처리된 MNIST 데이터를 포함하는 DataLoader 객체
+	dict:
+		{
+			"x": 합쳐진 MNIST 이미지 (torch.Tensor),
+			"y": 해당하는 라벨 (torch.Tensor)
+		}
 	"""
-	if train:
-		data = torchvision.datasets.MNIST(root='./data',
-		                                  train=True,
-		                                  download=True)
-	else:
-		data = torchvision.datasets.MNIST(root='./data',
-		                                  train=False,
-		                                  download=True)
 
-	images = data.data.float() / 255.0
-	targets = data.targets
+	# MNIST train과 test 데이터를 로드한다.
+	train_data = torchvision.datasets.MNIST(root='./data',
+											train=True,
+											download=True)
+	test_data = torchvision.datasets.MNIST(root='./data',
+										   train=False,
+										   download=True)
 
+	# train과 test 이미지를 합친다.
+	images = torch.cat([
+		train_data.data.float() / 255.0,
+		test_data.data.float() / 255.0
+	], dim=0)
+
+	# train과 test 라벨을 합친다.
+	targets = torch.cat([
+		train_data.targets,
+		test_data.targets
+	], dim=0)
+
+	# flatten 옵션에 따라 이미지를 1차원으로 평탄화한다.
 	if flatten:
 		images = images.view(-1, 28 * 28)
 
+	# cnn 옵션에 따라 채널 차원을 추가한다.
 	if cnn:
 		images = images.unsqueeze(1)
 
-	return images, targets
+	return {"x": images, "y": targets}
 
 
 if __name__ == "__main__":
