@@ -10,6 +10,16 @@ Created on  Feb 23 2025
 from torchmetrics import F1Score
 
 
+def calculate_f1s(train_data, valid_data, test_data):
+	f1_train = calculate_f1(train_data, name="train")
+	f1_valid = calculate_f1(valid_data, name="valid")
+	f1_test = calculate_f1(test_data, name="test")
+
+	# concat all f1s
+	f1s = {**f1_train, **f1_valid, **f1_test}
+	return f1s
+
+
 def calculate_f1(data, name="test"):
 	"""
 	이 함수는 입력으로 주어진 data에서 logits와 레이블 y를 추출한 뒤,
