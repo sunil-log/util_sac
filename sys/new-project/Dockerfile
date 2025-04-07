@@ -13,6 +13,7 @@ RUN pip install torchvision \
 				umap-learn \
 				shap \
 				tables \
+				tabulate \
 				PyMySQL \
 				pyyaml \
 				torchmetrics \
