@@ -5,6 +5,64 @@ import torch
 from util_sac.pytorch.data.print_array import print_array_info
 from util_sac.pytorch.dataloader.to_tensor_device import dict_to_tensors
 
+
+
+def label_distribution_table(data, label_col="y"):
+	import torch
+	import pandas as pd
+
+	splits = ["train", "valid", "test"]
+	df_result = pd.DataFrame()
+
+	for split in splits:
+		if split not in data:
+			continue
+
+		# 데이터의 레이블을 PyTorch Tensor에서 NumPy 배열로 변환
+		y_tensor = data[split][label_col]
+		y_numpy = y_tensor.cpu().numpy()
+
+		# split 하나에 대한 DataFrame 생성
+		df_split = pd.DataFrame({label_col: y_numpy})
+
+		# groupby로 레이블별 count 계산
+		counts = df_split.groupby(label_col).size().rename(f"count_{split}")
+		percents = (counts / counts.sum() * 100).rename(f"percent_{split}")
+
+		# df_result에 순차적으로 병합
+		if df_result.empty:
+			# 아직 아무것도 없다면 counts, percents 함께 첫 테이블 구성
+			df_result = pd.concat([counts, percents], axis=1)
+		else:
+			# 기존 테이블에 join으로 새 column들을 추가
+			df_result = df_result.join(counts, how="outer")
+			df_result = df_result.join(percents, how="outer")
+
+	# 인덱스(레이블 값)를 'Class'로 변환
+	df_result.index.name = "Class"
+	df_result.reset_index(inplace=True)
+
+	# NaN을 0으로 대체
+	df_result.fillna(0, inplace=True)
+
+	# 총합(Total) 행 만들기
+	# (count_ 계열은 합, percent_ 계열은 합하면 대체로 100 근방이지만 그대로 합으로 보여준다)
+	total_row = {"Class": "Total"}
+	for col in df_result.columns:
+		if col.startswith("count_") or col.startswith("percent_"):
+			total_row[col] = df_result[col].sum()
+		else:
+			# Class 열은 "Total"이므로 무시
+			continue
+
+	# total_row를 DataFrame에 추가
+	df_result = pd.concat([df_result, pd.DataFrame([total_row])], ignore_index=True)
+
+	return df_result
+
+
+
+
 def split_data_into_train_valid_test(
 		data: dict,
 		fold_i: int,
