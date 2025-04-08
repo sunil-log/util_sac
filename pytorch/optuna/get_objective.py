@@ -9,10 +9,10 @@ Created on  Mar 22 2025
 import optuna
 from types import SimpleNamespace
 import random
-
+from util_sac.dict.merge_dicts import deep_update
+from copy import deepcopy
 
 """
-from types import SimpleNamespace
 
 # 1) 예시용 Search Space (param_space) 설정
 param_space = {
@@ -200,26 +200,19 @@ def get_objective(
 		{'model': {'hidden_dim': 512}}
 		"""
 
+		# 2) merge args_static과 args_optimize
+		args = deepcopy(args_static)
+		args = deep_update(args, args_optimize)
 
-		print(args_static)
-		print(args_optimize)
-
-
-
-		exit()
-
-
-		# 2) lr_dict_idx를 통해 lr_dicts에서 선택
+		# 3) lr_dict_idx를 통해 lr_dicts에서 선택
 		args["lr_dict"] = lr_dicts[args["lr_dict_idx"]]
 
 		# Optuna Trial DB에 user attribute로 저장
 		trial.set_user_attr("lr_dict", args["lr_dict"])
 
 		# 이제 train_session에 넘겨서 학습
-		args.study_name = study_info["study_name"]
-		args.optuna_trial_index = trial.number
-		args.trial_name = f"{study_info['study_name']}__Trial_{trial.number}"  # 원하는 형식으로
-		args.db_dir = study_info["db_dir"]
+		args["trial_number"] = trial.number
+		args["trial_name"] = f"{args['trial_name']}__Trial_{trial.number}"
 
 		# run multiple train sessions
 		score = train_sessions(args)
