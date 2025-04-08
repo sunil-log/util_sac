@@ -11,6 +11,7 @@ from types import SimpleNamespace
 import random
 from util_sac.dict.merge_dicts import deep_update
 from copy import deepcopy
+from util_sac.pytorch.optuna.sessions import train_multiple_sessions
 
 """
 
@@ -162,7 +163,7 @@ def get_objective(
 		args_static: dict,
 		param_space: dict,
 		lr_dicts: list,
-		train_sessions: callable
+		train_session: callable
 ):
 
 	"""
@@ -215,7 +216,7 @@ def get_objective(
 		args["trial_name"] = f"{args['trial_name']}__Trial_{trial.number}"
 
 		# run multiple train sessions
-		score = train_sessions(args)
+		score = train_multiple_sessions(train_session, args)
 		return score
 
 	return objective
