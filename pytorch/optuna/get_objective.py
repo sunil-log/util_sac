@@ -47,33 +47,6 @@ param_space = {
 }
 
 
-def train_session(args):
-	import random
-	return random.random()  # 임의 스코어
-
-
-def objective(trial: optuna.trial.Trial):
-	# 2) sample_params 함수를 통해 dict 획득
-	args_dict = sample_params(trial, param_space)
-
-	# 3) SimpleNamespace로 감싸서 사용 (편의를 위해)
-	args = SimpleNamespace(**args_dict)
-
-	# 4) 이 args를 활용해 학습/검증
-	score = train_session(args)
-	return score
-
-
-def main():
-	study = optuna.create_study(direction="maximize")
-	study.optimize(objective, n_trials=10)
-
-	print("Best value:", study.best_value)
-	print("Best params:", study.best_params)
-
-
-if __name__ == "__main__":
-	main()
 """
 
 
