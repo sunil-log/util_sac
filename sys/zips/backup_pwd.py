@@ -37,7 +37,7 @@ def main():
 	zip_comnent = get_comment()
 
 	# key_in and key_out
-	key_in = [".py", ".m", ".sh", ".txt", "Dockerfile"]
+	key_in = [".py", ".m", ".sh", ".txt", "Dockerfile", '.yaml']
 	key_out = [".pyc", ".png", ".npy", "__pycache__", '.npz', '.pkl', '.zip', '.mat']
 
 	# zip all
