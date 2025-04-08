@@ -11,7 +11,7 @@ from types import SimpleNamespace
 import random
 from util_sac.dict.merge_dicts import deep_update
 from copy import deepcopy
-from util_sac.pytorch.optuna.sessions import train_multiple_sessions
+from util_sac.pytorch.optuna.session_manager import train_multiple_sessions
 
 """
 
