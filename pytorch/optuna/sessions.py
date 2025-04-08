@@ -44,47 +44,33 @@ def check_args_integrity(args):
 
 def train_multiple_sessions(train_session, args):
 
-	# check args integrity
+	# 1) 인자 무결성 확인
 	check_args_integrity(args)
 	args_copy = deepcopy(args)
 
-
-	# fn results
-	fn_results = f"{args['db_dir']}/scores.jsonl"
+	# 2) 결과 저장용 파일
+	fn_results = f"{args_copy['db_dir']}/scores.jsonl"
 	jm = jsonl_file_manager(fn_results)
 
-	"""
-	run sessions
-	"""
+	# 3) 세션 인덱스 설정
+	mode = args_copy["fold"]["mode"]
+	if mode == "all":
+		indices = range(args_copy["fold"]["count"])
+	elif mode == "single":
+		indices = [args_copy["fold"]["i"]]
+	else:
+		raise ValueError("args['fold']['mode']가 'single' 또는 'all'이어야 한다.")
+
+	# 4) 세션 반복
 	list_score = []
-	if args["fold"]["mode"] == "all":
-		"""
-		train multiple sessions
-		"""
-		for i in range(args["fold"]["count"]):
-			args = deepcopy(args_copy)
-			args["fold"]["i"] = i
-			args["trial_name"] = f"{args['trial_name']}__session_{i}"
-			score = train_session(args)
-			list_score.append(score)
-
-
-	elif args["fold"]["mode"] == "single":
-		"""
-		train single session
-		"""
-		args["trial_name"] = f"{args['trial_name']}__session_{args['fold']['i']}"
-		score = train_session(args)
+	for i in indices:
+		local_args = deepcopy(args_copy)
+		local_args["fold"]["i"] = i
+		local_args["trial_name"] = f"{local_args['trial_name']}__session_{i}"
+		score = train_session(local_args)
 		list_score.append(score)
 
-
-	else:
-		raise ValueError(
-			"args['fold']['mode']가 'single' 또는 'all'이어야 한다."
-		)
-
-
-	# mean_score
+	# 5) 스코어 기록 및 평균 계산
 	d = deepcopy(args_copy)
 	for i, score in enumerate(list_score):
 		d[f"score_{i}"] = score
