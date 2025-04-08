@@ -1,0 +1,42 @@
+
+# -----------------------------------
+# Optimization 하지 않는 parameter list
+# -----------------------------------
+static:
+  study_name: "MNIST"
+  trial_name: "Building"
+  n_epoch: 15         # training epoch 수
+  n_trial: 100        # optuna 실험을 몇 번 할 것인지
+  lr_dict_idx: 0
+
+  fold:
+    mode: "all"       # [single, all]
+    i: ~              # None or int; mode="all" 일 경우는 '~ (=None)'
+    count: 5
+    seed: 42
+
+  model:
+    input_dim: 784
+    hidden_dim: 256
+    output_dim: 10
+
+  save:             # 중간에 저장할지 여부 (None 이면 끝나고만 저장)
+    model: 10       # None or int
+    plot: 10        # None or int
+
+
+# -----------------------------------
+# Optimization 하는 parameter list
+# -----------------------------------
+optimize:
+  model:
+    hidden_dim:
+      type: "categorical"
+      choices: [128, 256, 512]
+
+    dropout:
+      type: "float"
+      low: 0.0
+      high: 0.5
+      log: false
+
