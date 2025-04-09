@@ -85,6 +85,12 @@ def copy_path(source_path, target_path):
 if __name__ == '__main__':
 
 	"""
+	copy_path 가 그냥 파일 하나만 복사하는거라서,
+	search 랑 combine 된 function 이 필요할듯.
+	"""
+
+
+	"""
 	# data list = all h5 subject files (load_subject can handle file_path)
 	df_data = search_files_by_pattern("/media/sac/WD4T/Projects_backup/eeg_data/RBD/대전성모병원", pattern=r".*/raw_microvolt\.npz$")
 
