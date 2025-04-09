@@ -7,12 +7,6 @@ Created on  Feb 14 2025
 """
 
 
-
-
-import matplotlib.pyplot as plt
-
-
-
 def plot_confusion_matrix(cm, ax, f1=0.5):
 	"""
 	Draws a confusion matrix on the given Axes object.

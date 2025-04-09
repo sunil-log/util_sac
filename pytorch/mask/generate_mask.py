@@ -1,6 +1,5 @@
-import torch
 import numpy as np
-
+import torch
 
 """
 이 모듈은 PyTorch Tensor 데이터를 특정 target 조건과 비교하여 boolean mask를 생성하고,

@@ -7,18 +7,12 @@ Created on  Oct 11 2024
 """
 
 
-import pandas as pd
 import numpy as np
-from pathlib import Path
-
-import matplotlib.pyplot as plt
-
-from util_sac.pandas.print_df import print_partial_markdown
-from util_sac.pytorch.data import print_array
-from util_sac.image_processing.reduce_palette import reduce_palette_from_matplotlib_image
-
+import pandas as pd
 from scipy.special import softmax
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, roc_auc_score, roc_curve
+
+from util_sac.image_processing.reduce_palette import reduce_palette_from_matplotlib_image
 
 """
 이 스크립트는 Binary Classification 문제에서 Validation Set을 통해

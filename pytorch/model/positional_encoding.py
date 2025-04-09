@@ -6,8 +6,9 @@ Created on  Mar 15 2025
 @author: sac
 """
 
-import torch
 import math
+
+import torch
 
 
 def positional_encoding(max_len=1000, d_model=64):

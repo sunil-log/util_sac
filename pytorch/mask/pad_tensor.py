@@ -1,8 +1,7 @@
 
-import torch
-import numpy as np
 import matplotlib.pyplot as plt
-from util_sac.pytorch.data import print_array
+import numpy as np
+import torch
 
 
 def pad_tensor(z, pad_size, pad_value=0):

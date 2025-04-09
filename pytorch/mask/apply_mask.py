@@ -1,5 +1,5 @@
-import torch
 import numpy as np
+import torch
 
 
 def apply_mask_1d(tensor_dict: dict, mask: torch.Tensor, device: torch.device) -> dict:
