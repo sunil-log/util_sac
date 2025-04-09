@@ -16,11 +16,10 @@ def run_LLM(prompt):
 """
 
 
-import os
-from openai import OpenAI
-
-
 import json
+import os
+
+from openai import OpenAI
 
 
 class ChatGPT:
