@@ -7,18 +7,14 @@ Created on  Feb 23 2025
 """
 
 import numpy as np
-
-from torch.utils.data import DataLoader, Dataset
-
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.data import DataLoader, Dataset
 
 from util_sac.pytorch.data import metric_tracker
-from util_sac.pytorch.trainer.trainer import BaseTrainer
 from util_sac.pytorch.metrics import calculate_f1
-
+from util_sac.pytorch.trainer.trainer import BaseTrainer
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 

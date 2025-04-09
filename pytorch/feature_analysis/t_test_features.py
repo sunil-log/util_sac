@@ -1,7 +1,8 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 from scipy.stats import ttest_ind
 from statsmodels.stats.multitest import multipletests
+
 
 def t_test_for_binary_features(X, y, feature_names, correction='fdr_bh'):
 	"""

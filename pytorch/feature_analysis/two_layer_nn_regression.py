@@ -7,19 +7,14 @@ Created on  Feb 23 2025
 """
 
 import numpy as np
-
-from torch.utils.data import DataLoader, Dataset
-
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from captum.attr import IntegratedGradients
+from torch.utils.data import DataLoader, Dataset
 
 from util_sac.pytorch.data import metric_tracker
-from util_sac.pytorch.data import print_array
 from util_sac.pytorch.trainer.trainer import BaseTrainer
-
-from captum.attr import IntegratedGradients
 
 
 class FeatureAttributionInspector:

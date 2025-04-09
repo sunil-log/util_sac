@@ -7,20 +7,12 @@ Created on  Feb 13 2025
 """
 
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-
 import matplotlib.pyplot as plt
-
-
-from util_sac.pandas.print_df import print_partial_markdown
-from util_sac.pytorch.data import print_array
-from util_sac.image_processing.reduce_palette import reduce_palette
-
+import numpy as np
 import optuna
-from sklearn.tree import DecisionTreeClassifier
+import pandas as pd
 from sklearn.model_selection import cross_val_score
+from sklearn.tree import DecisionTreeClassifier
 
 
 def objective(trial, X, y):
