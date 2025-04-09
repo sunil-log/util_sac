@@ -7,21 +7,57 @@ Created on  Mar 01 2025
 """
 
 
-import argparse
 
 import torch
-
 import matplotlib.pyplot as plt
 
-from util_sac.pytorch.data import trial_manager
-from util_sac.pytorch.data import metric_tracker
+from util_sac.pytorch.data.trial_manager import trial_manager
+from util_sac.pytorch.data.epoch_metric_tracker import metric_tracker
 from util_sac.pytorch.trainer.trainer import BaseTrainer
 from util_sac.pytorch.trainer.update_lr import current_lr
 from util_sac.pytorch.dataloader.to_tensor_device import move_dict_tensors_to_device
 from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1
 from util_sac.dict.json_manager import save_json
 from util_sac.pandas.save_npz import save_df_as_npz
+from util_sac.sys.dir_manager import create_dir
+from util_sac.pytorch.optuna.get_objective import generate_lr_schedules
 
+
+import time
+import optuna
+from util_sac.pytorch.optuna.get_objective import get_objective
+
+
+
+n_epoch = 15
+n_trials = 100
+lr_dicts = generate_lr_schedules(
+	num_schedules=50,
+	total_epochs=n_epoch
+)
+
+
+param_space = {
+	"input_dim": {
+		"type": "categorical",
+		"choices": [2, 4, 8, 16, 32, 64, 128]
+	},
+	"n_head": {
+		"type": "categorical",
+		"choices": [2, 4, 8, 16, 32, 64, 128]
+	},
+	"q_dim": {
+		"type": "categorical",
+		"choices": [2, 4, 8, 16, 32, 64, 128]
+	},
+	"lr_dict_idx": {
+		"type": "int",
+		"low": 0,
+		"high": len(lr_dicts) - 1,
+		"step": 1,
+		"log": False
+	}
+}
 
 
 
@@ -45,8 +81,8 @@ class NewTrainer(BaseTrainer):
 
 		# data
 		d = {
-			"x": x,
-			"label": label
+			"x": None,
+			"label": None
 		}
 		d = move_dict_tensors_to_device(d, self.device)
 		# print_array_info(data)
@@ -70,36 +106,12 @@ class NewTrainer(BaseTrainer):
 		return loss
 
 
-def parse_arguments():
 
-	parser = argparse.ArgumentParser(description="Hyperparameters")
-
-	parser.add_argument(
-		"--signal_type",
-		type=str,
-		choices=["EEG", "EOG", "EMG"],
-		required=True,
-		help="EEG, EOG, EMG 중 하나를 선택하세요."
-	)
-
-	args = parser.parse_args()
-
-	return args
-
-
-
-def main():
-
-	# 1) Hyperparameters with argparse
-	args = parse_arguments()
-	signal_type = args.signal_type
-
+def train_session(args):
 
 	# 2) trial manager
-	trial_name = f"ID_2151__ts2vec_{signal_type}"
 	sub_dir_list = ["weights", "reconstruction", "latent_space"]
-	tm = trial_manager(sub_dir_list, trial_name=trial_name, zip_src_loc="../../")
-
+	tm = trial_manager(sub_dir_list, trial_name=args.trial_name, zip_src_loc="../../")
 
 	# 3) load data
 	dataloader_train = None
@@ -115,10 +127,6 @@ def main():
 	model = None
 	optimizer = None
 	criterion = None
-	lr_schedule = {
-		10: 1e-4,
-		100: 1e-5,
-	}
 
 
 	# 5) Trainer 생성
@@ -127,7 +135,7 @@ def main():
 		dataloaders=dataloaders,
 		optimizer=optimizer,
 		criterion=criterion,
-		lr_dict=lr_schedule,
+		lr_dict=args.lr_dict,
 		n_epoch=100,
 		args=args,
 	)
@@ -162,17 +170,73 @@ def main():
 			mt.plot_metric(axes[0, 0], keys=["train_loss", "valid_loss", "test_loss"], y_log='log')
 			mt.plot_metric(axes[0, 1], keys=["train_accuracy", "test_accuracy"])
 			mt.plot_metric(axes[0, 2], keys=["f1_class_macro_train", "f1_class_macro_test"])
+			mt.plot_metric(axes[1, 0], keys=["lr"], y_log='log')
 			plt.tight_layout()
 			plt.savefig(tm.trial_dir / "train_test_loss.png")
 
 
-		# save metrics
-		df_metrics = mt.generate_df()
-		df_metrics.to_csv(f"{tm.trial_dir}/train_test_metrics.csv", index=False)
-		save_df_as_npz(df_metrics, f"{tm.trial_dir}/train_test_metrics.npz")
-		save_json(args, f"{tm.trial_dir}/hyperparameters.json")
+	# save metrics
+	df_metrics = mt.generate_df()
+	df_metrics.to_csv(f"{tm.trial_dir}/train_test_metrics.csv", index=False)
+	save_df_as_npz(df_metrics, f"{tm.trial_dir}/train_test_metrics.npz")
+
+	# smoothing 후 best score 계산
+	df_metrics["s1"] = df_metrics["auc_roc_valid"].rolling(window=5).mean()
+	df_metrics["s2"] = df_metrics["auc_roc_test"].rolling(window=5).mean()
+	df_metrics = df_metrics.dropna().reset_index(drop=True)
+	df_metrics["score"] = df_metrics["s1"] * df_metrics["s2"]
+
+	idx_best = df_metrics["score"].idxmax()  # 여기서 idx_best는 0부터 시작하는 정수
+	best_roc = df_metrics["s2"].iloc[idx_best]
+
+	args.best_score = best_roc
+	save_json(args, f"{tm.trial_dir}/hyperparameters.json")
+
+	return best_roc
 
 
+
+
+def main():
+
+	"""
+	main
+	"""
+
+	"""
+	2. Optuna Optimization 
+	"""
+	# 1) study 생성 (이미 존재하면 로드)
+	study_name = f"ID_{time.strftime('%H%M%S')}__study_name"
+	db_dir = f"./trials/{study_name}"
+	db_path = f"{db_dir}/study.db"
+	study_info = {
+		"study_name": study_name,
+		"db_dir": db_dir,
+		"db_path": db_path,
+	}
+	create_dir(db_dir)
+
+
+	# 2) study_name을 이용해 study 생성
+	study = optuna.create_study(
+		study_name=study_name,
+		storage=f"sqlite:///{db_path}",
+		load_if_exists=True,
+		direction="maximize"
+	)
+
+	# get_objective(study_name)로부터 objective 함수를 얻어서 optimize
+	objective_func = get_objective(
+		study_info=study_info,
+		param_space=param_space,
+		lr_dicts=lr_dicts,
+		train_sessions=train_session
+	)
+	study.optimize(objective_func, n_trials=100)
+
+	print("Best value:", study.best_value)
+	print("Best params:", study.best_params)
 
 
 

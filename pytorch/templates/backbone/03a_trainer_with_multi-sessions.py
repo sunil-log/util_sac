@@ -9,7 +9,7 @@ Created on  Mar 01 2025
 
 
 import torch
-import matplotlib.pyplot as plt
+import numpy as np
 
 from util_sac.pytorch.data.trial_manager import trial_manager
 from util_sac.pytorch.data.epoch_metric_tracker import metric_tracker
@@ -20,13 +20,17 @@ from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1
 from util_sac.dict.json_manager import save_json
 from util_sac.pandas.save_npz import save_df_as_npz
 from util_sac.sys.dir_manager import create_dir
+from util_sac.dict.jsonl_file_manager import jsonl_file_manager
 from util_sac.pytorch.optuna.get_objective import generate_lr_schedules
+
 
 
 import time
 import optuna
 from util_sac.pytorch.optuna.get_objective import get_objective
 
+
+import matplotlib.pyplot as plt
 
 
 n_epoch = 15
@@ -35,6 +39,7 @@ lr_dicts = generate_lr_schedules(
 	num_schedules=50,
 	total_epochs=n_epoch
 )
+
 
 
 param_space = {
@@ -111,7 +116,12 @@ def train_session(args):
 
 	# 2) trial manager
 	sub_dir_list = ["weights", "reconstruction", "latent_space"]
-	tm = trial_manager(sub_dir_list, trial_name=args.trial_name, zip_src_loc="../")
+	tm = trial_manager(
+		sub_dir_list,
+		base_dir=args.db_dir,
+		trial_name=args.trial_name,
+		zip_src_loc="../../"
+	)
 
 	# 3) load data
 	dataloader_train = None
@@ -136,7 +146,7 @@ def train_session(args):
 		optimizer=optimizer,
 		criterion=criterion,
 		lr_dict=args.lr_dict,
-		n_epoch=100,
+		n_epoch=args.n_epoch,
 		args=args,
 	)
 
@@ -154,31 +164,38 @@ def train_session(args):
 		f1_valid = calculate_f1(valid_data, name="valid")
 		f1_test = calculate_f1(test_data, name="test")
 
-		mt.update(epoch, **train_loss, **test_loss, **f1_train, **f1_test, **lr)
+		mt.update(
+			epoch,
+			**train_loss, **valid_loss, **test_loss,
+			**f1_train, **f1_valid, **f1_test,
+			**lr
+		)
 		mt.print_latest()
 
 		if epoch % 10 == 0:
-
 			# save model
-			torch.save(model.state_dict(), f"{tm['weights']}/epoch_{epoch}.pth")
+			# torch.save(model.state_dict(), f"{tm['weights']}/epoch_{epoch}.pth")
+			pass
 
-			# plot the train and test metrics
-			plt.close()
-			fig, axes = plt.subplots(2, 3, figsize=(20, 10))
 
-			# plot losses
-			mt.plot_metric(axes[0, 0], keys=["train_loss", "valid_loss", "test_loss"], y_log='log')
-			mt.plot_metric(axes[0, 1], keys=["train_accuracy", "test_accuracy"])
-			mt.plot_metric(axes[0, 2], keys=["f1_class_macro_train", "f1_class_macro_test"])
-			mt.plot_metric(axes[1, 0], keys=["lr"], y_log='log')
-			plt.tight_layout()
-			plt.savefig(tm.trial_dir / "train_test_loss.png")
+	# plot the train and test metrics
+	plt.close()
+	fig, axes = plt.subplots(2, 3, figsize=(20, 10))
+
+	# plot losses
+	mt.plot_metric(axes[0, 0], keys=["train_loss", "valid_loss", "test_loss"], y_log='log')
+	mt.plot_metric(axes[0, 1], keys=["train_accuracy", "test_accuracy"])
+	mt.plot_metric(axes[0, 2], keys=["f1_class_macro_train", "f1_class_macro_test"])
+	mt.plot_metric(axes[1, 0], keys=["lr"], y_log='log')
+	plt.tight_layout()
+	plt.savefig(tm.trial_dir / "train_test_loss.png")
 
 
 	# save metrics
 	df_metrics = mt.generate_df()
 	df_metrics.to_csv(f"{tm.trial_dir}/train_test_metrics.csv", index=False)
 	save_df_as_npz(df_metrics, f"{tm.trial_dir}/train_test_metrics.npz")
+
 
 	# smoothing 후 best score 계산
 	df_metrics["s1"] = df_metrics["auc_roc_valid"].rolling(window=5).mean()
@@ -192,7 +209,39 @@ def train_session(args):
 	args.best_score = best_roc
 	save_json(args, f"{tm.trial_dir}/hyperparameters.json")
 
+
 	return best_roc
+
+
+
+def multiple_train_sessions(args):
+
+	# fn results
+	fn_results = f"{args.db_dir}/scores.jsonl"
+	jm = jsonl_file_manager(fn_results)
+
+	# trial_name
+	trial_name = args.trial_name
+	list_score = []
+	for i in range(3):
+
+		# modify args
+		args.trial_name = f"{trial_name}__session_{i}"
+		args.n_epoch = n_epoch
+		score = train_session(args)
+		list_score.append(score)
+
+
+	# save session results
+	d = vars(args)
+	d.pop("trial_name")
+	for i, score in enumerate(list_score):
+		d[f"score_{i}"] = score
+	d["mean_score"] = np.mean(list_score)
+	jm.write_line(d)
+
+	# average score
+	return d["mean_score"]
 
 
 
@@ -203,11 +252,8 @@ def main():
 	main
 	"""
 
-	"""
-	2. Optuna Optimization 
-	"""
 	# 1) study 생성 (이미 존재하면 로드)
-	study_name = f"ID_{time.strftime('%H%M%S')}__study_name"
+	study_name = f"{time.strftime('%H-%M-%S')}__study_name"
 	db_dir = f"./trials/{study_name}"
 	db_path = f"{db_dir}/study.db"
 	study_info = {
@@ -231,13 +277,12 @@ def main():
 		study_info=study_info,
 		param_space=param_space,
 		lr_dicts=lr_dicts,
-		train_sessions=train_session
+		train_sessions=multiple_train_sessions      # or train_session
 	)
-	study.optimize(objective_func, n_trials=100)
+	study.optimize(objective_func, n_trials=n_trials)
 
 	print("Best value:", study.best_value)
 	print("Best params:", study.best_params)
-
 
 
 if __name__ == "__main__":

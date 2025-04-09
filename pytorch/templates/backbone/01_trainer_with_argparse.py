@@ -7,34 +7,21 @@ Created on  Mar 01 2025
 """
 
 
+import argparse
 
 import torch
-import torch.nn as nn
-import torch.optim as optim
 
 import matplotlib.pyplot as plt
 
-from util_sac.pytorch.data.trial_manager import trial_manager
-from util_sac.pytorch.data.epoch_metric_tracker import metric_tracker
+from util_sac.pytorch.data import trial_manager
+from util_sac.pytorch.data import metric_tracker
 from util_sac.pytorch.trainer.trainer import BaseTrainer
 from util_sac.pytorch.trainer.update_lr import current_lr
 from util_sac.pytorch.dataloader.to_tensor_device import move_dict_tensors_to_device
 from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1
 from util_sac.dict.json_manager import save_json
 from util_sac.pandas.save_npz import save_df_as_npz
-from util_sac.pytorch.optuna.get_objective import generate_lr_schedules
 
-import optuna
-from types import SimpleNamespace
-
-
-
-n_epoch = 15
-n_trials = 100
-lr_dicts = generate_lr_schedules(
-	num_schedules=50,
-	total_epochs=n_epoch
-)
 
 
 
@@ -58,8 +45,8 @@ class NewTrainer(BaseTrainer):
 
 		# data
 		d = {
-			"x": None,
-			"label": None
+			"x": x,
+			"label": label
 		}
 		d = move_dict_tensors_to_device(d, self.device)
 		# print_array_info(data)
@@ -83,12 +70,36 @@ class NewTrainer(BaseTrainer):
 		return loss
 
 
+def parse_arguments():
 
-def train_session(args):
+	parser = argparse.ArgumentParser(description="Hyperparameters")
+
+	parser.add_argument(
+		"--signal_type",
+		type=str,
+		choices=["EEG", "EOG", "EMG"],
+		required=True,
+		help="EEG, EOG, EMG 중 하나를 선택하세요."
+	)
+
+	args = parser.parse_args()
+
+	return args
+
+
+
+def main():
+
+	# 1) Hyperparameters with argparse
+	args = parse_arguments()
+	signal_type = args.signal_type
+
 
 	# 2) trial manager
+	trial_name = f"ID_2151__ts2vec_{signal_type}"
 	sub_dir_list = ["weights", "reconstruction", "latent_space"]
-	tm = trial_manager(sub_dir_list, trial_name=args.trial_name, zip_src_loc="../")
+	tm = trial_manager(sub_dir_list, trial_name=trial_name, zip_src_loc="../../../")
+
 
 	# 3) load data
 	dataloader_train = None
@@ -102,8 +113,12 @@ def train_session(args):
 
 	# 4) Model 생성
 	model = None
-	optimizer = optim.Adam(model.parameters(), lr=1e-3)
-	criterion = nn.CrossEntropyLoss()
+	optimizer = None
+	criterion = None
+	lr_schedule = {
+		10: 1e-4,
+		100: 1e-5,
+	}
 
 
 	# 5) Trainer 생성
@@ -112,7 +127,7 @@ def train_session(args):
 		dataloaders=dataloaders,
 		optimizer=optimizer,
 		criterion=criterion,
-		lr_dict=args.lr_dict,
+		lr_dict=lr_schedule,
 		n_epoch=100,
 		args=args,
 	)
@@ -147,54 +162,16 @@ def train_session(args):
 			mt.plot_metric(axes[0, 0], keys=["train_loss", "valid_loss", "test_loss"], y_log='log')
 			mt.plot_metric(axes[0, 1], keys=["train_accuracy", "test_accuracy"])
 			mt.plot_metric(axes[0, 2], keys=["f1_class_macro_train", "f1_class_macro_test"])
-			mt.plot_metric(axes[1, 0], keys=["lr"], y_log='log')
 			plt.tight_layout()
 			plt.savefig(tm.trial_dir / "train_test_loss.png")
 
 
+		# save metrics
+		df_metrics = mt.generate_df()
+		df_metrics.to_csv(f"{tm.trial_dir}/train_test_metrics.csv", index=False)
+		save_df_as_npz(df_metrics, f"{tm.trial_dir}/train_test_metrics.npz")
+		save_json(args, f"{tm.trial_dir}/hyperparameters.json")
 
-	# save metrics
-	df_metrics = mt.generate_df()
-	df_metrics.to_csv(f"{tm.trial_dir}/train_test_metrics.csv", index=False)
-	save_df_as_npz(df_metrics, f"{tm.trial_dir}/train_test_metrics.npz")
-
-
-	# smoothing 후 best score 계산
-	df_metrics["s1"] = df_metrics["auc_roc_valid"].rolling(window=5).mean()
-	df_metrics["s2"] = df_metrics["auc_roc_test"].rolling(window=5).mean()
-	df_metrics = df_metrics.dropna().reset_index(drop=True)
-	df_metrics["score"] = df_metrics["s1"] * df_metrics["s2"]
-
-	idx_best = df_metrics["score"].idxmax()  # 여기서 idx_best는 0부터 시작하는 정수
-	best_roc = df_metrics["s2"].iloc[idx_best]
-
-	args.best_score = best_roc
-	save_json(args, f"{tm.trial_dir}/hyperparameters.json")
-
-
-	return best_roc
-
-
-
-
-def main():
-
-	"""
-	main
-	"""
-
-	args_dict = {
-		"trial_name": "Building",
-		"input_dim": 32,
-		"n_head": 8,
-		"q_dim": 16,
-		"lr_dict_idx": 0,
-		"fold": 0,
-		"n_folds": 5,
-	}
-	args = SimpleNamespace(**args_dict)
-	score = train_session(args)
-	print("Single Trial Score:", score)
 
 
 

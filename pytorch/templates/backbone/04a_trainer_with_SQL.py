@@ -120,7 +120,7 @@ def train_session(args):
 		sub_dir_list,
 		base_dir=args.db_dir,
 		trial_name=args.trial_name,
-		zip_src_loc="../"
+		zip_src_loc="../../"
 	)
 
 	# 3) load data
