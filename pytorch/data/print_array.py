@@ -1,7 +1,8 @@
 
 
-import torch
 import numpy as np
+import torch
+
 
 def format_memory_size(memory_bytes):
 	"""

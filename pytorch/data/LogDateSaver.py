@@ -1,10 +1,7 @@
-import os
-import glob
-from pathlib import Path
 from abc import ABC, abstractmethod
-from typing import Union
-import pandas as pd
+from pathlib import Path
 
+import pandas as pd
 
 """
 df = 
@@ -118,7 +115,7 @@ Example usage:
 """
 if __name__ == '__main__':
 	import numpy as np
-	from datetime import datetime, timedelta
+	from datetime import datetime
 
 	root_dir = "log"
 

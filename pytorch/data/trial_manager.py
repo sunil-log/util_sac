@@ -1,13 +1,11 @@
 
 
-from pathlib import Path
-from datetime import datetime
-from util_sac.sys.zips.zip_df import backup_keywords
-
-
-import os
 import re
 from datetime import datetime
+from pathlib import Path
+
+from util_sac.sys.zips.zip_df import backup_keywords
+
 
 def validate_trial_name(trial_name):
 	# Ubuntu 파일 시스템에서 허용되지 않는 문자 체크
