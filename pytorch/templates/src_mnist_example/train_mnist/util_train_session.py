@@ -51,6 +51,35 @@ def train_session(args):
 		zip_src_loc="../"
 	)
 
+	"""
+	먼저 데이터 구조 정규화가 필요하다.
+	데이터를 subject by subject로 수집 load 하고,
+	util_sac.pytorch.dataloader.data_collector.DataCollector 를 사용하여 collect 한다.
+	
+	사용 예시:
+	structure = {
+		'REM_emg': 'float32',
+		'stage_label': 'int64',
+		'is_sleep': 'bool'
+	}
+	collector = DataCollector(structure)
+
+	# 데이터 추가
+	for i in range(n_subjects):
+		collector.add_sample({
+			'REM_emg': np.array([0.123, 0.234, 0.345], dtype=np.float32),
+			'stage_label': 2,
+			'is_sleep': True
+		})
+	
+	# numpy array로 변환
+	numpy_data = collector.to_numpy()
+
+	# .npz 파일 저장
+	collector.save_npz('some_directory')
+	
+	이렇게 저장된 npz 파일을 load_data()에서 사용한다.
+	"""
 
 	# load data
 	dataloaders = load_data(args)
