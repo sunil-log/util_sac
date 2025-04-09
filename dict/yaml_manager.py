@@ -1,7 +1,7 @@
 import argparse
-import json
-import yaml
 from types import SimpleNamespace
+
+import yaml
 
 
 def save_yaml(args, filename):

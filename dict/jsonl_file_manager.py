@@ -32,10 +32,12 @@
 	- 확장자는 일반적으로 .jsonl(또는 .ndjson)을 권장하지만, .txt로도 동작에 문제는 없습니다.
 """
 
+import json
 from pathlib import Path
 from typing import Union
-import json
+
 import pandas as pd
+
 
 class jsonl_file_manager:
 	"""

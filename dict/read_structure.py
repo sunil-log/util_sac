@@ -1,6 +1,6 @@
 
-from rich.tree import Tree
 from rich.console import Console
+from rich.tree import Tree
 
 """
 이 모듈은 JSON 데이터를 Python dict 형식으로 받아,
