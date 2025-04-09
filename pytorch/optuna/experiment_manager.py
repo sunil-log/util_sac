@@ -6,15 +6,10 @@ Created on  Apr 09 2025
 @author: sac
 """
 
-
-from pathlib import Path
 import optuna
 
-
-from util_sac.pytorch.optuna.session_manager import train_multiple_sessions
 from util_sac.pytorch.optuna.get_objective import get_objective, generate_lr_schedules
-
-
+from util_sac.pytorch.optuna.session_manager import train_multiple_sessions
 
 
 def execute_experiment(config, train_session):

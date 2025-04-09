@@ -7,23 +7,20 @@ Created on  Apr 07 2025
 """
 
 
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
 
-import matplotlib.pyplot as plt
-
-from util_sac.pytorch.data.trial_manager import trial_manager
-from util_sac.pytorch.data.epoch_metric_tracker import metric_tracker
-from util_sac.pytorch.trainer.update_lr import current_lr
-from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1s
-from util_sac.dict.json_manager import save_json
-from util_sac.pandas.save_npz import save_df_as_npz
-
 from train_mnist.util_dataloader import load_data
 from train_mnist.util_model import TwoLayerMNIST
 from train_mnist.util_trainer import NewTrainer
-
+from util_sac.dict.json_manager import save_json
+from util_sac.pandas.save_npz import save_df_as_npz
+from util_sac.pytorch.data.epoch_metric_tracker import metric_tracker
+from util_sac.pytorch.data.trial_manager import trial_manager
+from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1s
+from util_sac.pytorch.trainer.update_lr import current_lr
 
 
 def plot_losses(tm, mt):

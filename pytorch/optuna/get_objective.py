@@ -6,11 +6,12 @@ Created on  Mar 22 2025
 @author: sac
 """
 
-import optuna
-from types import SimpleNamespace
 import random
-from util_sac.dict.merge_dicts import deep_update
 from copy import deepcopy
+
+import optuna
+
+from util_sac.dict.merge_dicts import deep_update
 from util_sac.pytorch.optuna.session_manager import train_multiple_sessions
 
 """
