@@ -1,6 +1,8 @@
 
 import subprocess
+
 import pandas as pd
+
 
 def get_wmctrl_output_as_df():
 	"""

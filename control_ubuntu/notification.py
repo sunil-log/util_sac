@@ -7,6 +7,7 @@ cron 에서 사용할 경우, DISPLAY 환경변수가 없어서 오류가 발생
 	export DISPLAY=:1
 """
 import subprocess
+
 import pandas as pd
 
 
