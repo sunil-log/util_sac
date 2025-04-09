@@ -1,6 +1,8 @@
-from PIL import Image
-import numpy as np
 import io
+
+import numpy as np
+from PIL import Image
+
 
 def reduce_palette(figure, palette_size):
 	"""

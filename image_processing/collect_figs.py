@@ -1,7 +1,9 @@
 import math
-import matplotlib.pyplot as plt
+
 import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
 import numpy as np
+
 
 def create_subplots_figure(image_paths, ncols, nrows=None, figsize=None):
 	"""
