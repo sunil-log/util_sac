@@ -23,15 +23,19 @@ def remove_dir(directory: Union[str, Path]) -> None:
 
 
 def create_dir(directory: Union[str, Path]) -> None:
-	"""디렉토리를 생성한다. 이미 존재하면 아무것도 하지 않는다."""
+	"""
+	디렉토리를 생성한다. 이미 존재하면 아무것도 하지 않는다.
+	Path(directory).mkdir(parents=True, exist_ok=True)를 통해
+	필요 시 상위 디렉토리도 자동으로 생성한다.
+	"""
+	path = Path(directory)
 	try:
-		if not check_exists(directory):
-			print(f"> Creating directory: {directory}")
-			Path(directory).mkdir(parents=True, exist_ok=True)
-		else:
-			print(f"> {directory} already exists - do nothing")
+		path.mkdir(parents=True, exist_ok=True)
+		print(f"> Created (or already exists): {directory}")
 	except OSError as e:
 		print(f"> Creation error: {e}")
+
+
 
 
 def renew_dir(directory: Union[str, Path]) -> None:

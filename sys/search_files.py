@@ -6,44 +6,32 @@ from typing import Pattern, Union, List
 import pandas as pd
 
 
-def escape_special_chars(pattern: str) -> str:
+
+
+def convert_filename_pattern_to_regex(pattern: str) -> re.Pattern:
 	"""
-	괄호 등 re에서 의미를 갖는 특수문자를 이스케이프 처리합니다.
+	간단한 파일명 패턴 문자열(예: 'event.csv', '*_info.json')을
+	정규표현식 pattern 객체로 변환하여 반환한다.
 	"""
-	special_chars = r'()'
-	for c in special_chars:
-		pattern = pattern.replace(c, rf'\{c}')
-	return pattern
+	# 전체를 이스케이프한 뒤, glob 문법용 '*'와 '?'을
+	# 정규표현식용 '.*'와 '.' 으로 치환
+	escaped = re.escape(pattern)
+	escaped = escaped.replace(r'\*', '.*')  # '*' -> '.*'
+	escaped = escaped.replace(r'\?', '.')   # '?' -> '.'
+	regex_pattern = f'^{escaped}$'  # 전체 문자열 매칭
+	return re.compile(regex_pattern)
 
 
 def search_items(root_dir: str,
-                 pattern: Union[str, Pattern],
-                 search_type: str = 'both') -> List[Path]:
+				 pattern: Union[str, Pattern],
+				 search_type: str = 'both') -> List[Path]:
 	"""
-	root_dir 아래에서 pattern과 매치되는 파일/폴더를 검색하여 list[Path] 형태로 반환합니다.
+	root_dir 아래에서 pattern과 매치되는 파일/폴더를 검색하여 list[Path] 형태로 반환한다.
 	(디렉토리나 파일의 이름(name)만을 기준으로 패턴 매칭)
-
-	Parameters
-	----------
-	root_dir : str
-		검색할 루트 경로
-	pattern : Union[str, Pattern]
-		검색할 정규표현식 패턴(문자열 or re.compile 객체)
-	search_type : str
-		'files', 'directories' 또는 'both' 중 선택
-		- 'files': 파일만
-		- 'directories': 디렉토리만
-		- 'both': 둘 다
-
-	Returns
-	-------
-	List[Path]
-		pattern이 매칭된 파일/디렉토리 Path 객체 리스트
 	"""
-	# 만약 문자열 패턴이면, 특수문자 이스케이프 후 compile
+	# 만약 문자열 패턴이면 convert_filename_pattern_to_regex를 이용하여 Regex로 변환한다
 	if isinstance(pattern, str):
-		escaped_pattern = escape_special_chars(pattern)
-		pattern = re.compile(escaped_pattern)
+		pattern = convert_filename_pattern_to_regex(pattern)
 
 	# 모든 하위 아이템(파일/폴더) 수집
 	all_paths = [Path(p) for p in glob.glob(str(Path(root_dir) / '**'), recursive=True)]
