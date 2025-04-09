@@ -1,5 +1,6 @@
-import torch
 import numpy as np
+import torch
+
 
 def dict_to_tensors(d, float_dtype=torch.float32, int_dtype=torch.int64):
 	"""

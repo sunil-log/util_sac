@@ -1,10 +1,8 @@
 import numpy as np
-from sklearn.model_selection import KFold, StratifiedKFold
 import torch
+from sklearn.model_selection import KFold, StratifiedKFold
 
-from util_sac.pytorch.data.print_array import print_array_info
 from util_sac.pytorch.dataloader.to_tensor_device import dict_to_tensors
-
 
 
 def label_distribution_table(data, label_col="y"):
