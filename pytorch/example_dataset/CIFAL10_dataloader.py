@@ -1,9 +1,9 @@
+import os
+
+import matplotlib.pyplot as plt
 import torch
 import torchvision
 from torch.utils.data import DataLoader, Dataset
-import matplotlib.pyplot as plt
-
-import os
 
 """
 CIFAR_dataset 클래스는 DataLoader에 넣을 때마다 transform을 반복 적용하는 대신,

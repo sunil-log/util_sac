@@ -5,16 +5,14 @@ Created on  Mar 15 2025
 
 @author: sac
 """
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import torch
 from torch.utils.data import DataLoader, Dataset
 
-import numpy as np
-import pandas as pd
-from util_sac.pytorch.dataloader.to_tensor_device import dict_to_tensors
-
-import matplotlib.pyplot as plt
 from util_sac.image_processing.reduce_palette import reduce_palette
-
+from util_sac.pytorch.dataloader.to_tensor_device import dict_to_tensors
 
 
 class ECG200Dataset(Dataset):
