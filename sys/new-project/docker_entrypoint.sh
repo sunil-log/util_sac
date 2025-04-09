@@ -17,6 +17,6 @@ cd /sac/src
 
 
 
-python load_data.py
+python run_main.py
 # python run.py
 exit
