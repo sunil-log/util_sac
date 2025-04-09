@@ -1,9 +1,11 @@
-from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Union, Callable
-import numpy as np
-from datetime import datetime
 import glob
+from abc import ABC, abstractmethod
+from datetime import datetime
+from pathlib import Path
+from typing import Union
+
+import numpy as np
+
 
 class DataProcessor(ABC):
 	@abstractmethod

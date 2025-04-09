@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
+
 import numpy as np
-
-
 
 
 def add_timestamp_to_string(input_string: str) -> str:
