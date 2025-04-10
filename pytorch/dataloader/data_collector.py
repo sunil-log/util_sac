@@ -31,8 +31,9 @@ class DataCollector:
 		  줄일 수 있으며, 수집된 데이터를 통합 관리하기가 용이해진다.
 
 	구조:
-		1) structure (dict): key는 데이터 필드 이름, value는 'float32', 'float64', 'int32', 'int64', 'bool' 중 하나이다.
-		2) data (dict): structure에 정의된 key를 기준으로, 각 key에 해당하는 데이터가 리스트로 쌓인다.
+		1) structure (dict): key는 데이터 필드 이름, value는 'float32', 'float64', 'int32', 'int64', 'bool', 'str' 중 하나이다.
+		2) str 의 경우 torch에서는 직접적인 dtype이 없으므로 차후 torch 로 변환할 때는 주의해야 한다.
+		3) data (dict): structure에 정의된 key를 기준으로, 각 key에 해당하는 데이터가 리스트로 쌓인다.
 
 	주요 메서드:
 		- add_sample(sample): 샘플(행) 단위로 데이터를 추가한다.
@@ -66,6 +67,7 @@ class DataCollector:
 		'int32': (np.int32, torch.int32),
 		'int64': (np.int64, torch.int64),
 		'bool': (np.bool_, torch.bool)
+		'str': (np.str_, None)  # str 처리 추가 (PyTorch에는 직접적인 str dtype이 없으므로 None)
 	}
 
 	def __init__(self, structure):
