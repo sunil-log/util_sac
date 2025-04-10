@@ -75,8 +75,7 @@ def backup_keywords(fn_zip, key_in, key_out, src_loc="."):
 	"""
 
 	# find files having some keywords in the file name
-	pattern = re
-	df = search_items_df(src_loc, r"*")
+	df = search_items_df(src_loc, "*")
 	print(df)
 	exit()
 	"""
