@@ -67,7 +67,7 @@ class DataCollector:
 		'float64': (np.float64, torch.float64),
 		'int32': (np.int32, torch.int32),
 		'int64': (np.int64, torch.int64),
-		'bool': (np.bool_, torch.bool)
+		'bool': (np.bool_, torch.bool),
 		'str': (np.str_, None)  # str 처리 추가 (PyTorch에는 직접적인 str dtype이 없으므로 None)
 	}
 
