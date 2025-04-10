@@ -85,6 +85,7 @@ class DataCollector:
 			self.structure[key] = dtype
 
 		self.data = {key: [] for key in self.structure.keys()}
+		self.flag_numpy = False
 		"""
 		예) 
 		self.structure = {'REM_emg': 'float32', ...}
@@ -108,10 +109,12 @@ class DataCollector:
 
 		:return: {key: numpy_array} 형태의 dict
 		"""
+		self.flag_numpy = True
 		numpy_data = {}
 		for key, value_list in self.data.items():
 			numpy_type = self.ALLOWED_TYPES[self.structure[key]][0]
 			numpy_data[key] = np.array(value_list, dtype=numpy_type)
+		self.data = numpy_data
 		return numpy_data
 
 	def save_npz(self, target_dir):
@@ -121,19 +124,19 @@ class DataCollector:
 
 		:param target_dir: 파일이 저장될 디렉터리 경로
 		"""
-		os.makedirs(target_dir, exist_ok=True)
+		if not self.flag_numpy:
+			raise RuntimeError("Data must be converted to numpy array before saving.")
 
-		# numpy array로 변환
-		numpy_data = self.to_numpy()
-		print(f"saving data to {target_dir}")
-		print_array_info(numpy_data)
+		os.makedirs(target_dir, exist_ok=True)
 
 		# 파일 경로 설정
 		npz_path = os.path.join(target_dir, "data.npz")
 		json_path = os.path.join(target_dir, "data_structure.json")
 
 		# data.npz 저장
-		np.savez(npz_path, **numpy_data)
+		print(f"\n\nSaving data to {target_dir}")
+		print_array_info(self.data)
+		np.savez(npz_path, **self.data)
 
 		# data_structure.json 저장
 		save_json(self.structure, json_path)
