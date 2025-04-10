@@ -42,6 +42,7 @@ class DataCollector:
 
 	사용 예시:
 		structure = {
+			'path': 'str',
 			'REM_emg': 'float32',
 			'stage_label': 'int64',
 			'is_sleep': 'bool'
