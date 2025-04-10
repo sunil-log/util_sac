@@ -28,6 +28,9 @@ def search_items(root_dir: str,
 	"""
 	root_dir 아래에서 pattern과 매치되는 파일/폴더를 검색하여 list[Path] 형태로 반환한다.
 	(디렉토리나 파일의 이름(name)만을 기준으로 패턴 매칭)
+
+	string 패턴을 사용할 경우, convert_filename_pattern_to_regex() 가 re.pattern (or Pattern) 으로 변환하여 사용한다.
+	re.pattern (or Pattern) 이 들어오면, 그대로 사용한다.
 	"""
 	# 만약 문자열 패턴이면 convert_filename_pattern_to_regex를 이용하여 Regex로 변환한다
 	if isinstance(pattern, str):
