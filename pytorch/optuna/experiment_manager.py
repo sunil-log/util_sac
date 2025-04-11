@@ -19,7 +19,6 @@ def execute_experiment(config, train_session):
 		num_schedules=50,
 		total_epochs=config["static"]["n_epoch"]
 	)
-	lr_dicts[0] = {3: 1e-4, 98:1e-5}
 
 
 	if 'optimize' not in config or config['optimize'] is None:
