@@ -13,6 +13,18 @@ from torchmetrics.classification import (
 	BinaryAveragePrecision
 )
 
+
+
+def calculate_roc_aucs(train_data, valid_data, test_data):
+	roc_auc_train = calculate_roc(train_data, name="train")
+	roc_auc_valid = calculate_roc(valid_data, name="valid")
+	roc_auc_test = calculate_roc(test_data, name="test")
+
+	# concat all roc_auc
+	roc_aucs = {**roc_auc_train, **roc_auc_valid, **roc_auc_test}
+	return roc_aucs
+
+
 def calculate_roc(data, auc_only=True, name="test"):
 	"""
 	이 함수는 이진분류를 위한 (logits, label) 데이터를 입력받아
