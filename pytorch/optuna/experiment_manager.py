@@ -12,7 +12,19 @@ from util_sac.pytorch.optuna.get_objective import get_objective, generate_lr_sch
 from util_sac.pytorch.optuna.session_manager import train_multiple_sessions
 
 
+
+def lr_dict_from_args_static(args):
+	# lr dicts
+	if "lr" in args and isinstance(args["lr"], dict) and "lr_dict" in args["lr"]:
+		lr_dict = args["lr"]["lr_dict"]
+		lr_dict = {key: float(value) for key, value in lr_dict.items()}
+	else:
+		lr_dict = {5: 1e-4, 100: 1e-5}
+
+	return lr_dict
+
 def execute_experiment(config, train_session):
+
 
 
 	if 'optimize' not in config or config['optimize'] is None:
@@ -21,13 +33,7 @@ def execute_experiment(config, train_session):
 		Only Static section
 		"""
 		args = config["static"]
-
-		# lr dicts
-		if "lr" in args and isinstance(args["lr"], dict) and "lr_dict" in args["lr"]:
-			args["lr_dict"] = args["lr"]["lr_dict"]
-			args["lr_dict"] = {key: float(value) for key, value in args["lr_dict"].items()}
-		else:
-			args["lr_dict"] = {50: 1e-4, 100: 1e-5}
+		args["lr_dict"] = lr_dict_from_args_static(args)
 
 		# train_session
 		score = train_multiple_sessions(train_session, args)
@@ -53,6 +59,14 @@ def execute_experiment(config, train_session):
 		# get params
 		args_static = config["static"]
 		param_space = config["optimize"]
+		param_space["lr_dict_idx"] = {
+			"type": "int",
+			"low": 0,
+			"high": len(lr_dicts) - 1,
+			"step": 1,
+			"log": False
+		}
+
 
 		# add params
 		args_static["db_path"] = f"{args_static['db_dir']}/study.db"
