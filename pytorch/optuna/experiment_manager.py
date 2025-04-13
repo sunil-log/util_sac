@@ -25,6 +25,7 @@ def execute_experiment(config, train_session):
 		# lr dicts
 		if "lr" in args and isinstance(args["lr"], dict) and "lr_dict" in args["lr"]:
 			args["lr_dict"] = args["lr"]["lr_dict"]
+			args["lr_dict"] = {key: float(value) for key, value in args["lr_dict"].items()}
 		else:
 			args["lr_dict"] = {50: 1e-4, 100: 1e-5}
 
