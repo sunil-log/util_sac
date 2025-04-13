@@ -15,8 +15,8 @@ from util_sac.pytorch.optuna.session_manager import train_multiple_sessions
 
 def lr_dict_from_args_static(args):
 	# lr dicts
-	if "lr" in args and isinstance(args["lr"], dict) and "lr_dict" in args["lr"]:
-		lr_dict = args["lr"]["lr_dict"]
+	if "lr_dict" in args:
+		lr_dict = args["lr_dict"]
 		lr_dict = {key: float(value) for key, value in lr_dict.items()}
 	else:
 		lr_dict = {5: 1e-4, 100: 1e-5}
@@ -44,15 +44,6 @@ def execute_experiment(config, train_session):
 
 	else:
 		"""
-		lr_dicts 생성
-		"""
-		lr_dicts = generate_lr_schedules(
-			num_schedules=50,
-			total_epochs=config["static"]["n_epoch"]
-		)
-
-
-		"""
 		Optuna optimize section
 		"""
 
@@ -60,14 +51,27 @@ def execute_experiment(config, train_session):
 		args_static = config["static"]
 		param_space = config["optimize"]
 
-		if param_space.get('lr') is True:
-			param_space["lr_dict_idx"] = {
-				"type": "int",
-				"low": 0,
-				"high": len(lr_dicts) - 1,
-				"step": 1,
-				"log": False
-			}
+
+		# lr dict related
+		if "lr_dict_idx" in param_space:
+			"""
+			lr_dict_idx 가 optimize 에 포함된 경우
+			
+			  lr_dict_idx:
+			    type: "int"
+			    low: 0
+			    high: 50
+			    log: false
+			"""
+			lr_dicts = generate_lr_schedules(
+				num_schedules=param_space["lr_dict_idx"]["high"],
+				total_epochs=args_static["n_epoch"]
+			)
+
+		else:
+			# lr 을 optimize 하지 않을 경우
+			args_static["lr_dict_idx"] = 0
+			lr_dicts = [lr_dict_from_args_static(args_static)]
 
 
 		# add params
