@@ -7,11 +7,12 @@ static:
   trial_name: "Building"
   n_epoch: 15         # training epoch 수
   n_trial: 100        # optuna 실험을 몇 번 할 것인지
-  lr_dict_idx: 0
+
+  lr_dict: {5: 1e-4, 100: 1e-5}
 
   fold:
-    mode: "all"       # [single, all]
-    i: ~              # None or int; mode="all" 일 경우는 '~ (=None)'
+    mode: "single"       # [single, all]
+    i: 0              # None or int; mode="all" 일 경우는 '~ (=None)'
     count: 5
     seed: 42
 
@@ -19,6 +20,7 @@ static:
     input_dim: 784
     hidden_dim: 256
     output_dim: 10
+    dropout: 0.5
 
   save:             # 중간에 저장할지 여부 (None 이면 끝나고만 저장)
     model: 10       # None or int
@@ -29,6 +31,12 @@ static:
 # Optimization 하는 parameter list
 # -----------------------------------
 optimize:
+  lr_dict_idx:
+    type: "int"
+    low: 0
+    high: 50
+    log: false
+
   model:
     hidden_dim:
       type: "categorical"
