@@ -64,7 +64,7 @@ def execute_experiment(config, train_session):
 			    log: false
 			"""
 			lr_dicts = generate_lr_schedules(
-				num_schedules=param_space["lr_dict_idx"]["high"],
+				num_schedules=param_space["lr_dict_idx"]["high"]+1,
 				total_epochs=args_static["n_epoch"]
 			)
 
