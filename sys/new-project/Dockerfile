@@ -7,6 +7,7 @@ RUN pip install torchvision \
 				matplotlib \
 				seaborn \
 				Pillow \
+				plotly \
 				scikit-learn \
 				statsmodels \
 				openai \
