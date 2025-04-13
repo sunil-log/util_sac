@@ -14,27 +14,37 @@ from util_sac.pytorch.optuna.session_manager import train_multiple_sessions
 
 def execute_experiment(config, train_session):
 
-	# lr_dicts 생성
-	lr_dicts = generate_lr_schedules(
-		num_schedules=50,
-		total_epochs=config["static"]["n_epoch"]
-	)
-
 
 	if 'optimize' not in config or config['optimize'] is None:
 
 		"""
 		Only Static section
 		"""
-
 		args = config["static"]
-		args["lr_dict"] = lr_dicts[args["lr_dict_idx"]]
+
+		# lr dicts
+		if "lr" in args and isinstance(args["lr"], dict) and "lr_dict" in args["lr"]:
+			args["lr_dict"] = args["lr"]["lr_dict"]
+		else:
+			args["lr_dict"] = {50: 1e-4, 100: 1e-5}
+
+		# train_session
 		score = train_multiple_sessions(train_session, args)
 
+		# print score
 		print("Single Trial Score:", score)
 
 
 	else:
+		"""
+		lr_dicts 생성
+		"""
+		lr_dicts = generate_lr_schedules(
+			num_schedules=50,
+			total_epochs=config["static"]["n_epoch"]
+		)
+
+
 		"""
 		Optuna optimize section
 		"""
