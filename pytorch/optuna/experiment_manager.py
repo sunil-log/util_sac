@@ -59,13 +59,15 @@ def execute_experiment(config, train_session):
 		# get params
 		args_static = config["static"]
 		param_space = config["optimize"]
-		param_space["lr_dict_idx"] = {
-			"type": "int",
-			"low": 0,
-			"high": len(lr_dicts) - 1,
-			"step": 1,
-			"log": False
-		}
+
+		if param_space.get('lr') is True:
+			param_space["lr_dict_idx"] = {
+				"type": "int",
+				"low": 0,
+				"high": len(lr_dicts) - 1,
+				"step": 1,
+				"log": False
+			}
 
 
 		# add params
