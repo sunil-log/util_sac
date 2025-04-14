@@ -97,7 +97,7 @@ if __name__ == "__main__":
 		- bad: r".*/chunk_.*\.npz"
 	"""
 	root_directory = "/path/to/root/directory"
-	search_pattern = r".*\.txt$"  # 정규표현식
+	search_pattern = "*.txt"  # 정규표현식
 	result_df = search_items_df(root_directory, search_pattern, search_type="files")
 	print(result_df)
 
