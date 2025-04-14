@@ -5,19 +5,34 @@
 import shutil
 from pathlib import Path
 
-from util_sac.pandas.print_df import print_partial_markdown
 from util_sac.sys.search_files import search_items_df
 
-
 """
+이 모듈은 지정된 source directory 내에서 특정 search pattern과 일치하는 파일들을 검색하여,
+source directory 내에서의 상대적인 경로 구조를 유지하면서 target directory로 복사하는 기능을 제공한다.
 
-용례
-copy_files_with_structure(
-	source_dir="/home/sac/Dropbox/Projects/RWA (rem without atonia)/RAW data archive",
-	target_dir="/home/sac/Downloads",
-	search_pattern="event.csv",
-)
+주요 기능:
+- `copy_files_with_structure`: source directory에서 pattern에 맞는 파일을 찾아 target directory로 구조를 유지하며 복사하는 메인 함수이다.
+- `copy_path_simple`: 단일 파일을 target 경로로 복사하는 보조 함수이다. target의 상위 directory가 없으면 생성한다. 파일 metadata는 복사하지 않는다.
 
+의존성:
+- pathlib: 파일 시스템 경로를 객체 지향적으로 다루기 위해 사용된다.
+- shutil: 고수준 파일 연산(복사 등)을 위해 사용된다 (`copy_path_simple` 내에서 사용).
+- util_sac.sys.search_files.search_items_df: source directory 내에서 파일을 검색하는 데 사용된다.
+
+용례:
+	아래 예시는 '/home/sac/Dropbox/Projects/RWA (rem without atonia)/RAW data archive' directory 및 그 하위 directory에서
+	이름이 'event.csv'인 모든 파일을 찾아 '/home/sac/Downloads' directory 아래에 원래의 directory 구조를 유지하며 복사한다.
+	예를 들어, '/home/sac/Dropbox/Projects/RWA (rem without atonia)/RAW data archive/subject1/visit1/event.csv' 파일은
+	'/home/sac/Downloads/subject1/visit1/event.csv'로 복사된다.
+
+	```python
+	copy_files_with_structure(
+		source_dir="/home/sac/Dropbox/Projects/RWA (rem without atonia)/RAW data archive",
+		target_dir="/home/sac/Downloads",
+		search_pattern="event.csv",
+	)
+	```
 """
 
 
@@ -25,8 +40,16 @@ copy_files_with_structure(
 
 def copy_path_simple(source_path, target_path):
 	"""
-	source_path(파일 또는 디렉토리)를 target_path 위치로 복사한다.
-	target 디렉토리가 없으면 생성한다. metadata는 복사하지 않는다.
+	source_path(파일)를 target_path 위치로 복사한다.
+	target directory가 없으면 생성한다. 파일 metadata는 복사하지 않는다.
+
+	Args:
+		source_path (str 또는 Path): 복사할 원본 파일의 경로.
+		target_path (str 또는 Path): 파일이 복사될 목적지 경로 (파일 이름 포함).
+
+	Raises:
+		ValueError: source_path가 유효한 파일이 아닐 경우 발생한다.
+		Exception: 파일 복사 중 다른 예외 발생 시 전파될 수 있다.
 	"""
 	source = Path(source_path)
 	target = Path(target_path)
@@ -46,7 +69,18 @@ def copy_files_with_structure(
 		target_dir,
 		search_pattern
 ):
+	"""
+	source directory 내에서 search pattern과 일치하는 파일들을 검색하여,
+	source directory 기준의 상대 경로 구조를 유지하며 target directory로 복사한다.
 
+	Args:
+		source_dir (str 또는 Path): 검색을 시작할 원본 directory 경로.
+		target_dir (str 또는 Path): 파일들을 복사할 목적지 directory 경로.
+		search_pattern (str): 검색할 파일 패턴 (예: '*.txt', 'event.csv'). `search_items_df`에서 지원하는 패턴을 사용한다.
+
+	Returns:
+		None. 복사 과정 중 발생하는 정보나 오류는 표준 출력으로 print된다.
+	"""
 	source = Path(source_dir).resolve() # 경로 정규화
 	target = Path(target_dir).resolve() # 경로 정규화
 
