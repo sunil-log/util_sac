@@ -1,0 +1,83 @@
+
+# -----------------------------------
+# Optimization 하지 않는 parameter list
+# -----------------------------------
+static:
+  data_npz:   "data/201702_meta/data.npz"
+
+  targets: ["문재인", "안철수"]    # 실험의 pair; 0번쨰가 binary classifier의 positive class
+
+  study_name: "IAT_201702_optimize_2"
+  trial_name: "Building"
+  n_epoch: 100         # training epoch 수
+  n_trial: 400        # optuna 실험을 몇 번 할 것인지
+
+  lr_dict: {10: 1e-4, 80: 1e-5}
+
+  iat_use_name: False     # iat 의 단어를 왼쪽-오른쪽(2차원)만 (False) vs 안철수-문재인(4차원)로 할지 (True) 결정
+
+  normalize:  # Normalization 하는 방법
+    age: True
+
+    iat:
+      method: "log-z"        # (log-z, z, ~) where '~ (=None)'
+      sd: 3.0
+
+
+  fold:
+    mode: "all"       # [single, all]
+    i: ~              # None or int; mode="all" 일 경우는 '~ (=None)'
+    count: 5
+    seed: 42
+
+  model:
+    emb_dim: 64
+    proj_stack: 3
+
+    q_dim: 128
+    n_head: 32
+
+    dropout: 0.5
+
+  use:
+    iat: True
+    wat_s: True
+    wat: True
+
+
+  save:             # 중간에 저장할지 여부 (None 이면 끝나고만 저장)
+    model: ~       # None or int
+    plot: ~        # None or int
+
+
+# -----------------------------------
+# Optimization 하는 parameter list
+# -----------------------------------
+optimize:
+
+  lr_dict_idx:
+    type: "int"
+    low: 0
+    high: 50
+    log: false
+
+  model:
+    emb_dim:
+      type: "categorical"
+      choices: [16, 32, 64, 128]
+
+    proj_stack:
+      type: "categorical"
+      choices: [1, 2, 3, 4]
+
+    q_dim:
+      type: "categorical"
+      choices: [16, 32, 64, 128]
+
+    n_head:
+      type: "categorical"
+      choices: [8, 16, 32, 64, 128]
+
+    dropout:
+      type: "categorical"
+      choices: [0.1, 0.2, 0.3, 0.4, 0.5]
