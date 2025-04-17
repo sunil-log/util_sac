@@ -26,7 +26,7 @@ from util_sac.pytorch.optuna.get_objective import generate_lr_schedules
 from util_sac.pytorch.optuna.get_objective import get_objective
 from util_sac.pytorch.trainer.trainer import BaseTrainer
 from util_sac.pytorch.trainer.update_lr import current_lr
-from util_sac.sys.file.dir_manager import create_dir
+from util_sac.sys.files.dir_manager import create_dir
 
 n_epoch = 15
 n_trials = 100

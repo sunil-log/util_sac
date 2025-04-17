@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from util_sac.dict.json_manager import save_json
-from util_sac.sys.file.dir_manager import create_dir
+from util_sac.sys.files.dir_manager import create_dir
 
 """
 see: [[concept, MIL, part xx, design DataLoader (pytorch) for multimodal data]]

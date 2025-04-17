@@ -17,7 +17,7 @@ from util_sac.pytorch.trainer.load_metrics import load_hyperparams
 
 def main():
 
-	# Load the scores.jsonl file as a DataFrame
+	# Load the scores.jsonl files as a DataFrame
 	bast_path = './trials/ID_133016__study_name'
 	fm = jsonl_file_manager(f"{bast_path}/scores.jsonl")
 	df = fm.read_as_df()
@@ -26,7 +26,7 @@ def main():
 	print_partial_markdown(df)
 	exit()
 
-	# Load the hyperparameters.jsonl file as a DataFrame
+	# Load the hyperparameters.jsonl files as a DataFrame
 	df = load_hyperparams(bast_path)
 	print_partial_markdown(df)
 	"""

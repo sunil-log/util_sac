@@ -13,7 +13,7 @@ import numpy as np
 from train_mnist.util_train_session import train_session
 from util_sac.dict.yaml_manager import load_yaml
 from util_sac.pytorch.optuna.experiment_manager import execute_experiment
-from util_sac.sys.file.dir_manager import create_dir
+from util_sac.sys.files.dir_manager import create_dir
 
 
 def main():

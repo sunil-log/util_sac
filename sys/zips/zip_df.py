@@ -10,7 +10,7 @@ from glob import glob
 
 import pandas as pd
 
-from util_sac.sys.file.dir_manager import renew_dir
+from util_sac.sys.files.dir_manager import renew_dir
 from util_sac.sys.search_files import search_items_df
 
 # change pandas maximum width option
@@ -26,7 +26,7 @@ def unzip_all(src, dst):
 	# find list of notion exports
 	fns = glob(f'./{src}/*.zip')
 	if len(fns) < 1:
-		print("no zip file placed in notion")
+		print("no zip files placed in notion")
 
 	# unzip all
 	renew_dir(dst)
@@ -61,20 +61,20 @@ def zip_files_df(df, fn_zip):
 			print(f"adding {arcname}")
 			zf.write(file_path, arcname=arcname)
 
-	# print size of the zip file in MB
-	print(f"\n> size of the zip file: {os.path.getsize(fn_zip)/1e6:.2f} MB")
+	# print size of the zip files in MB
+	print(f"\n> size of the zip files: {os.path.getsize(fn_zip)/1e6:.2f} MB")
 
 
 
 def backup_keywords(fn_zip, key_in, key_out, src_loc="."):
 
 	"""
-	1. find files having some keywords in the file name
-	2. exclude files having some keywords in the file name
+	1. find files having some keywords in the files name
+	2. exclude files having some keywords in the files name
 	3. zip them and copy it to ./backup
 	"""
 
-	# find files having some keywords in the file name
+	# find files having some keywords in the files name
 	df = search_items_df(src_loc, "*")
 	"""
 		                                               File Path                        Parent                               Stem

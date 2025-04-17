@@ -12,9 +12,9 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from train_mnist.util_dataloader import load_data
-from train_mnist.util_model import TwoLayerMNIST
-from train_mnist.util_trainer import NewTrainer
+from train_iat.util_dataloader import load_data
+from train_iat.util_model import TwoLayerMNIST
+from train_iat.util_trainer import NewTrainer
 from util_sac.dict.json_manager import save_json
 from util_sac.pandas.save_npz import save_df_as_npz
 from util_sac.pytorch.data.epoch_metric_tracker import metric_tracker

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from util_sac.sys.file.dir_manager import create_dir
+from util_sac.sys.files.dir_manager import create_dir
 from util_sac.sys.zips.zip_df import backup_keywords
 
 
@@ -24,8 +24,8 @@ def get_comment():
 def main():
 
 	"""
-	1. find files having some keywords in the file name
-	2. exclude files having some keywords in the file name
+	1. find files having some keywords in the files name
+	2. exclude files having some keywords in the files name
 	3. zip them and copy it to ./backup
 	"""
 
