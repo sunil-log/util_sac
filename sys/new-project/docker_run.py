@@ -27,7 +27,7 @@ def run_docker(**kwargs):
 	사용 예시:
 	run_docker(
 		user_name="sac",
-		dir_data="/path/to/data",
+		dir_data="/path/to/trials",
 		out_entry="/home/sac/projects"
 	)
 	"""

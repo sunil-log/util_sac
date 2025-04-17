@@ -61,7 +61,7 @@ class SupervisedContrastiveLoss(nn.Module):
 
 def main():
 
-	# Example data
+	# Example trials
 	features = torch.tensor([
 		[1.0, 2.0, 3.0, 4.0],
 		[2.0, 3.0, 4.0, 5.0],

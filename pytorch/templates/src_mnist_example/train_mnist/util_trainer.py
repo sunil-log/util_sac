@@ -51,7 +51,7 @@ class NewTrainer(BaseTrainer):
 			loss=loss.item(),
 		)
 
-		# collect test data
+		# collect test trials
 		self.data_collector.update(
 			logits=logits,         # logits 가 있어야 metric 계산 가능
 			y=d['y'],             # y 가 있어야 metric 계산 가능

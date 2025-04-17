@@ -18,8 +18,8 @@ import torch
 from util_sac.dict.json_manager import save_json, load_json
 from util_sac.dict.jsonl_file_manager import jsonl_file_manager
 from util_sac.pandas.save_npz import save_df_as_npz
-from util_sac.pytorch.data.epoch_metric_tracker import metric_tracker
-from util_sac.pytorch.data.trial_manager import trial_manager
+from util_sac.pytorch.trials.epoch_metric_tracker import metric_tracker
+from util_sac.pytorch.trials.trial_manager import trial_manager
 from util_sac.pytorch.dataloader.to_tensor_device import move_dict_tensors_to_device
 from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1
 from util_sac.pytorch.optuna.get_objective import generate_lr_schedules
@@ -79,13 +79,13 @@ class NewTrainer(BaseTrainer):
 
 	def one_step(self, batch, epoch):
 
-		# data
+		# trials
 		d = {
 			"x": None,
 			"label": None
 		}
 		d = move_dict_tensors_to_device(d, self.device)
-		# print_array_info(data)
+		# print_array_info(trials)
 
 		# forward
 		y_hat = self.model(d['x'])
@@ -96,7 +96,7 @@ class NewTrainer(BaseTrainer):
 			loss=loss.item(),
 		)
 
-		# collect test data
+		# collect test trials
 		if self.mode == 'test':
 			self.data_collector.update(
 				logits=y_hat,  # logits 가 있어야 metric 계산 가능
@@ -118,7 +118,7 @@ def train_session(args):
 		zip_src_loc="../../"
 	)
 
-	# 3) load data
+	# 3) load trials
 	dataloader_train = None
 	dataloader_valid = None
 	dataloader_test = None

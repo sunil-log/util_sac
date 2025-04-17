@@ -8,11 +8,11 @@ rich 라이브러리의 Tree 객체를 이용해 해당 데이터 구조를 시�
 유용한 함수를 제공합니다.
 
 주요 함수:
-- build_tree(data, tree): 주어진 data(dict, list 등)를 재귀적으로 순회하며,
+- build_tree(trials, tree): 주어진 trials(dict, list 등)를 재귀적으로 순회하며,
   Rich의 Tree 객체에 노드를 추가합니다.
-- create_tree(data, root_label): 주어진 dict 데이터를 바탕으로 루트 노드를 생성한 뒤,
+- create_tree(trials, root_label): 주어진 dict 데이터를 바탕으로 루트 노드를 생성한 뒤,
   build_tree 함수를 이용해 전체 구조를 구성한 Tree 객체를 반환합니다.
-- print_tree(data, root_label): create_tree 함수를 통해 생성한 Tree 객체를
+- print_tree(trials, root_label): create_tree 함수를 통해 생성한 Tree 객체를
   콘솔에 출력합니다.
 
 사용 예시:
@@ -23,8 +23,8 @@ rich 라이브러리의 Tree 객체를 이용해 해당 데이터 구조를 시�
 	output_dir = "output"
 	json_file = f"{output_dir}/2pv7_confidences.json"
 	with open(json_file, "r") as f:
-		data = json.load(f)
-	print_tree(data)
+		trials = json.load(f)
+	print_tree(trials)
 
 
 의존성:
@@ -43,7 +43,7 @@ def build_tree(data, tree: Tree) -> None:
 	주어진 data의 구조를 rich의 Tree 객체에 재귀적으로 추가합니다.
 
 	인자:
-		data: 탐색할 데이터 (dict, list, 또는 기타 타입)
+		trials: 탐색할 데이터 (dict, list, 또는 기타 타입)
 		tree (Tree): 현재 노드
 	"""
 	if isinstance(data, dict):
@@ -70,7 +70,7 @@ def create_tree(data: dict, root_label: str = "[bold green]JSON 구조[/bold gre
 	주어진 dict 데이터를 기반으로 rich의 Tree 객체를 생성하여 반환합니다.
 
 	인자:
-		data (dict): JSON 데이터로 변환된 dict
+		trials (dict): JSON 데이터로 변환된 dict
 		root_label (str): 트리의 루트 노드에 표시할 레이블 (기본값: "[bold green]JSON 구조[/bold green]")
 
 	반환:
@@ -86,7 +86,7 @@ def print_tree(data: dict, root_label: str = "[bold green]JSON 구조[/bold gree
 	주어진 dict 데이터를 기반으로 rich의 Tree 객체를 생성하고 출력합니다.
 
 	인자:
-		data (dict): JSON 데이터로 변환된 dict
+		trials (dict): JSON 데이터로 변환된 dict
 		root_label (str): 트리의 루트 노드에 표시할 레이블 (기본값: "[bold green]JSON 구조[/bold green]")
 	"""
 	tree = create_tree(data, root_label)

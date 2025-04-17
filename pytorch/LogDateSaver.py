@@ -12,7 +12,7 @@ df =
 	98 2024-01-04 07:23:38  0.910436
 	99 2024-01-05 21:52:56  0.699800
 		
-위와 같은 data 가 있을 때,
+위와 같은 trials 가 있을 때,
 day 별로 group 해서 해서 따로 저장한다.
 
 		
@@ -41,7 +41,7 @@ class LogDateSaver(ABC):
 	def _process_existing_data(self, file_path: Path, group: pd.DataFrame) -> pd.DataFrame:
 		existing_df = self._read_existing_data(file_path)
 		if not existing_df.columns.equals(group.columns):
-			raise ValueError(f"Columns of existing data at {file_path} do not match the input DataFrame.")
+			raise ValueError(f"Columns of existing trials at {file_path} do not match the input DataFrame.")
 		existing_df["date"] = pd.to_datetime(existing_df["date"])
 		combined_df = pd.concat([existing_df, group])
 		return combined_df
@@ -86,10 +86,10 @@ class CSVSaver(LogDateSaver):
 
 class H5Saver(LogDateSaver):
 	def _read_existing_data(self, file_path: Path) -> pd.DataFrame:
-		return pd.read_hdf(file_path, "data")
+		return pd.read_hdf(file_path, "trials")
 
 	def _save_data(self, file_path: Path, combined_df: pd.DataFrame):
-		combined_df.to_hdf(file_path, key="data", mode="w")
+		combined_df.to_hdf(file_path, key="trials", mode="w")
 
 	def _get_extension(self) -> str:
 		return "h5"

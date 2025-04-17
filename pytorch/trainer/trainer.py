@@ -1,7 +1,7 @@
 import pandas as pd
 import torch
 
-from util_sac.pytorch.data.batch_collector import batch_loss_collector, batch_data_collector
+from util_sac.pytorch.trials.batch_collector import batch_loss_collector, batch_data_collector
 from util_sac.pytorch.trainer.update_lr import update_lr_with_dict
 
 """
@@ -38,7 +38,7 @@ class VAETrainer(BaseTrainer):
 	
 		# Progress: epoch/self.n_epoch
 	
-		# data
+		# trials
 		x, label = batch
 		x *= global_scale_factor
 		x = x.to(self.device)
@@ -58,7 +58,7 @@ class VAETrainer(BaseTrainer):
 			x_log_var=self.model.x_log_var.item()
 		)
 
-		# collect test data
+		# collect test trials
 		if self.mode == 'test':
 			self.data_collector.update(
 				x=x,
@@ -110,7 +110,7 @@ def main():
 
 
 	# train
-	from util_sac.data.epoch_metric_tracker import metric_tracker
+	from util_sac.trials.epoch_metric_tracker import metric_tracker
 	mt = metric_tracker()
 	for epoch in range(trainer.n_epoch):
 
@@ -231,7 +231,7 @@ class BaseTrainer:
 		self.loss_collector = batch_loss_collector()
 		self.data_collector = batch_data_collector()
 
-		# iterate over data
+		# iterate over trials
 		for batch_idx, batch in enumerate(data_loader):
 			self.optimizer.zero_grad()
 			if mode == 'train':

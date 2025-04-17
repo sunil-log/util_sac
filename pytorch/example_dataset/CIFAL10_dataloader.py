@@ -52,7 +52,7 @@ def prepare_data_cached(train=True, flatten=True, cache_path=None):
 
 	# 캐시 파일이 없는 경우, 새로 로드 및 변환
 	raw_data = torchvision.datasets.CIFAR10(
-		root="./data",
+		root="./trials",
 		train=train,
 		download=True
 	)

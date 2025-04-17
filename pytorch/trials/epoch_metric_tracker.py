@@ -1,4 +1,58 @@
 
+
+"""
+metric_tracker 모듈
+==================
+
+본 모듈은 **딥러닝 학습 과정에서 발생하는 다양한 scalar metric**(예: `loss`, `accuracy`,
+`AUC`)을 **epoch 단위로 기록‧조회‧시각화**하기 위해 설계된 경량 추적기(tracker)이다.
+`torch.Tensor` ‑‑> `float` 자동 변환, `numpy.ndarray` 단일 원소 지원,
+`matplotlib` 축(ax) 전달 기반의 다중 곡선 플로팅 등 **실험 관리에서 자주 반복되는
+보일러플레이트 코드를 제거**하는 데 목적이 있다.
+
+주요 구성
+--------
+* **Metric**
+  개별 metric 하나를 표현하는 경량 컨테이너. `(epoch, value)` 튜플 시퀀스를 보존한다.
+* **metric_tracker**
+  여러 `Metric` 인스턴스를 **dict 형태로 관리**하며,
+  - `update(epoch, **kwargs)` : 한 번의 호출로 여러 metric 갱신
+  - `get_latest(name)` : 가장 최근 (epoch, value)
+  - `__getitem__(name)` : `(epochs, values)` 언패킹용 sugar syntax
+  - `plot_metric(ax, keys, …)` : 복수 metric 곡선 시각화
+  - `generate_df()` : `pandas.DataFrame` 로 직렬화
+
+의존 / 호환
+-----------
+* **필수** : `numpy`, `pandas`, `torch`
+* **선택** : `matplotlib` (시각화 기능 사용 시)
+* Python ≥ 3.8, PyTorch ≥ 1.10 권장
+
+사용 예시
+---------
+```python
+import matplotlib.pyplot as plt
+from metric_tracker import metric_tracker
+
+mt = metric_tracker()
+for epoch in range(num_epochs):
+    train_stats = trainer.one_epoch(train=True)   # e.g. {'train_loss': 0.123}
+    valid_stats = trainer.one_epoch(train=False)  # e.g. {'valid_loss': 0.145}
+
+    mt.update(epoch, **train_stats, **valid_stats)
+    mt.print_latest()          # 콘솔에 'Epoch 7 | train_loss: 0.1234 | …' 형식 출력
+
+# 시각화
+fig, ax = plt.subplots()
+mt.plot_metric(ax, keys=["train_loss", "valid_loss"], y_log=True)
+plt.show()
+
+# 로그를 DataFrame 으로 저장
+df = mt.generate_df()
+df.to_csv("training_log.csv", index=False)
+"""
+
+
 import numpy as np
 import pandas as pd
 import torch

@@ -14,7 +14,7 @@ class DataProcessor(ABC):
 
 class ConcreteDataProcessor(DataProcessor):
 	def process_data(self, file_path: Path) -> Union[list, tuple, set, dict, np.array]:
-		# Implement the data processing logic here
+		# Implement the trials processing logic here
 		# This is just a placeholder example
 		data = np.array([1, 2, 3, 4, 5])
 		return data
@@ -22,18 +22,18 @@ class ConcreteDataProcessor(DataProcessor):
 
 class PathProcessor:
 	"""
-	Processor 와 data 를 받아서 처하고, 그것을 directory 의 구조를 유지하면서 저장한다.
+	Processor 와 trials 를 받아서 처하고, 그것을 directory 의 구조를 유지하면서 저장한다.
 
 	기능:
 		원본 데이터 파일의 경로에서 필요없는 부분을 제거하고, 원하는 위치에 데이터 파일을 저장합니다.
 		지정된 디렉토리 구조가 존재하지 않는 경우, 필요에 따라 디렉토리를 생성합니다.
 
 	예시:
-		# data.npy 파일을 './대전성모병원/PSG group 2 (PD without RBD)/edf1/'에 저장
+		# trials.npy 파일을 './대전성모병원/PSG group 2 (PD without RBD)/edf1/'에 저장
 		data_path = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/대전성모병원/PSG group 2 (PD without RBD)/edf1/raw_microvolt.h5"
 		unwanted_path = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/"
 		save_location = './'
-		file_name = 'data.npy'
+		file_name = 'trials.npy'
 
 	속성:
 		data_path (Path): 데이터 파일의 경로입니다.
@@ -48,7 +48,7 @@ class PathProcessor:
 		_validate_paths(): 제공된 데이터 및 불필요한 경로를 검증합니다.
 		_remove_unnecessary_path(file_path: Path) -> Path: 파일 경로에서 불필요한 경로를 제거합니다.
 		_create_save_path(processed_path: Path) -> Path: 처리된 데이터를 저장할 경로를 생성합니다.
-		_save_data(save_path: Path, data: Union[list, tuple, set, dict, np.array]) -> None: 처리된 데이터를 저장합니다.
+		_save_data(save_path: Path, trials: Union[list, tuple, set, dict, np.array]) -> None: 처리된 데이터를 저장합니다.
 		_save_data_description(save_path: Path) -> None: 처리된 데이터에 대한 설명 파일을 저장합니다.
 
 	사용 방법:
@@ -82,7 +82,7 @@ class PathProcessor:
 
 	def _validate_paths(self) -> None:
 		if not self.data_path.is_file():
-			raise ValueError(f"Invalid data path: {self.data_path}")
+			raise ValueError(f"Invalid trials path: {self.data_path}")
 		if not self.unnecessary_path.is_dir():
 			raise ValueError(f"Invalid unnecessary path: {self.unnecessary_path}")
 
@@ -102,7 +102,7 @@ class PathProcessor:
 		try:
 			np.save(str(save_path), data)
 		except ImportError:
-			raise ImportError("NumPy library is required to save the data.")
+			raise ImportError("NumPy library is required to save the trials.")
 		print(f"\033[92mData saved to: {save_path}\033[0m")
 
 	def _save_data_description(self, save_path: Path) -> None:
@@ -119,8 +119,8 @@ if __name__ == '__main__':
 	data_location = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/대전성모병원/PSG group 2 (PD without RBD)/edf1/"
 	unnecessary_path = "/media/sac/WD4T/Projects_backup/eeg_data/RBD/"
 	save_location = "./"
-	save_filename = "data.npy"
-	data_description = "This is a sample data description."
+	save_filename = "trials.npy"
+	data_description = "This is a sample trials description."
 
 	# Create an instance of ConcreteDataProcessor
 	data_processor = ConcreteDataProcessor()
@@ -128,5 +128,5 @@ if __name__ == '__main__':
 	# Create an instance of PathProcessor
 	path_processor = PathProcessor(data_location, unnecessary_path, save_location, save_filename, data_description, data_processor)
 
-	# Process the files and save the data
+	# Process the files and save the trials
 	path_processor.process_and_save()

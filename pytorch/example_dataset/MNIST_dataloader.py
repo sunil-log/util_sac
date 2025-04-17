@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader, Dataset
 """
 MNIST class 는 dataloader 에 넣을 때 transform 을 한번에 적용하는 것이 아니라,
 dataloader 에 의해서 호출될 때마다 transform 을 적용한다. 그래서 느려진다.
-차라리 data 를 transform 한 뒤 torch tensor 로 변환하여 dataloader 에 넣는게 낫다.
+차라리 trials 를 transform 한 뒤 torch tensor 로 변환하여 dataloader 에 넣는게 낫다.
 """
 
 
@@ -56,10 +56,10 @@ def prepare_data_combine_train_test(flatten=True, cnn=True):
 	"""
 
 	# MNIST train과 test 데이터를 로드한다.
-	train_data = torchvision.datasets.MNIST(root='./data',
+	train_data = torchvision.datasets.MNIST(root='./trials',
 											train=True,
 											download=True)
-	test_data = torchvision.datasets.MNIST(root='./data',
+	test_data = torchvision.datasets.MNIST(root='./trials',
 										   train=False,
 										   download=True)
 

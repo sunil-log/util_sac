@@ -10,7 +10,7 @@ Created on  Apr 07 2025
 import numpy as np
 import pandas as pd
 
-from util_sac.pytorch.data.print_array import print_array_info
+from util_sac.pytorch.print_array import print_array_info
 from util_sac.pytorch.dataloader.to_tensor_device import move_dict_tensors_to_device
 from util_sac.pytorch.trainer.trainer import BaseTrainer
 
@@ -63,7 +63,7 @@ class NewTrainer(BaseTrainer):
 			loss=loss.item(),
 		)
 
-		# collect test data
+		# collect test trials
 		self.data_collector.update(
 			logits=logits,         # logits 가 있어야 metric 계산 가능
 			y=d['y'],             # y 가 있어야 metric 계산 가능

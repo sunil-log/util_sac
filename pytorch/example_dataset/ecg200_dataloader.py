@@ -18,12 +18,12 @@ from util_sac.pytorch.dataloader.to_tensor_device import dict_to_tensors
 class ECG200Dataset(Dataset):
 	"""
 	UCR ECG200 데이터를 담는 Custom Dataset 클래스이다.
-	__getitem__ 호출 시 {'data': ..., 'label': ...} 형태의 dict를 반환한다.
+	__getitem__ 호출 시 {'trials': ..., 'label': ...} 형태의 dict를 반환한다.
 	"""
 	def __init__(self, data, labels):
 		"""
 		파라미터:
-			data (np.ndarray): shape = (N, T, 1)
+			trials (np.ndarray): shape = (N, T, 1)
 			labels (np.ndarray): shape = (N,)
 		"""
 		super().__init__()
@@ -50,7 +50,7 @@ def process_ECG200_df(df: pd.DataFrame):
 		df (pd.DataFrame): 0번째 컬럼이 라벨, 1~96번째 컬럼이 시계열인 DataFrame
 
 	반환값:
-		data (np.ndarray): shape = (N, T, 1)
+		trials (np.ndarray): shape = (N, T, 1)
 		labels (np.ndarray): shape = (N,)
 	"""
 	# 1) 라벨과 시계열 데이터 분리

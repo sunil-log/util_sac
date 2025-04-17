@@ -72,7 +72,7 @@ def show_multi_tensors(**kwargs):
 			data = data.T  # (c, 1000)
 		elif data.ndim == 3:  # (1000, c, d)
 			data = data.max(axis=1).T  # (d, 1000)
-			# data = data[:, 0, :].T  # (d, 1000)
+			# trials = trials[:, 0, :].T  # (d, 1000)
 
 		# mean ± std 범위 설정
 		d_mean = np.mean(data)

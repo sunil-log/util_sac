@@ -21,14 +21,14 @@ source directory 내에서의 상대적인 경로 구조를 유지하면서 targ
 - util_sac.sys.search_files.search_items_df: source directory 내에서 파일을 검색하는 데 사용된다.
 
 용례:
-	아래 예시는 '/home/sac/Dropbox/Projects/RWA (rem without atonia)/RAW data archive' directory 및 그 하위 directory에서
+	아래 예시는 '/home/sac/Dropbox/Projects/RWA (rem without atonia)/RAW trials archive' directory 및 그 하위 directory에서
 	이름이 'event.csv'인 모든 파일을 찾아 '/home/sac/Downloads' directory 아래에 원래의 directory 구조를 유지하며 복사한다.
-	예를 들어, '/home/sac/Dropbox/Projects/RWA (rem without atonia)/RAW data archive/subject1/visit1/event.csv' 파일은
+	예를 들어, '/home/sac/Dropbox/Projects/RWA (rem without atonia)/RAW trials archive/subject1/visit1/event.csv' 파일은
 	'/home/sac/Downloads/subject1/visit1/event.csv'로 복사된다.
 
 	```python
 	copy_files_with_structure(
-		source_dir="/home/sac/Dropbox/Projects/RWA (rem without atonia)/RAW data archive",
+		source_dir="/home/sac/Dropbox/Projects/RWA (rem without atonia)/RAW trials archive",
 		target_dir="/home/sac/Downloads",
 		search_pattern="event.csv",
 	)
@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
 
 	"""
-	# data list = all h5 subject files (load_subject can handle file_path)
+	# trials list = all h5 subject files (load_subject can handle file_path)
 	df_data = search_files_by_pattern("/media/sac/WD4T/Projects_backup/eeg_data/RBD/대전성모병원", pattern=r".*/raw_microvolt\.npz$")
 
 	# target dir

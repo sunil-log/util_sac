@@ -28,7 +28,7 @@ Accuracy, F1, AUC, Confusion Matrix 등 다양한 Performance Metric을 계산 �
 
 
 def pred_by_threshold(data, threshold):
-	# calculate metrics; data["logit"].shape = (subject, 2)
+	# calculate metrics; trials["logit"].shape = (subject, 2)
 	prob = softmax(data["logit"], axis=1)
 	prob = prob[:, 1]
 	pred = prob > threshold
@@ -120,7 +120,7 @@ def binary_metrics(train_data, valid_data, test_data):
 	"""
 
 
-	# find the best threshold using validation data
+	# find the best threshold using validation trials
 	th, j = find_threshold_based_on_roc(valid_data)
 
 	# prob, pred, label 을 구한다; 각각은 "prob", "pred", "label" 을 포함한다.

@@ -8,7 +8,7 @@
 	from pathlib import Path
 
 	# 파일 매니저 인스턴스 생성 (str 또는 Path 사용 가능)
-	manager = JsonlFileManager(filepath=Path("data.jsonl"))
+	manager = JsonlFileManager(filepath=Path("trials.jsonl"))
 
 	# dict 데이터를 한 줄씩 저장
 	manager.write_line({"id": 1, "text": "Hello World"})
@@ -44,7 +44,7 @@ class jsonl_file_manager:
 	Line-based JSON 파일(.jsonl)을 관리하는 클래스입니다.
 	- __init__(filepath): 파일 경로를 받아 self.filepath에 저장합니다.
 	  (str 또는 Path 객체 모두 가능)
-	- write_line(data): dict를 받아 JSON 형식으로 한 줄씩 파일에 저장합니다.
+	- write_line(trials): dict를 받아 JSON 형식으로 한 줄씩 파일에 저장합니다.
 	- read(): 파일의 모든 줄을 읽고, 각 줄을 dict로 변환한 뒤 list로 반환합니다.
 	- read_as_df(): read()로 얻은 dict list를 DataFrame으로 변환하여 반환합니다.
 	"""
@@ -56,7 +56,7 @@ class jsonl_file_manager:
 
 	def write_line(self, data):
 		"""
-		data(dict): 파일에 JSON 형식으로 한 줄 저장할 데이터
+		trials(dict): 파일에 JSON 형식으로 한 줄 저장할 데이터
 		"""
 		converted_data = {}
 		for k, v in data.items():

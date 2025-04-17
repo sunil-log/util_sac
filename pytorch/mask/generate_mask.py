@@ -8,7 +8,7 @@ import torch
 
 주요 기능:
 - create_mask_single:
-    주어진 data Tensor와 하나의 target을 비교해 boolean mask를 생성합니다.
+    주어진 trials Tensor와 하나의 target을 비교해 boolean mask를 생성합니다.
 - create_mask_multi_targets:
     여러 target을 OR 연산으로 결합해 boolean mask를 생성합니다.
 - create_mask:
@@ -18,12 +18,12 @@ import torch
 
 용례:
 1) 단일 target에 대한 필터링
-    예를 들어, data["label"]에 1이 포함된 row만 골라내고 싶다면:
-    >>> mask = create_mask(data["label"], target=1, dim=-1)
+    예를 들어, trials["label"]에 1이 포함된 row만 골라내고 싶다면:
+    >>> mask = create_mask(trials["label"], target=1, dim=-1)
 
 2) 다중 target에 대한 필터링
-    예를 들어, data["label"]에서 [0,1,0,0,0] 또는 [0,0,1,0,0]을 가진 row만 필터링하려면:
-    >>> mask = create_mask(data["label"], target=[[0,1,0,0,0], [0,0,1,0,0]], dim=-1, multi=True)
+    예를 들어, trials["label"]에서 [0,1,0,0,0] 또는 [0,0,1,0,0]을 가진 row만 필터링하려면:
+    >>> mask = create_mask(trials["label"], target=[[0,1,0,0,0], [0,0,1,0,0]], dim=-1, multi=True)
 
 이를 통해 다차원 Tensor에서 특정 조건('all' 혹은 'any')을 만족하는 요소들만 빠르게 추출하고,
 추가 연산을 용이하게 수행할 수 있습니다.
@@ -38,7 +38,7 @@ def create_mask_single(
 		match_mode: str = 'all'  # 'all' or 'any'
 ) -> torch.Tensor:
 	"""
-	data.shape = (..., dim_size)
+	trials.shape = (..., dim_size)
 	target.shape = (dim_size,) 또는 단일 스칼라 int 가능
 	match_mode 이 'all' 이면 전부 일치해야 True, 'any'면 하나라도 일치하면 True.
 	반환값은 data에서 비교 차원을 줄인 boolean mask.
@@ -51,7 +51,7 @@ def create_mask_single(
 
 	# case 1) target 이 int 인 경우
 	if isinstance(target, int):
-		# (data == target) -> bool 텐서
+		# (trials == target) -> bool 텐서
 		mask = (data == target)
 		return mask
 
@@ -75,7 +75,7 @@ def create_mask_multi_targets(
 ) -> torch.Tensor:
 
 	"""
-	주어진 data Tensor와 여러 targets를 비교하여 최종적으로 boolean mask를 생성한다.
+	주어진 trials Tensor와 여러 targets를 비교하여 최종적으로 boolean mask를 생성한다.
 	내부적으로 ... 함수를 반복 호출하고, 생성된 mask들을 OR 연산으로 통합한다.
 
 	Args:
@@ -140,8 +140,8 @@ def create_mask(
 
 if __name__ == '__main__':
 
-	# load data
-	fn = './data/encoded__weight_4990__normalize_False.npz'
+	# load trials
+	fn = './trials/encoded__weight_4990__normalize_False.npz'
 	data = np.load(fn)
 	"""
 	z_eeg      NumPy Array          (413, 1000, 12, 64)          1.18 GB float32

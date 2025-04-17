@@ -12,7 +12,7 @@ import numpy as np
 import torch
 
 from util_sac.dict.json_manager import save_json
-from util_sac.pytorch.data.print_array import print_array_info
+from util_sac.pytorch.print_array import print_array_info
 
 
 class DataCollector:
@@ -33,12 +33,12 @@ class DataCollector:
 	구조:
 		1) structure (dict): key는 데이터 필드 이름, value는 'float32', 'float64', 'int32', 'int64', 'bool', 'str' 중 하나이다.
 		2) str 의 경우 torch에서는 직접적인 dtype이 없으므로 차후 torch 로 변환할 때는 주의해야 한다.
-		3) data (dict): structure에 정의된 key를 기준으로, 각 key에 해당하는 데이터가 리스트로 쌓인다.
+		3) trials (dict): structure에 정의된 key를 기준으로, 각 key에 해당하는 데이터가 리스트로 쌓인다.
 
 	주요 메서드:
 		- add_sample(sample): 샘플(행) 단위로 데이터를 추가한다.
 		- to_numpy(): 수집된 데이터를 numpy array로 변환한다.
-		- save_npz(target_dir): to_numpy() 결과를 data.npz로 저장하고, structure를 data_structure.json으로 저장한다.
+		- save_npz(target_dir): to_numpy() 결과를 trials.npz로 저장하고, structure를 data_structure.json으로 저장한다.
 
 	사용 예시:
 		structure = {
@@ -81,7 +81,7 @@ class DataCollector:
 		for key, dtype in structure.items():
 			if dtype not in self.ALLOWED_TYPES:
 				raise ValueError(
-					f"Unsupported data type: {dtype}. Allowed types are: {', '.join(self.ALLOWED_TYPES.keys())}")
+					f"Unsupported trials type: {dtype}. Allowed types are: {', '.join(self.ALLOWED_TYPES.keys())}")
 			self.structure[key] = dtype
 
 		self.data = {key: [] for key in self.structure.keys()}
@@ -89,7 +89,7 @@ class DataCollector:
 		"""
 		예) 
 		self.structure = {'REM_emg': 'float32', ...}
-		self.data = {'REM_emg': [], ...}
+		self.trials = {'REM_emg': [], ...}
 		"""
 
 	def add_sample(self, sample):
@@ -119,7 +119,7 @@ class DataCollector:
 
 	def save_npz(self, target_dir):
 		"""
-		수집된 데이터를 to_numpy()로 변환한 뒤, data.npz 형태로 저장하고,
+		수집된 데이터를 to_numpy()로 변환한 뒤, trials.npz 형태로 저장하고,
 		structure는 data_structure.json 파일로 저장한다.
 
 		:param target_dir: 파일이 저장될 디렉터리 경로
@@ -130,11 +130,11 @@ class DataCollector:
 		os.makedirs(target_dir, exist_ok=True)
 
 		# 파일 경로 설정
-		npz_path = os.path.join(target_dir, "data.npz")
+		npz_path = os.path.join(target_dir, "trials.npz")
 		json_path = os.path.join(target_dir, "data_structure.json")
 
-		# data.npz 저장
-		print(f"\n\nSaving data to {target_dir}")
+		# trials.npz 저장
+		print(f"\n\nSaving trials to {target_dir}")
 		print_array_info(self.data)
 		np.savez(npz_path, **self.data)
 

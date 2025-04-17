@@ -13,7 +13,7 @@ import torch
 
 import util_sac.pytorch.dataloader as dlf
 from util_sac.pandas.print_df import print_partial_markdown
-from util_sac.pytorch.data.print_array import print_array_info
+from util_sac.pytorch.print_array import print_array_info
 from util_sac.pytorch.dataloader.string_to_int import apply_or_create_map
 from util_sac.pytorch.dataloader.int_to_onehot import one_hot_encode
 
@@ -27,7 +27,7 @@ def create_iat_embeddings_repeated_rt(data: Dict[str, Any]) -> Dict[str, Any]:
 	"""
 	Implicit Association Test (IAT) 단어와 반응 시간 데이터를 결합하여 임베딩 생성
 
-	이 함수는 입력 딕셔너리 `data`에서 IAT 과제 관련 데이터인
+	이 함수는 입력 딕셔너리 `trials`에서 IAT 과제 관련 데이터인
 	'iat_word' (단어 특징 벡터 배열)와 'iat_rt' (반응 시간 배열)를 사용합니다.
 	반응 시간(rt) 데이터를 단어 특징 벡터의 마지막 차원 수(4)만큼 반복시킨 후,
 	단어 특징 벡터와 결합(concatenate)하여 새로운 임베딩 벡터를 생성합니다.
@@ -35,7 +35,7 @@ def create_iat_embeddings_repeated_rt(data: Dict[str, Any]) -> Dict[str, Any]:
 	결과적으로 각 시행(trial)의 각 단계(time step)마다 4개의 단어 특징과
 	4번 반복된 반응 시간 값이 결합되어 총 8차원의 특징 벡터를 갖는
 	새로운 임베딩 배열('iat_emb_1', 'iat_emb_2')을 생성하여
-	원본 딕셔너리 `data`에 추가하고 반환합니다.
+	원본 딕셔너리 `trials`에 추가하고 반환합니다.
 
 	Args:
 		data (Dict[str, Any]): 다음 키를 포함해야 하는 딕셔너리:
@@ -47,7 +47,7 @@ def create_iat_embeddings_repeated_rt(data: Dict[str, Any]) -> Dict[str, Any]:
 						각 단어/자극 제시에 대한 반응 시간(ms 등).
 
 	Returns:
-		Dict[str, Any]: 입력 딕셔너리 `data`에 다음 키가 추가된 상태로 반환됨:
+		Dict[str, Any]: 입력 딕셔너리 `trials`에 다음 키가 추가된 상태로 반환됨:
 			- "iat_emb_1": np.ndarray, 형태 (N, 40, 8).
 						   첫 번째 조건 쌍에 대한 결합 임베딩.
 						   (4개의 단어 특징 + 4번 반복된 반응 시간)
@@ -56,7 +56,7 @@ def create_iat_embeddings_repeated_rt(data: Dict[str, Any]) -> Dict[str, Any]:
 						   (4개의 단어 특징 + 4번 반복된 반응 시간)
 
 	Side Effects:
-		입력된 `data` 딕셔너리에 "iat_emb_1"와 "iat_emb_2" 키가 추가되어
+		입력된 `trials` 딕셔너리에 "iat_emb_1"와 "iat_emb_2" 키가 추가되어
 		원본 딕셔너리가 변경됩니다.
 	"""
 	# 1. 데이터 추출
@@ -93,9 +93,9 @@ def process_iat_rt(data, log_transform=True, threshold=3.0, eps=1e-3):
 	    최종적으로 RT 배열을 가공하여 data에 갱신한다.
 
 	파라미터:
-	  - data (dict):
-	      * data["iat_rt"]: (n_subject, n_session, n_trial) 형태의 RT 배열
-	      * data["error"]: (n_subject, n_session, n_trial) 형태의 error 배열 (1이면 error)
+	  - trials (dict):
+	      * trials["iat_rt"]: (n_subject, n_session, n_trial) 형태의 RT 배열
+	      * trials["error"]: (n_subject, n_session, n_trial) 형태의 error 배열 (1이면 error)
 	  - log_transform (bool, 기본값 True):
 	      * True일 경우 RT에 log(RT + eps)를 적용한다
 	  - threshold (float, 기본값 3.0):
@@ -109,13 +109,13 @@ def process_iat_rt(data, log_transform=True, threshold=3.0, eps=1e-3):
 	  3. z-score를 계산하기 위해 피험자별로 (valid_mask==1)인 값만 골라 평균과 표준편차를 구한다.
 	     - 표준편차가 매우 작은 경우(1e-12 이하)나 유효값이 부족하면 오류 메시지를 출력하고 종료한다.
 	  4. z-score로 변환한 뒤, threshold를 초과하는 Outlier 구간을 valid_mask에서 0으로 마스킹한다.
-	  5. valid_mask에서 0인 구간(Outlier+error)은 0으로 셋팅하고, 최종 z-score 값을 data["iat_rt"]에 저장한다.
-	  6. 마지막으로 valid_mask를 data["iat_valid_mask"]에 추가한다.
+	  5. valid_mask에서 0인 구간(Outlier+error)은 0으로 셋팅하고, 최종 z-score 값을 trials["iat_rt"]에 저장한다.
+	  6. 마지막으로 valid_mask를 trials["iat_valid_mask"]에 추가한다.
 
 	반환:
-	  - data (dict):
-	      * data["iat_rt"]: z-score로 변환된 RT 배열 (Outlier 및 error 구간은 0)
-	      * data["iat_valid_mask"]: Outlier와 error가 마스킹된 배열
+	  - trials (dict):
+	      * trials["iat_rt"]: z-score로 변환된 RT 배열 (Outlier 및 error 구간은 0)
+	      * trials["iat_valid_mask"]: Outlier와 error가 마스킹된 배열
 	"""
 
 	rt = data["iat_rt"]	  # shape: (n_subject, n_session, n_trial)
@@ -160,7 +160,7 @@ def process_iat_rt(data, log_transform=True, threshold=3.0, eps=1e-3):
 	# 3. outlier + error 구간을 0으로 설정
 	z_rt[valid_mask == 0] = 0
 
-	# 4. 최종적으로 data["iat_rt"]에 z_rt를 덮어쓴다
+	# 4. 최종적으로 trials["iat_rt"]에 z_rt를 덮어쓴다
 	data["iat_rt"] = z_rt
 	data["iat_valid_mask"] = valid_mask
 
@@ -461,7 +461,7 @@ def data_pre_processing_wat_select(data, args):
 	3. `view`와 `sum`을 사용해 각 후보별 category count를 계산하고 (`(N, 2, num_classes)`),
 	   이를 `view`를 통해 하나의 tensor로 결합한다 (`(N, 2 * num_classes)`).
 
-	Input: `data['W선택단어평가']`의 슬라이스 (`[:N, 3:9, 0]`).
+	Input: `trials['W선택단어평가']`의 슬라이스 (`[:N, 3:9, 0]`).
 	Output: `result` tensor, 각 샘플에 대한 [후보1 counts, 후보2 counts] 형태의
 	        결합된 category count 벡터 (`(N, 2 * num_classes)`).
 	"""
@@ -568,7 +568,7 @@ def data_pre_processing_demographics(data, args):
 
 
 	"""
-	demographic data 를 묶는다; (residence, gender, age) -> demographics
+	demographic trials 를 묶는다; (residence, gender, age) -> demographics
 	"""
 	age_numpy = data["age"][..., np.newaxis]
 	age_numpy = np.repeat(age_numpy, 3, axis=1)  # (81,) -> (81, 3)
@@ -611,7 +611,7 @@ def data_pre_processing_demographics(data, args):
 
 def load_data(args):
 
-	# load data
+	# load trials
 	data = dict(np.load(args["data_npz"]))
 	"""
 	path       NumPy Array          (81,)                        8.86 KB <U28
@@ -657,7 +657,7 @@ def load_data(args):
 
 
 	data = pre_processing_iat(data, args)
-	# print_array_info(data)
+	# print_array_info(trials)
 	"""
 	path       NumPy Array          (81,)                       648.00 B int64
 	W단어        NumPy Array          (81, 9, 16)                 91.12 KB int64
@@ -702,7 +702,7 @@ def load_data(args):
 
 
 	"""
-	split data into train, valid, test
+	split trials into train, valid, test
 	"""
 	data = dlf.split_data_into_train_valid_test(
 		data=data,
@@ -712,14 +712,14 @@ def load_data(args):
 		stratify_key="y"
 	)
 	"""
-	print_array_info(data)
+	print_array_info(trials)
 	train      Other                <class 'dict'>                   N/A N/A       
 	valid      Other                <class 'dict'>                   N/A N/A       
 	test       Other                <class 'dict'>                   N/A N/A
 	"""
 
 	"""
-	print_array_info(data["train"])
+	print_array_info(trials["train"])
 	"""
 
 
@@ -737,9 +737,9 @@ def load_data(args):
 
 	dataloaders = dlf.create_dataloaders(data, batch_size=16, shuffle=True)
 	"""
-	train      Other                <class 'torch.utils.data.dataloader.DataLoader'>             N/A N/A       
-	valid      Other                <class 'torch.utils.data.dataloader.DataLoader'>             N/A N/A       
-	test       Other                <class 'torch.utils.data.dataloader.DataLoader'>             N/A N/A  
+	train      Other                <class 'torch.utils.trials.dataloader.DataLoader'>             N/A N/A       
+	valid      Other                <class 'torch.utils.trials.dataloader.DataLoader'>             N/A N/A       
+	test       Other                <class 'torch.utils.trials.dataloader.DataLoader'>             N/A N/A  
 	"""
 
 	"""

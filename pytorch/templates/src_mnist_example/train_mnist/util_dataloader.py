@@ -17,7 +17,7 @@ from util_sac.pytorch.example_dataset.MNIST_dataloader import prepare_data_combi
 
 def load_data(args):
 
-	# load data
+	# load trials
 	data = prepare_data_combine_train_test(flatten=True, cnn=True)
 	"""
 	x          PyTorch Tensor       (70000, 1, 784)            209.35 MB torch.float32
@@ -32,14 +32,14 @@ def load_data(args):
 		stratify_key="y"
 	)
 	"""
-	print_array_info(data)
+	print_array_info(trials)
 	train      Other                <class 'dict'>                   N/A N/A       
 	valid      Other                <class 'dict'>                   N/A N/A       
 	test       Other                <class 'dict'>                   N/A N/A
 	"""
 
 	"""
-	print_array_info(data["train"])
+	print_array_info(trials["train"])
 	x          PyTorch Tensor       (42000, 1, 784)            125.61 MB torch.float32
 	y          PyTorch Tensor       (42000,)                   328.12 KB torch.int64
 	"""
@@ -66,9 +66,9 @@ def load_data(args):
 
 	dataloaders = dlf.create_dataloaders(data, batch_size=128, shuffle=True)
 	"""
-	train      Other                <class 'torch.utils.data.dataloader.DataLoader'>             N/A N/A       
-	valid      Other                <class 'torch.utils.data.dataloader.DataLoader'>             N/A N/A       
-	test       Other                <class 'torch.utils.data.dataloader.DataLoader'>             N/A N/A  
+	train      Other                <class 'torch.utils.trials.dataloader.DataLoader'>             N/A N/A       
+	valid      Other                <class 'torch.utils.trials.dataloader.DataLoader'>             N/A N/A       
+	test       Other                <class 'torch.utils.trials.dataloader.DataLoader'>             N/A N/A  
 	"""
 
 	"""

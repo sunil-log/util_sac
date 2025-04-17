@@ -40,7 +40,7 @@ def create_dataloaders(data, batch_size=32, shuffle=True):
 	"""
 	주어진 데이터를 DataLoader로 변환합니다.
 	:param data: 변환할 데이터
-	data = {
+	trials = {
 		'train': data_train,
 		'valid': data_valid,
 		'test': data_test

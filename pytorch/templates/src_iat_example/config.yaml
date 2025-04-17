@@ -3,7 +3,7 @@
 # Optimization 하지 않는 parameter list
 # -----------------------------------
 static:
-  data_npz:   "data/201702_meta/data.npz"
+  data_npz:   "trials/201702_meta/trials.npz"
 
   targets: ["문재인", "안철수"]    # 실험의 pair; 0번쨰가 binary classifier의 positive class
 

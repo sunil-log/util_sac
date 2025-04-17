@@ -13,7 +13,7 @@ import torch.nn.functional as F
 from captum.attr import IntegratedGradients
 from torch.utils.data import DataLoader, Dataset
 
-from util_sac.pytorch.data import metric_tracker
+from util_sac.pytorch.trials import metric_tracker
 from util_sac.pytorch.trainer.trainer import BaseTrainer
 
 

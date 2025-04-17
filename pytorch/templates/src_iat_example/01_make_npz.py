@@ -12,7 +12,7 @@ import pandas as pd
 
 from util_sac.dict.json_manager import load_json
 from util_sac.pandas.print_df import print_partial_markdown
-from util_sac.pytorch.data.print_array import print_array_info
+from util_sac.pytorch.print_array import print_array_info
 from util_sac.pytorch.dataloader.data_collector import DataCollector
 from util_sac.sys.dir_manager import create_dir
 from util_sac.sys.search_files import search_items_df
@@ -46,12 +46,12 @@ from util_sac.sys.search_files import search_items_df
 
 def main():
 	"""
-	"/home/sac/Dropbox/Projects/2022_snow_man/IAT/data" 를 './data' 로 복사.
+	"/home/sac/Dropbox/Projects/2022_snow_man/IAT/trials" 를 './trials' 로 복사.
 	"""
 
 	# search for files
 	exp_name = "201702"
-	source_dir = f"./data/{exp_name}"
+	source_dir = f"./trials/{exp_name}"
 	df = search_items_df(source_dir, "info.json")
 	print_partial_markdown(df)
 

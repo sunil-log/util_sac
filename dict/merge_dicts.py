@@ -15,17 +15,17 @@ def deep_update(d, u):
 	예시:
 		>>> d = {
 		...	 "model": {"input_dim": 784, "hidden_dim": 256},
-		...	 "data": {"path": "./data"}
+		...	 "trials": {"path": "./trials"}
 		... }
 		>>> u = {
 		...	 "model": {"hidden_dim": 512},
-		...	 "data": {"batch_size": 32}
+		...	 "trials": {"batch_size": 32}
 		... }
 		>>> updated_d = deep_update(d, u)
 		>>> print(updated_d)
 		{
 			"model": {"input_dim": 784, "hidden_dim": 512},
-			"data": {"path": "./data", "batch_size": 32}
+			"trials": {"path": "./trials", "batch_size": 32}
 		}
 
 	Args:

@@ -5,7 +5,7 @@ from util_sac.dict.json_manager import save_json
 from util_sac.sys.files.dir_manager import create_dir
 
 """
-see: [[concept, MIL, part xx, design DataLoader (pytorch) for multimodal data]]
+see: [[concept, MIL, part xx, design DataLoader (pytorch) for multimodal trials]]
 """
 
 """
@@ -18,19 +18,19 @@ see: [[concept, MIL, part xx, design DataLoader (pytorch) for multimodal data]]
 
 결과:
   - cast_np_scalar(value): numpy generic 객체를 Python native scalar(int, float 등)로 변환한다.
-  - create_unique_map(data): data 내 고유값에 대한 mapping(dict)을 생성한다.
-  - apply_or_create_map(data, map_name, map_dir, mapping): data를 integer로 매핑한 결과 Series와 mapping을 반환한다. 또한 mapping을 JSON 파일로 저장한다.
+  - create_unique_map(trials): trials 내 고유값에 대한 mapping(dict)을 생성한다.
+  - apply_or_create_map(trials, map_name, map_dir, mapping): data를 integer로 매핑한 결과 Series와 mapping을 반환한다. 또한 mapping을 JSON 파일로 저장한다.
 
 예시:
 
   >>> # 2) create_unique_map
-  >>> data = pd.Series(["apple", "banana", "apple", "cherry"])
-  >>> mapping_dict = create_unique_map(data)
+  >>> trials = pd.Series(["apple", "banana", "apple", "cherry"])
+  >>> mapping_dict = create_unique_map(trials)
   >>> print(mapping_dict)
   {'apple': 0, 'banana': 1, 'cherry': 2}
 
   >>> # 3) apply_or_create_map
-  >>> mapped_series, used_mapping = apply_or_create_map(data, map_name='fruit_map')
+  >>> mapped_series, used_mapping = apply_or_create_map(trials, map_name='fruit_map')
   >>> print(mapped_series)
   0    0
   1    1
@@ -84,7 +84,7 @@ def create_unique_map(data):
 
 def apply_or_create_map(data, map_name, root_dir='./', mapping=None, return_type='numpy'):
 	"""
-	data: numpy array (다차원 가능) 또는 pandas Series
+	trials: numpy array (다차원 가능) 또는 pandas Series
 	mapping: 이미 생성된 mapping dict (선택)
 
 	1) data가 numpy array라면:
@@ -92,7 +92,7 @@ def apply_or_create_map(data, map_name, root_dir='./', mapping=None, return_type
 	   - 변환된 shape 정보를 보관한다.
 	2) data가 pandas Series라면 그대로 사용한다.
 	3) mapping이 None이라면 create_unique_map을 이용해 생성한다.
-	4) 해당 mapping을 data(혹은 flatten된 data)에 적용한다.
+	4) 해당 mapping을 trials(혹은 flatten된 trials)에 적용한다.
 	5) 다차원 numpy array였다면, 적용된 결과를 다시 원래 shape로 reshape한다.
 	6) 최종 결과와 mapping을 반환한다.
 	7) 생성 혹은 사용된 mapping은 map_dir/map_name.json으로 저장한다.

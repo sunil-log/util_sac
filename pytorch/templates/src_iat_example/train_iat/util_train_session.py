@@ -19,8 +19,8 @@ from train_iat.util_trainer import NewTrainer
 
 from util_sac.dict.json_manager import save_json
 from util_sac.pandas.save_npz import save_df_as_npz
-from util_sac.pytorch.data.epoch_metric_tracker import metric_tracker
-from util_sac.pytorch.data.trial_manager import trial_manager
+from util_sac.pytorch.trials.epoch_metric_tracker import metric_tracker
+from util_sac.pytorch.trials.trial_manager import trial_manager
 from util_sac.pytorch.metrics.multiclass_f1 import calculate_f1s
 from util_sac.pytorch.metrics.binary_ROC_PR import calculate_roc_aucs
 from util_sac.pytorch.trainer.update_lr import current_lr
@@ -55,12 +55,12 @@ def train_session(args):
 	)
 
 
-	# load data
+	# load trials
 	dataloaders = load_data(args)
 	"""
-	train      Other                <class 'torch.utils.data.dataloader.DataLoader'>             N/A N/A       
-	valid      Other                <class 'torch.utils.data.dataloader.DataLoader'>             N/A N/A       
-	test       Other                <class 'torch.utils.data.dataloader.DataLoader'>             N/A N/A  
+	train      Other                <class 'torch.utils.trials.dataloader.DataLoader'>             N/A N/A       
+	valid      Other                <class 'torch.utils.trials.dataloader.DataLoader'>             N/A N/A       
+	test       Other                <class 'torch.utils.trials.dataloader.DataLoader'>             N/A N/A  
 	"""
 
 	# 4) Model 생성

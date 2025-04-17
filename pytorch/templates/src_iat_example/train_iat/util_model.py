@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from util_sac.pytorch.data.print_array import print_array_info
+from util_sac.pytorch.print_array import print_array_info
 from util_sac.pytorch.model.positional_encoding import positional_encoding
 from util_sac.pytorch.model.projectors.stacked_projectors import StackedProjector
 from util_sac.pytorch.model.AttnPooling import MultiHeadAttnPoolingWithMask

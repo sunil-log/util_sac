@@ -72,7 +72,7 @@ def split_data_into_train_valid_test(
 	generate_train_test_index 함수를 사용하여 data를 train, valid, test로 분할한다.
 
 	매개변수:
-		data: key마다 (N, ...) 형태를 갖는 Python Dictionary
+		trials: key마다 (N, ...) 형태를 갖는 Python Dictionary
 		fold_i: 현재 test로 사용할 fold index
 		fold_count: 전체 fold 개수
 		fold_seed: generate_fold_index 함수에서 사용할 random seed
@@ -82,7 +82,7 @@ def split_data_into_train_valid_test(
 		data_train, data_valid, data_test: 각 split에 해당하는 Dictionary
 	"""
 
-	# move data to tensors
+	# move trials to tensors
 	data = dict_to_tensors(data)
 	"""
 	subject    PyTorch Tensor       (95,)                       760.00 B torch.int64
@@ -118,7 +118,7 @@ def split_data_into_train_valid_test(
 	data_valid = {}
 	data_test = {}
 
-	# data Dictionary의 각 key별로 분할을 수행한다
+	# trials Dictionary의 각 key별로 분할을 수행한다
 	for key, value in data.items():
 		data_train[key] = value[train_idx]
 		data_valid[key] = value[valid_idx]
@@ -139,7 +139,7 @@ def generate_train_test_index(
 	valid로, 나머지를 전부 train으로 사용한다.
 
 	매개변수:
-		data: (N, ...) 형태의 key-value들이 들어 있는 Dictionary
+		trials: (N, ...) 형태의 key-value들이 들어 있는 Dictionary
 		fold_i: 현재 사용할 test fold index
 		fold_count: 전체 fold 개수
 		fold_seed: generate_fold_index 함수에서 사용하는 무작위 시드
@@ -195,7 +195,7 @@ def generate_fold_index(
 		stratify_key: str = None
 ):
 	"""
-	data: (N, ...) 형태의 key-value들이 들어 있는 Dictionary
+	trials: (N, ...) 형태의 key-value들이 들어 있는 Dictionary
 	n_fold: 생성할 Fold의 개수
 	seed: 무작위 시드
 	stratify_key: 특정 key(예: "class")를 기준으로 계층화 분할을 수행할 때 사용.
@@ -258,7 +258,7 @@ def generate_fold_index(
 
 # 함수 사용 예시
 if __name__ == "__main__":
-	# 예시 data 구성
+	# 예시 trials 구성
 	N = 10
 	data_example = {
 		"X": np.random.randn(N, 5),  # (10, 5)

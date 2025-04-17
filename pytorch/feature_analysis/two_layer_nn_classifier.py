@@ -12,7 +12,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 
-from util_sac.pytorch.data import metric_tracker
+from util_sac.pytorch.trials import metric_tracker
 from util_sac.pytorch.metrics import calculate_f1
 from util_sac.pytorch.trainer.trainer import BaseTrainer
 
