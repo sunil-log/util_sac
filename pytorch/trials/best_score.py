@@ -121,23 +121,28 @@ def compute_weighted_score(
 
 	예시
 	----
-	>>> metric_cfg = {
-	...     "valid_loss": {
-	...         "weight": 0.4, "direction": "min", "log": True,
-	...         "smooth": {"method": "ema", "kw": {"alpha": 0.2}}
-	...     },
-	...     "auc_roc_valid": {
-	...         "weight": 0.35, "direction": "max",
-	...         "smooth": {"method": "sma", "kw": {"w": 3}}
-	...     },
-	...     "f1_class_macro_valid": {
-	...         "weight": 0.25, "direction": "max"
-	...     }
-	... }
-	>>> score, best_epoch = compute_weighted_score(
-	...     df, metric_cfg, normalize="z-score", add_col="score"
-	... )
-	>>> print(f"Best epoch = {best_epoch}, score = {score[best_epoch]:.4f}")
+	# save metrics
+	df_metrics = mt.generate_df()
+	metric_cfg = {
+		"valid_loss": {
+			"weight": 0.3,
+			"direction": "min",
+			"log": True,
+			"smooth": {"method": "ema", "kw": {"alpha": 0.2}}
+		},
+		"auc_roc_valid": {
+			"weight": 0.5,
+			"direction": "max",
+			"smooth": {"method": "ema", "kw": {"alpha": 0.2}}
+		},
+		"f1_class_macro_valid": {
+			"weight": 0.2,
+			"direction": "max",
+			"smooth": {"method": "ema", "kw": {"alpha": 0.2}}
+		},
+	}
+	score_series, best_idx = compute_weighted_score(df_metrics, metric_cfg)
+
 
 	Notes
 	-----
