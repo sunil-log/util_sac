@@ -7,30 +7,70 @@ Created on  Apr 09 2025
 """
 
 import optuna
+from typing import List, Dict
 
 from util_sac.pytorch.optuna.get_objective import get_objective
 from util_sac.pytorch.optuna.session_manager import train_multiple_sessions
 
-def generate_lr_schedules(num_schedules: int, total_epochs: int):
+
+def generate_lr_schedules(
+	num_schedules: int,
+	total_epochs: int,
+	*,
+	second_drop_ratio: float = 0.9,
+	lr_first: float = 1e-4,
+	lr_second: float = 1e-5,
+) -> List[Dict[int, float]]:
+
 	"""
-	두 번 학습률이 떨어지는 스케줄을 num_schedules만큼 랜덤으로 생성한다.
-	각 스케줄은 {e1: 1e-4, e2: 1e-5} 형태의 딕셔너리로, e1 < e2 < total_epochs를 만족한다.
+	두 번 learning‑rate( lr )가 하락하는 스케줄을 생성한다.
+	첫 번째 하락 시점(e1)은 **index/num_schedules × total_epochs**로 선형 동기화시키고,
+	두 번째 하락 시점(e2)은 e1 이후 남은 구간의 *second_drop_pct %* 지점이 되도록 결정한다.
 
-	Args:
-		num_schedules (int): 생성할 스케줄 개수
-		total_epochs (int): 전체 에폭 수
+	Parameters
+	----------
+	num_schedules : int
+		생성할 스케줄 개수.
+	total_epochs : int
+		전체 epoch 수.
+	second_drop_pct : float, default 10.0
+		e1 이후 남은 구간 중 몇 퍼센트 시점에서 두 번째 하락을 적용할지 결정하는 비율.
+		예) 10.0 → 남은 기간의 10 %.
+	lr_first : float, default 1e‑4
+		첫 번째 하락 후 learning‑rate.
+	lr_second : float, default 1e‑5
+		두 번째 하락 후 learning‑rate.
 
-	Returns:
-		List[dict]: 두 번에 걸쳐 학습률이 하락하는 스케줄 딕셔너리의 리스트
+	Returns
+	-------
+	List[dict[int, float]]
+		각 스케줄을 {epoch: lr} 형태로 보관한 리스트.
+		예) [{30: 1e‑4, 45: 1e‑5}, …]
+
+	Notes
+	-----
+	* e1, e2 는 1‑based 정수 epoch 로 계산한다.
+	* e2 ≤ total_epochs 를 보장하며, 계산 결과가 e1 과 겹칠 경우 e1 + 1 로 보정한다.
 	"""
-	schedules = []
-	for _ in range(num_schedules):
-		# e1과 e2는 1 ~ total_epochs-1 범위에서 선택하고, e1 < e2 가 되도록 설정
-		e1 = random.randint(1, total_epochs - 1)
-		e2 = random.randint(e1 + 1, total_epochs)  # e2는 e1보다 무조건 커야 함
+	schedules: List[Dict[int, float]] = []
 
-		schedule = {e1: 1e-4, e2: 1e-5}
-		schedules.append(schedule)
+	for idx in range(1, num_schedules + 1):
+		# 1) e1: index 에 선형 대응 (가장 앞 schedule 도 최소 epoch 1 보장)
+		e1 = max(1, round(idx / num_schedules * total_epochs))
+
+		# 2) e2: e1 이후 remaining 의 second_drop_pct %
+		remaining = total_epochs - e1
+		e2 = e1 + max(1, round(remaining * second_drop_ratio))
+
+		# 총 epoch를 넘지 않도록 클램프
+		e2 = min(e2, total_epochs)
+
+		# e1, e2 가 동일해질 가능성을 한 번 더 방지
+		if e2 == e1:
+			e2 = min(e1 + 1, total_epochs)
+
+		schedules.append({e1: lr_first, e2: lr_second})
+
 	return schedules
 
 
