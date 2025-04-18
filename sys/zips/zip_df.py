@@ -14,10 +14,10 @@ from util_sac.sys.files.dir_manager import renew_dir
 from util_sac.sys.search_files import search_items_df
 
 # change pandas maximum width option
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_columns', None)
-pd.set_option('display.max_colwidth', None)
-pd.set_option('display.width', None)
+# pd.set_option('display.max_rows', None)
+# pd.set_option('display.max_columns', None)
+# pd.set_option('display.max_colwidth', None)
+# pd.set_option('display.width', None)
 
 
 
