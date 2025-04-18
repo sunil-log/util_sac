@@ -94,9 +94,9 @@ def compute_weighted_score(
 	metrics_cfg : dict[str, dict]
 		지표별 설정. key = 열 이름, value = 아래 항목 포함 dict.
 
-		* **weight** (float)              : 가중치.
-		* **direction** {"max","min"}    : 'min'이면 값에 -1 곱해 방향 통일.
-		* **log** (bool)                 : True → log1p 변환.
+		* **weight** (float)              : 가중치.
+		* **direction** {"max","min"}    : 'min'이면 값에 -1 곱해 방향 통일.
+		* **log** (bool)                 : True → log1p 변환.
 		* **norm** {"inherit","none","z-score","minmax"} (선택)
 		  - "inherit" → 함수 인수 `normalize`와 동일 방식 적용.
 		* **smooth** (선택)
