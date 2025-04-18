@@ -75,8 +75,7 @@ def compute_weighted_score(
 	df: pd.DataFrame,
 	metrics_cfg: dict[str, dict],
 	*,
-	normalize: str = "z-score",
-	add_col: str | None = None
+	normalize: str = "z-score"
 ) -> tuple[pd.Series, int]:
 	"""
 	목적
@@ -150,43 +149,41 @@ def compute_weighted_score(
 			return s
 		if how == "minmax":
 			rng = s.max() - s.min()
-			return (s - s.min()) / rng if rng != 0 else 0.0
+			return (s - s.min()) / rng if rng != 0 else pd.Series(0.0, index=s.index)
 		std = s.std(ddof=0)
-		return (s - s.mean()) / std if std != 0 else 0.0
+		return (s - s.mean()) / std if std != 0 else pd.Series(0.0, index=s.index)
 
 	parts = []
 
 	for col, cfg in metrics_cfg.items():
 		if col not in df.columns:
 			raise KeyError(f"'{col}' not found in df columns.")
-		s = df[col].copy()
+		s = df[col]
 
-		# --- 1. smoothing ---------------------------------------------------
+		# 1) smoothing
 		if "smooth" in cfg:
-			sm_opt = cfg["smooth"]
+			sm = cfg["smooth"]
 			s = smooth_series(
 				s,
-				method=sm_opt.get("method", "ema"),
-				**sm_opt.get("kw", {})
+				method=sm.get("method", "ema"),
+				**sm.get("kw", {})
 			)
 
-		# --- 2. log 변환 -----------------------------------------------------
+		# 2) log transform
 		if cfg.get("log", False):
 			s = np.log1p(s.clip(lower=0))
 
-		# --- 3. 방향 통일 ----------------------------------------------------
+		# 3) direction unify
 		if cfg.get("direction", "max") == "min":
 			s = -s
 
-		# --- 4. 정규화 -------------------------------------------------------
-		local_norm = cfg.get("norm", "inherit")
-		s = _normalize(s, normalize if local_norm == "inherit" else local_norm)
+		# 4) normalization
+		norm_mode = cfg.get("norm", "inherit")
+		s = _normalize(s, normalize if norm_mode == "inherit" else norm_mode)
 
-		# --- 5. 가중치 -------------------------------------------------------
+		# 5) weighting
 		parts.append(cfg.get("weight", 1.0) * s)
 
 	score_series = sum(parts)
-	if add_col is not None:
-		df[add_col] = score_series
 	best_idx = int(score_series.idxmax())
 	return score_series, best_idx
