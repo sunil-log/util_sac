@@ -71,77 +71,122 @@ def smooth_series(s: pd.Series, method: str = "ema", **kw) -> pd.Series:
 
 
 
-def calc_best_auc(df):
-
-
-	print(df)
-	exit()
-
-
+def compute_weighted_score(
+	df: pd.DataFrame,
+	metrics_cfg: dict[str, dict],
+	*,
+	normalize: str = "z-score",
+	add_col: str | None = None
+) -> tuple[pd.Series, int]:
 	"""
-	일반적으로 모이는 지표들
-	epoch,
-		train_loss, valid_loss, test_loss,
-		f1_class_0_train, f1_class_1_train, f1_class_macro_train,
-		f1_class_0_valid, f1_class_1_valid, f1_class_macro_valid,
-		f1_class_0_test, f1_class_1_test, f1_class_macro_test,
-		auc_roc_train, auc_roc_valid, auc_roc_test, lr
+	목적
+	----
+	여러 지표(metric)의 **평활(smoothing)·전처리·가중합**을 자동으로 수행하여
+	각 epoch별 종합 점수를 산출하고, **가장 우수한 모델(epoch)**을 선택한다.
+	‒ loss·AUC·F1 등 방향이 다른 지표를 한데 묶어 비교 가능하도록
+	  *로그 변환*, *방향 반전*, *정규화*를 지원한다.
+	‒ 지표마다 개별 **smoothing**(EMA/SMA) 파라미터를 지정할 수 있어
+	  노이즈를 줄인 후 안정적인 선택 기준을 제공한다.
 
-	1. auc_roc_valid (높을수록 좋음)
-	2. valid_loss (낮을수록 좋음)
-	3. gap_auc: auc_roc_valid - auc_roc_train (낮을수록 좋음)
-	4. auc 안정성:
+	Parameters
+	----------
+	df : pd.DataFrame
+		지표들이 열(column)로 정리된 학습 기록.
+	metrics_cfg : dict[str, dict]
+		지표별 설정. key = 열 이름, value = 아래 항목 포함 dict.
 
-	실제로 사용하는 지표: auc_roc_valid, valid_loss, auc_roc_train
+		* **weight** (float)              : 가중치.
+		* **direction** {"max","min"}    : 'min'이면 값에 -1 곱해 방향 통일.
+		* **log** (bool)                 : True → log1p 변환.
+		* **norm** {"inherit","none","z-score","minmax"} (선택)
+		  - "inherit" → 함수 인수 `normalize`와 동일 방식 적용.
+		* **smooth** (선택)
+		  ```python
+		  "smooth": {
+		  	"method": {"ema","sma"},
+		  	"kw": {...}       # smooth_series 에 넘길 추가 파라미터
+		  }
+		  ```
+
+	normalize : {"z-score","minmax","none"}, default "z-score"
+		전역 스케일 정규화 방법.
+	add_col : str | None, default None
+		None이 아니면 df[add_col]에 계산된 종합 점수를 저장한다.
+
+	Returns
+	-------
+	score_series : pd.Series
+		epoch별 가중합 점수.
+	best_idx : int
+		점수가 최대인 epoch(index).
+
+	예시
+	----
+	>>> metric_cfg = {
+	...     "valid_loss": {
+	...         "weight": 0.4, "direction": "min", "log": True,
+	...         "smooth": {"method": "ema", "kw": {"alpha": 0.2}}
+	...     },
+	...     "auc_roc_valid": {
+	...         "weight": 0.35, "direction": "max",
+	...         "smooth": {"method": "sma", "kw": {"w": 3}}
+	...     },
+	...     "f1_class_macro_valid": {
+	...         "weight": 0.25, "direction": "max"
+	...     }
+	... }
+	>>> score, best_epoch = compute_weighted_score(
+	...     df, metric_cfg, normalize="z-score", add_col="score"
+	... )
+	>>> print(f"Best epoch = {best_epoch}, score = {score[best_epoch]:.4f}")
+
+	Notes
+	-----
+	* smoothing → log → 방향 통일 → 정규화 → 가중합 순서로 처리된다.
+	* σ=0 또는 range=0인 지표는 0으로 대체하여 정규화 오류를 방지한다.
 	"""
+	def _normalize(s: pd.Series, how: str):
+		if how == "none":
+			return s
+		if how == "minmax":
+			rng = s.max() - s.min()
+			return (s - s.min()) / rng if rng != 0 else 0.0
+		std = s.std(ddof=0)
+		return (s - s.mean()) / std if std != 0 else 0.0
 
-	# load df
-	metrics = ["auc_roc_valid", "valid_loss", "auc_roc_train", "auc_roc_test", "f1_class_0_valid"]
-	df = df[metrics].copy()
+	parts = []
 
-	"""
-	Smooth the series
-	"""
-	metrics_s = []
-	for m in metrics:
-		m_new = f"{m}_s"
-		df[m_new] = smooth_series(df[m], method="ema", alpha=0.2)
-		metrics_s.append(m_new)
+	for col, cfg in metrics_cfg.items():
+		if col not in df.columns:
+			raise KeyError(f"'{col}' not found in df columns.")
+		s = df[col].copy()
 
+		# --- 1. smoothing ---------------------------------------------------
+		if "smooth" in cfg:
+			sm_opt = cfg["smooth"]
+			s = smooth_series(
+				s,
+				method=sm_opt.get("method", "ema"),
+				**sm_opt.get("kw", {})
+			)
 
+		# --- 2. log 변환 -----------------------------------------------------
+		if cfg.get("log", False):
+			s = np.log1p(s.clip(lower=0))
 
+		# --- 3. 방향 통일 ----------------------------------------------------
+		if cfg.get("direction", "max") == "min":
+			s = -s
 
-	import matplotlib.pyplot as plt
-	fig, ax = plt.subplots(1, len(metrics), figsize=(len(metrics)*5, 6))
-	for i, m in enumerate(metrics):
-		ax[i].plot(df[m], label=m)
-		ax[i].plot(df[f"{m}_s"], label=f"{m}_s")
-		ax[i].set_title(m)
-		ax[i].set_xlabel("epoch")
-		ax[i].set_ylabel(m)
-		ax[i].grid()
-		ax[i].legend()
+		# --- 4. 정규화 -------------------------------------------------------
+		local_norm = cfg.get("norm", "inherit")
+		s = _normalize(s, normalize if local_norm == "inherit" else local_norm)
 
+		# --- 5. 가중치 -------------------------------------------------------
+		parts.append(cfg.get("weight", 1.0) * s)
 
-
-
-
-	plt.savefig("smoothing.png", bbox_inches='tight')
-	exit()
-
-
-
-
-
-
-
-
-
-
-
-
-def main():
-	pass
-
-if __name__ == "__main__":
-	main()
+	score_series = sum(parts)
+	if add_col is not None:
+		df[add_col] = score_series
+	best_idx = int(score_series.idxmax())
+	return score_series, best_idx
