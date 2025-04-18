@@ -279,7 +279,7 @@ def analyze(cfg: StudyConfig) -> None:
 
 if __name__ == "__main__":
     # user editable section
-    STUDY_NAME = "18-12-30__IAT_201702_optimize_2"
+    STUDY_NAME = "05-24-50__IAT_201702_optimize_building"
     DB_PATH = Path("./trials") / STUDY_NAME / "study.db"
     OUTPUT_DIR = Path("./optuna_plots_refactored")
     TOP_PERCENT = 20.0

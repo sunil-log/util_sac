@@ -51,7 +51,7 @@ def main():
 
 	# search for files
 	exp_name = "201702"
-	source_dir = f"./trials/{exp_name}"
+	source_dir = f"./data/{exp_name}"
 	df = search_items_df(source_dir, "info.json")
 	print_partial_markdown(df)
 
